@@ -2,30 +2,30 @@
 
 namespace Oni;
 
-class Res {
-
-	static private $path;
+class Res
+{
+    static private $res;
 
     private function __construct()
     {
-
+        // nothing here
     }
 
-    static public function setPath($path)
+    static function init($res)
     {
-    	self::$path = $path;
+        self::$res = $res;
     }
 
     static public function html($_template, $_data)
     {
-    	$_template_path = self::$path . "/$_template.phtml";
+        $_template_path = self::$res['path'] . "/$_template.phtml";
 
         if (file_exists($_template_path)) {
-        	foreach ($_data as $_key => $_value) {
-	            $$_key = $_value;
-	        }
+            foreach ($_data as $_key => $_value) {
+                $$_key = $_value;
+            }
 
-        	include $_template_path;
+            include $_template_path;
         }
     }
 

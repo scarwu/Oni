@@ -2,6 +2,7 @@
 
 namespace Oni;
 
-class ORM {
+class ORM
+{
 
 }

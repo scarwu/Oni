@@ -2,8 +2,8 @@
 
 namespace Oni;
 
-class App {
-
+class App
+{
     private $name;
     private $path;
     private $default_api;
@@ -43,9 +43,7 @@ class App {
 
     public function run()
     {
-        Res::setPath($this->path['template']);
-
-        $query = explode('/', $this->query());
+        $query = $this->query();
 
         if ('' === $query[0]) {
             $query[0] = $this->default_api;
@@ -55,12 +53,16 @@ class App {
         $api_path = $this->path['api'];
 
         while($query) {
-            if (!file_exists("$api_path/{$query[0]}Api.php")) {
+            $file_name = ucfirst($query[0]);
+
+            if (!file_exists("$api_path/{$file_name}Api.php")) {
                 break;
             }
 
-            $api_path = "$api_path/{$query[0]}";
-            $api_name .= '\\' . ucfirst(array_pop($query));
+            $api_path = "$api_path/$file_name";
+            $api_name .= "\\$file_name";
+
+            array_shift($query);
         }
 
         require $api_path . 'Api.php';
@@ -69,6 +71,16 @@ class App {
         $api = new $api_name();
 
         if (method_exists($api, $this->method() . 'Action')) {
+
+            Req::init([
+                'method' => $this->method(),
+                'query' => $query
+            ]);
+
+            Res::init([
+                'path' => $this->path['template']
+            ]);
+
             $method = $this->method() . 'Action';
             $api->$method();
         }
@@ -76,9 +88,11 @@ class App {
 
     private function method()
     {
-        return isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) 
+        $method = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) 
             ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
             : $_SERVER['REQUEST_METHOD'];
+
+        return strtolower($method);
     }
 
     private function query() {
@@ -96,7 +110,7 @@ class App {
                 : '';
         }
 
-        return trim($query, '/');
+        return explode('/', trim($query, '/'));
     }
 
 }

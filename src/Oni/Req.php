@@ -2,20 +2,27 @@
 
 namespace Oni;
 
-class Res {
+class Req
+{
+    static private $req;
 
-    private function __construct();
-
-    static public funtcion getMethod()
+    private function __construct()
     {
-        return isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) 
-            ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
-            : $_SERVER['REQUEST_METHOD'];
+        // nothing here
     }
 
-    static private function render($template, $data)
+    static function init($req)
     {
-        
+        self::$req = $req;
     }
 
+    static public function method()
+    {
+        return self::$req['method'];
+    }
+
+    static public function query()
+    {
+        return self::$req['query'];
+    }
 }
