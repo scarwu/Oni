@@ -1,4 +1,12 @@
 <?php
+/**
+ * Oni Response Module
+ * 
+ * @package     Oni
+ * @author      ScarWu
+ * @copyright   Copyright (c) 2014, ScarWu (http://scar.simcz.tw/)
+ * @link        http://github.com/scarwu/Oni
+ */
 
 namespace Oni;
 
@@ -6,6 +14,7 @@ class Res
 {
     static private $res;
     static private $http_status_code = [
+
         // 1xx Informational
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -99,7 +108,7 @@ class Res
     /**
      * Send HTTP Status Code
      * 
-     * @param int
+     * @param Integer
      */
     static public function code($code)
     {
@@ -109,7 +118,13 @@ class Res
         }
     }
 
-    static public function html($_template, $_data)
+    /**
+     * Render HTML
+     * 
+     * @param String
+     * @param Array
+     */
+    static public function html($_template, $_data= [])
     {
         $_template_path = self::$res['path'] . "/$_template.phtml";
 
@@ -123,6 +138,11 @@ class Res
         }
     }
 
+    /**
+     * Render JSON
+     * 
+     * @param Array
+     */
     static public function json($json = null)
     {
         if (null === $json) {

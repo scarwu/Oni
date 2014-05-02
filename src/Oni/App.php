@@ -1,4 +1,12 @@
 <?php
+/**
+ * Oni Application
+ * 
+ * @package     Oni
+ * @author      ScarWu
+ * @copyright   Copyright (c) 2014, ScarWu (http://scar.simcz.tw/)
+ * @link        http://github.com/scarwu/Oni
+ */
 
 namespace Oni;
 
@@ -40,13 +48,14 @@ class App
     private function loadStatic()
     {
         $query = $this->query();
-        $satic_path = $this->enable['static'] . "/$query";
 
         if ('' === $query) {
             return false;
         }
 
-        if (!file_exists($satic_path)) {
+        $path = $this->enable['static'] . "/$query";
+
+        if (!file_exists($path)) {
             return false;
         }
 
@@ -54,14 +63,33 @@ class App
             return false;
         }
 
-        echo file_get_contents($satic_path);
+        echo file_get_contents($path);
 
         return true;
     }
 
     private function loadCache()
     {
-        return false;
+        $query = $this->query();
+        
+        if ('' === $query) {
+            return false;
+        }
+
+        $query = md5($query);
+        $path = $this->enable['cache'] . "/$query";
+
+        if (!file_exists($path)) {
+            return false;
+        }
+
+        if ('get' !== $this->method()) {
+            return false;
+        }
+
+        echo file_get_contents($path);
+
+        return true;
     }
 
     private function loadApi()
@@ -112,8 +140,12 @@ class App
                 'path' => $this->enable['template']
             ]);
 
-            $method = $this->method() . 'Action';
-            $api->$method();
+            if (false !== $api->up()) {
+                $method = $this->method() . 'Action';
+                $api->$method();
+            }
+
+            $api->down();
         }
     }
 
