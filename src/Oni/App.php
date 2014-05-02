@@ -4,53 +4,77 @@ namespace Oni;
 
 class App
 {
-    private $name;
-    private $path;
-    private $default_api;
+    private $set;
+    private $enable;
 
     public function __construct()
     {
-        error_reporting(0);
+        $this->set = [
+            'name' => 'OniApp',
+            'default_api' => 'Index'
+        ];
 
-        $this->path = [];
-        $this->default_api = 'Index';
+        $this->enable = [
+            'api' => false,
+            'model' => false,
+            'template' => false,
+            'static' => false,
+            'cache' => false
+        ];
     }
 
-    public function setDev($isDev = false)
+    public function set($key, $value)
     {
-        if ($isDev) {
-            error_reporting(E_ALL | E_STRICT);
-            ini_set('display_errors', 1);
-            ini_set('display_startup_errors', 1);
-        }
+        $this->set[$key] = $value;
 
         return $this;
     }
 
-    public function setName($name)
+    public function enable($key, $value)
     {
-        $this->name = $name;
+        $this->enable[$key] = $value;
 
         return $this;
     }
 
-    public function setPath($path = [])
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    public function run()
+    private function loadStatic()
     {
         $query = $this->query();
+        $satic_path = $this->enable['static'] . "/$query";
 
-        if ('' === $query[0]) {
-            $query[0] = $this->default_api;
+        if ('' === $query) {
+            return false;
         }
 
-        $api_name = ucfirst($this->name) . '\Api';
-        $api_path = $this->path['api'];
+        if (!file_exists($satic_path)) {
+            return false;
+        }
+
+        if ('get' !== $this->method()) {
+            return false;
+        }
+
+        echo file_get_contents($satic_path);
+
+        return true;
+    }
+
+    private function loadCache()
+    {
+        return false;
+    }
+
+    private function loadApi()
+    {
+        $query = explode('/', $this->query());
+
+        if ('' === $query[0]) {
+            $query[0] = $this->set['default_api'];
+        }
+
+        $api_is_found = false;
+        $api_name = ucfirst($this->set['name']) . '\Api';
+        $api_path = $this->enable['api'];
 
         while($query) {
             $file_name = ucfirst($query[0]);
@@ -59,10 +83,17 @@ class App
                 break;
             }
 
+            $api_is_found = true;
             $api_path = "$api_path/$file_name";
             $api_name .= "\\$file_name";
 
             array_shift($query);
+        }
+
+        if (!$api_is_found) {
+            Res::code(404);
+
+            return false;
         }
 
         require $api_path . 'Api.php';
@@ -78,11 +109,26 @@ class App
             ]);
 
             Res::init([
-                'path' => $this->path['template']
+                'path' => $this->enable['template']
             ]);
 
             $method = $this->method() . 'Action';
             $api->$method();
+        }
+    }
+
+    public function run()
+    {
+        if ($this->enable['static'] && $this->loadStatic()) {
+            return true;
+        }
+
+        if ($this->enable['cache'] && $this->loadCache()) {
+            return true;
+        }
+
+        if ($this->enable['api']) {
+            $this->loadApi();
         }
     }
 
@@ -95,7 +141,8 @@ class App
         return strtolower($method);
     }
 
-    private function query() {
+    private function query()
+    {
         $query = null;
 
         if(!isset($_SERVER['QUERY_STRING'])) {
@@ -110,7 +157,6 @@ class App
                 : '';
         }
 
-        return explode('/', trim($query, '/'));
+        return trim($query, '/');
     }
-
 }
