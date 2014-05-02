@@ -13,34 +13,25 @@ namespace Oni;
 class App
 {
     private $set;
-    private $enable;
 
     public function __construct()
     {
         $this->set = [
             'name' => 'OniApp',
-            'default_api' => 'Index'
-        ];
-
-        $this->enable = [
             'api' => false,
+            'api/default' => 'Index',
             'model' => false,
             'template' => false,
+            'template/engine' => 'native',
             'static' => false,
-            'cache' => false
+            'cache' => false,
+            'cache/time' => 300
         ];
     }
 
     public function set($key, $value)
     {
         $this->set[$key] = $value;
-
-        return $this;
-    }
-
-    public function enable($key, $value)
-    {
-        $this->enable[$key] = $value;
 
         return $this;
     }
@@ -53,7 +44,7 @@ class App
             return false;
         }
 
-        $path = $this->enable['static'] . "/$query";
+        $path = $this->set['static'] . "/$query";
 
         if (!file_exists($path)) {
             return false;
@@ -77,7 +68,7 @@ class App
         }
 
         $query = md5($query);
-        $path = $this->enable['cache'] . "/$query";
+        $path = $this->set['cache'] . "/$query";
 
         if (!file_exists($path)) {
             return false;
@@ -97,12 +88,12 @@ class App
         $query = explode('/', $this->query());
 
         if ('' === $query[0]) {
-            $query[0] = $this->set['default_api'];
+            $query[0] = $this->set['api/default'];
         }
 
         $api_is_found = false;
         $api_name = ucfirst($this->set['name']) . '\Api';
-        $api_path = $this->enable['api'];
+        $api_path = $this->set['api'];
 
         while($query) {
             $file_name = ucfirst($query[0]);
@@ -120,7 +111,7 @@ class App
 
         if (!$api_is_found) {
             Res::code(404);
-
+            echo '404';
             return false;
         }
 
@@ -137,7 +128,7 @@ class App
             ]);
 
             Res::init([
-                'path' => $this->enable['template']
+                'path' => $this->set['template']
             ]);
 
             if (false !== $api->up()) {
@@ -151,17 +142,19 @@ class App
 
     public function run()
     {
-        if ($this->enable['static'] && $this->loadStatic()) {
+        if ($this->set['static'] && $this->loadStatic()) {
             return true;
         }
 
-        if ($this->enable['cache'] && $this->loadCache()) {
+        if ($this->set['cache'] && $this->loadCache()) {
             return true;
         }
 
-        if ($this->enable['api']) {
-            $this->loadApi();
+        if ($this->set['api'] && $this->loadApi()) {
+            return true;
         }
+
+        Res::code(404);
     }
 
     private function method()

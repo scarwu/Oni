@@ -126,15 +126,15 @@ class Res
      */
     static public function html($_template, $_data= [])
     {
-        $_template_path = self::$res['path'] . "/$_template.phtml";
+        $_path = self::$res['path'] . "/$_template.phtml";
 
-        if (file_exists($_template_path)) {
+        if (file_exists($_path)) {
             header('Content-Type: text/html; charset=utf-8');
             foreach ($_data as $_key => $_value) {
                 $$_key = $_value;
             }
 
-            include $_template_path;
+            include $_path;
         }
     }
 

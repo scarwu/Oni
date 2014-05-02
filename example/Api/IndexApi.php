@@ -8,7 +8,7 @@
  * @link        http://github.com/scarwu/Oni
  */
 
-namespace Example\Api;
+namespace OniApp\Api;
 
 use Oni;
 

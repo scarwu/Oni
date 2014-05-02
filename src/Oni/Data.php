@@ -1,6 +1,6 @@
 <?php
 /**
- * Oni Model Class 
+ * Oni Data Class 
  * 
  * @package     Oni
  * @author      ScarWu
@@ -10,7 +10,7 @@
 
 namespace Oni;
 
-class Model
+class Data
 {
 
 }
