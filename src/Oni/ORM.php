@@ -1,7 +1,7 @@
 <?php
 /**
  * Oni ORM Module
- * 
+ *
  * @package     Oni
  * @author      ScarWu
  * @copyright   Copyright (c) 2014, ScarWu (http://scar.simcz.tw/)

@@ -1,7 +1,7 @@
 <?php
 /**
- * Oni Api Class 
- * 
+ * Oni Controller Class
+ *
  * @package     Oni
  * @author      ScarWu
  * @copyright   Copyright (c) 2014, ScarWu (http://scar.simcz.tw/)
@@ -10,16 +10,16 @@
 
 namespace Oni;
 
-abstract class Api
+abstract class Controller
 {
     public function up()
     {
-    	// nothing here
+        // nothing here
     }
 
     public function down()
     {
-    	// nothing here
+        // nothing here
     }
 
 }

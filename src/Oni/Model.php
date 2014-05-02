@@ -1,7 +1,7 @@
 <?php
 /**
- * Oni Data Class 
- * 
+ * Oni Model Class
+ *
  * @package     Oni
  * @author      ScarWu
  * @copyright   Copyright (c) 2014, ScarWu (http://scar.simcz.tw/)
@@ -10,7 +10,7 @@
 
 namespace Oni;
 
-class Data
+class Model
 {
 
 }

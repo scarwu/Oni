@@ -1,6 +1,6 @@
 <?php
 /**
- * Index Api Example 
+ * Index Controller Example 
  * 
  * @package     Oni
  * @author      ScarWu
@@ -8,18 +8,20 @@
  * @link        http://github.com/scarwu/Oni
  */
 
-namespace OniApp\Api;
+namespace OniApp\Controller;
 
-use Oni;
+use Oni\Controller;
+use Oni\Req;
+use Oni\Res;
 
-class IndexApi extends Oni\Api
+class IndexController extends Controller
 {
     public function getAction()
     {
-        Oni\Res::html('index', [
+        Res::html('index', [
             'title' => 'Oni - Simple REST Framework',
-            'method' => Oni\Req::method(),
-            'param' => implode('/', Oni\Req::param())
+            'method' => Req::method(),
+            'param' => implode('/', Req::param())
         ]);
     }
 }

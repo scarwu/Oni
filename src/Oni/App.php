@@ -1,7 +1,7 @@
 <?php
 /**
  * Oni Application
- * 
+ *
  * @package     Oni
  * @author      ScarWu
  * @copyright   Copyright (c) 2014, ScarWu (http://scar.simcz.tw/)
@@ -21,8 +21,8 @@ class App
     {
         $this->set = [
             'name' => 'OniApp',
-            'api' => false,
-            'api/default' => 'Index',
+            'controller' => false,
+            'controller/default' => 'Index',
             'model' => false,
             'template' => false,
             'template/engine' => 'native',
@@ -44,6 +44,31 @@ class App
         $this->set[$key] = $value;
 
         return $this;
+    }
+
+    /**
+     * Run Application
+     */
+    public function run()
+    {
+        // Load Static File
+        if ($this->set['static'] && $this->loadStatic()) {
+            return true;
+        }
+
+        // Load Cache File
+        if ($this->set['cache'] && $this->loadCache()) {
+            return true;
+        }
+
+        // Load Controller
+        if ($this->set['controller'] && $this->loadController()) {
+            return true;
+        }
+
+        if (200 === http_response_code()) {
+            http_response_code(404);
+        }
     }
 
     /**
@@ -81,7 +106,7 @@ class App
     private function loadCache()
     {
         $param = $this->param();
-        
+
         if ('' === $param) {
             return false;
         }
@@ -113,55 +138,73 @@ class App
     }
 
     /**
-     * Load API Handler
+     * Load Controller
      */
-    private function loadApi()
+    private function loadController()
     {
         $param = explode('/', $this->param());
 
-        // Set Deafult API
+        // Set Deafult Controller
         if ('' === $param[0]) {
-            $param[0] = $this->set['api/default'];
+            $param[0] = $this->set['controller/default'];
         }
 
-        $api_is_found = false;
-        $api_name = ucfirst($this->set['name']) . '\Api';
-        $api_path = $this->set['api'];
+        $controller_param_temp = $param;
+        $controller_name_temp = ucfirst($this->set['name']) . '\Controller';
+        $controller_path_temp = $this->set['controller'];
 
-        // Search API Handler
-        while($param) {
+        $controller_is_found = false;
+
+        $controller_param = $controller_param_temp;
+        $controller_name = $controller_name_temp;
+        $controller_path = $controller_path_temp;
+
+        // Search Controller
+        while ($param) {
             $file_name = ucfirst($param[0]);
 
-            if (!file_exists("$api_path/{$file_name}Api.php")) {
+            if (file_exists("$controller_path_temp/{$file_name}Controller.php")) {
+                array_shift($param);
+
+                $controller_param_temp = $param;
+                $controller_name_temp = "$controller_name_temp\\$file_name";
+                $controller_path_temp = "$controller_path_temp/$file_name";
+
+                $controller_is_found = true;
+
+                $controller_param = $controller_param_temp;
+                $controller_name = $controller_name_temp;
+                $controller_path = $controller_path_temp;
+            } elseif (file_exists("$controller_path_temp/$file_name")) {
+                array_shift($param);
+
+                $controller_param_temp = $param;
+                $controller_name_temp = "$controller_name_temp\\$file_name";
+                $controller_path_temp = "$controller_path_temp/$file_name";
+            } else {
                 break;
             }
-
-            $api_is_found = true;
-            $api_path = "$api_path/$file_name";
-            $api_name .= "\\$file_name";
-
-            array_shift($param);
         }
 
         // Response HTTP Status Code 404
-        if (!$api_is_found) {
+        if (!$controller_is_found) {
             http_response_code(404);
 
             return false;
         }
 
-        // Require API Handler
-        require $api_path . 'Api.php';
+        // Require Controller
+        require $controller_path . 'Controller.php';
 
-        // New API Instance
-        $api_name .= 'Api';
-        $api = new $api_name();
+        // New Controller Instance
+        $controller_name .= 'Controller';
+        $controller = new $controller_name();
 
-        if (method_exists($api, $this->method() . 'Action')) {
+        if (method_exists($controller, $this->method() . 'Action')) {
             // Initialize Request Module
             Req::init([
                 'method' => $this->method(),
-                'param' => $param
+                'param' => $controller_param
             ]);
 
             // Initialize Response Module
@@ -170,37 +213,19 @@ class App
             ]);
 
             // Call Function: up -> xxxAction -> down
-            if (false !== $api->up()) {
+            if (false !== $controller->up()) {
                 $method = $this->method() . 'Action';
-                $api->$method();
+                $controller->$method();
             }
 
-            $api->down();
+            $controller->down();
 
             return true;
         }
+
+        http_response_code(501);
 
         return false;
-    }
-
-    /**
-     * Run Application
-     */
-    public function run()
-    {
-        if ($this->set['static'] && $this->loadStatic()) {
-            return true;
-        }
-
-        if ($this->set['cache'] && $this->loadCache()) {
-            return true;
-        }
-
-        if ($this->set['api'] && $this->loadApi()) {
-            return true;
-        }
-
-        http_response_code(404);
     }
 
     /**
@@ -210,7 +235,7 @@ class App
      */
     private function method()
     {
-        $method = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) 
+        $method = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])
             ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
             : $_SERVER['REQUEST_METHOD'];
 
@@ -226,9 +251,9 @@ class App
     {
         $param = null;
 
-        if(isset($_SERVER['PATH_INFO'])) {
+        if (isset($_SERVER['PATH_INFO'])) {
             $param = $_SERVER['PATH_INFO'];
-        } elseif(isset($_SERVER['REQUEST_URI']) || isset($_SERVER['PHP_SELF'])) {
+        } elseif (isset($_SERVER['REQUEST_URI']) || isset($_SERVER['PHP_SELF'])) {
             $pattern = str_replace('/', '\/', $_SERVER['SCRIPT_NAME']);
             $pattern = "/^$pattern/";
 

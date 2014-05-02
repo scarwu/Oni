@@ -1,7 +1,7 @@
 <?php
 /**
  * Oni Request Module
- * 
+ *
  * @package     Oni
  * @author      ScarWu
  * @copyright   Copyright (c) 2014, ScarWu (http://scar.simcz.tw/)
@@ -15,7 +15,7 @@ class Req
     /**
      * @var Array
      */
-    static private $req;
+    private static $req;
 
     private function __construct()
     {
@@ -27,7 +27,7 @@ class Req
      *
      * @param Array
      */
-    static function init($req)
+    public static function init($req)
     {
         self::$req = $req;
     }
@@ -37,7 +37,7 @@ class Req
      *
      * @return String
      */
-    static public function method()
+    public static function method()
     {
         return self::$req['method'];
     }
@@ -47,7 +47,7 @@ class Req
      *
      * @return String
      */
-    static public function param()
+    public static function param()
     {
         return self::$req['param'];
     }

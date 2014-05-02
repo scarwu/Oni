@@ -19,8 +19,8 @@ require "$root/vendor/autoload.php";
 // New Oni Application Instance
 $app = new Oni\App();
 
-$app->set('api', "$root/example/Api");
-$app->set('data', "$root/example/Data");
+$app->set('controller', "$root/example/Controller");
+$app->set('model', "$root/example/Model");
 $app->set('template', "$root/example/Template");
 $app->set('static', "$root/example/Static");
 $app->set('cache', "$root/example/Cache");
