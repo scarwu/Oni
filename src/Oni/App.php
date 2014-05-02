@@ -51,13 +51,13 @@ class App
      */
     private function loadStatic()
     {
-        $query = $this->query();
+        $param = $this->param();
 
-        if ('' === $query) {
+        if ('' === $param) {
             return false;
         }
 
-        $path = $this->set['static'] . "/$query";
+        $path = $this->set['static'] . "/$param";
 
         if (!file_exists($path)) {
             return false;
@@ -80,14 +80,14 @@ class App
      */
     private function loadCache()
     {
-        $query = $this->query();
+        $param = $this->param();
         
-        if ('' === $query) {
+        if ('' === $param) {
             return false;
         }
 
-        $query = md5($query);
-        $path = $this->set['cache'] . "/$query";
+        $param = md5($param);
+        $path = $this->set['cache'] . "/$param";
 
         if (!file_exists($path)) {
             return false;
@@ -117,11 +117,11 @@ class App
      */
     private function loadApi()
     {
-        $query = explode('/', $this->query());
+        $param = explode('/', $this->param());
 
         // Set Deafult API
-        if ('' === $query[0]) {
-            $query[0] = $this->set['api/default'];
+        if ('' === $param[0]) {
+            $param[0] = $this->set['api/default'];
         }
 
         $api_is_found = false;
@@ -129,8 +129,8 @@ class App
         $api_path = $this->set['api'];
 
         // Search API Handler
-        while($query) {
-            $file_name = ucfirst($query[0]);
+        while($param) {
+            $file_name = ucfirst($param[0]);
 
             if (!file_exists("$api_path/{$file_name}Api.php")) {
                 break;
@@ -140,7 +140,7 @@ class App
             $api_path = "$api_path/$file_name";
             $api_name .= "\\$file_name";
 
-            array_shift($query);
+            array_shift($param);
         }
 
         // Response HTTP Status Code 404
@@ -161,7 +161,7 @@ class App
             // Initialize Request Module
             Req::init([
                 'method' => $this->method(),
-                'query' => $query
+                'param' => $param
             ]);
 
             // Initialize Response Module
@@ -218,29 +218,29 @@ class App
     }
 
     /**
-     * Get Request Query String
+     * Get Request Parameter
      *
      * @return String
      */
-    private function query()
+    private function param()
     {
-        $query = null;
+        $param = null;
 
         if(isset($_SERVER['PATH_INFO'])) {
-            $query = $_SERVER['PATH_INFO'];
+            $param = $_SERVER['PATH_INFO'];
         } elseif(isset($_SERVER['REQUEST_URI']) || isset($_SERVER['PHP_SELF'])) {
             $pattern = str_replace('/', '\/', $_SERVER['SCRIPT_NAME']);
             $pattern = "/^$pattern/";
 
-            $query = isset($_SERVER['REQUEST_URI'])
+            $param = isset($_SERVER['REQUEST_URI'])
                 ? urldecode($_SERVER['REQUEST_URI'])
                 : $_SERVER['PHP_SELF'];
 
-            $query = $query !== preg_replace($pattern, '', $query)
-                ? preg_replace($pattern, '', $query)
+            $param = $param !== preg_replace($pattern, '', $param)
+                ? preg_replace($pattern, '', $param)
                 : '';
         }
 
-        return trim($query, '/');
+        return trim($param, '/');
     }
 }

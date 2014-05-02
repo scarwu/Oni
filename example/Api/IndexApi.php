@@ -19,7 +19,7 @@ class IndexApi extends Oni\Api
         Oni\Res::html('index', [
             'title' => 'Oni - Simple REST Framework',
             'method' => Oni\Req::method(),
-            'query' => implode('/', Oni\Req::query())
+            'param' => implode('/', Oni\Req::param())
         ]);
     }
 }

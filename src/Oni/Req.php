@@ -43,12 +43,12 @@ class Req
     }
 
     /**
-     * Get Request Query String
+     * Get Request Parameter
      *
      * @return String
      */
-    static public function query()
+    static public function param()
     {
-        return self::$req['query'];
+        return self::$req['param'];
     }
 }
