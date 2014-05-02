@@ -21,7 +21,7 @@ $app = new Oni\App();
 
 $app->set('controller', "$root/example/Controller");
 $app->set('model', "$root/example/Model");
-$app->set('template', "$root/example/Template");
+$app->set('view', "$root/example/View");
 $app->set('static', "$root/example/Static");
 $app->set('cache', "$root/example/Cache");
 

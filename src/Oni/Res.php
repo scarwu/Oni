@@ -38,9 +38,9 @@ class Res
      * @param String
      * @param Array
      */
-    public static function html($_template, $_data= [])
+    public static function html($_view, $_data= [])
     {
-        $_path = self::$res['path'] . "/$_template.phtml";
+        $_path = self::$res['path'] . "/$_view.phtml";
 
         if (file_exists($_path)) {
             foreach ($_data as $_key => $_value) {

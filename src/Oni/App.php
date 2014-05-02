@@ -24,8 +24,8 @@ class App
             'controller' => false,
             'controller/default' => 'Index',
             'model' => false,
-            'template' => false,
-            'template/engine' => 'native',
+            'view' => false,
+            'view/engine' => 'native',
             'static' => false,
             'cache' => false,
             'cache/time' => 300 // 300 sec = 5 min
@@ -209,7 +209,7 @@ class App
 
             // Initialize Response Module
             Res::init([
-                'path' => $this->set['template']
+                'path' => $this->set['view']
             ]);
 
             // Call Function: up -> xxxAction -> down
