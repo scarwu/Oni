@@ -12,6 +12,9 @@ namespace Oni;
 
 class Req
 {
+    /**
+     * @var Array
+     */
     static private $req;
 
     private function __construct()
@@ -19,16 +22,31 @@ class Req
         // nothing here
     }
 
+    /**
+     * Initialize Request Module
+     *
+     * @param Array
+     */
     static function init($req)
     {
         self::$req = $req;
     }
 
+    /**
+     * Get Request Method
+     *
+     * @return String
+     */
     static public function method()
     {
         return self::$req['method'];
     }
 
+    /**
+     * Get Request Query String
+     *
+     * @return String
+     */
     static public function query()
     {
         return self::$req['query'];

@@ -8,10 +8,15 @@
  * @link        http://github.com/scarwu/Oni
  */
 
+// Set Default Time Zone
+date_default_timezone_set('Etc/UTC');
+
 $root = realpath(dirname(__FILE__) . '/../..');
 
+// Require Composer Autoloader
 require "$root/vendor/autoload.php";
 
+// New Oni Application Instance
 $app = new Oni\App();
 
 $app->set('api', "$root/example/Api");
