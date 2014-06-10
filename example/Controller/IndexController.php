@@ -19,7 +19,7 @@ class IndexController extends Controller
     public function getAction()
     {
         Res::html('index', [
-            'title' => 'Oni - Simple REST Framework',
+            'title' => 'Oni - A Simple REST Framework',
             'method' => Req::method(),
             'param' => implode('/', Req::param())
         ]);
