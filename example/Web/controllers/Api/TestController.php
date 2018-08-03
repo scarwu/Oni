@@ -11,43 +11,46 @@
 namespace WebApp\Controller\Api;
 
 use Oni\Web\Controller;
-use Oni\Web\Req;
-use Oni\Web\Res;
 
 class TestController extends Controller
 {
     private $option;
-    private $json;
+    private $data;
 
     public function up()
     {
         $this->option = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE;
-        $this->json = [
-            'method' => Req::method(),
-            'param' => Req::param(),
-            'server' => $_SERVER,
-            'post' => $_POST,
-            'get' => $_GET
+        $this->data = [
+            'method' => $this->req->method(),
+            'method' => $this->req->method(),
+            'query' => $this->req->query(),
+            'content' => $this->req->content(),
+            'file' => $this->req->file(),
+            'native' => [
+                'server' => $_SERVER,
+                'post' => $_POST,
+                'get' => $_GET
+            ]
         ];
     }
 
     public function getAction()
     {
-        Res::json($this->json, $this->option);
+        $this->res->json($this->data, $this->option);
     }
 
     public function postAction()
     {
-        Res::json($this->json, $this->option);
+        $this->res->json($this->data, $this->option);
     }
 
     public function putAction()
     {
-        Res::json($this->json, $this->option);
+        $this->res->json($this->data, $this->option);
     }
 
     public function deleteAction()
     {
-        Res::json($this->json, $this->option);
+        $this->res->json($this->data, $this->option);
     }
 }

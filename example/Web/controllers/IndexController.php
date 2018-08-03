@@ -11,17 +11,17 @@
 namespace WebApp\Controller;
 
 use Oni\Web\Controller;
-use Oni\Web\Req;
-use Oni\Web\Res;
 
 class IndexController extends Controller
 {
     public function getAction()
     {
-        Res::html('index', [
-            'title' => 'Oni - A Simple REST Framework',
-            'method' => Req::method(),
-            'param' => implode('/', Req::param())
+        $this->res->html('index', [
+            'title' => 'Oni - A Lightweight PHP Framework for Web & CLI',
+            'method' => $this->req->method(),
+            'query' => json_encode($this->req->query()),
+            'content' => json_encode($this->req->content()),
+            'file' => json_encode($this->req->file())
         ]);
     }
 }

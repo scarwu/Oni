@@ -138,8 +138,8 @@ abstract class Command
     /**
      * Find Command
      *
-     * @param string prefix
-     * @param array arguments
+     * @param string $prefix
+     * @param array $arguments
      *
      * @return array
      */
@@ -195,13 +195,15 @@ abstract class Command
     /**
      * Get Options
      *
-     * @return array
+     * @return string $key
+     *
+     * @return array|bool
      */
-    final protected function getArguments($index = null)
+    final protected function getArguments($key = null)
     {
-        if (null !== $index) {
-            if (array_key_exists($index, self::$_arguments)) {
-                return self::$_arguments[$index];
+        if (null !== $key) {
+            if (array_key_exists($key, self::$_arguments)) {
+                return self::$_arguments[$key];
             } else {
                 return false;
             }
@@ -213,13 +215,15 @@ abstract class Command
     /**
      * Get Options
      *
-     * @return array
+     * @return string $key
+     *
+     * @return array|bool
      */
-    final protected function getOptions($option = null)
+    final protected function getOptions($key = null)
     {
-        if (null !== $option) {
-            if (array_key_exists($option, self::$_options)) {
-                return self::$_options[$option];
+        if (null !== $key) {
+            if (array_key_exists($key, self::$_options)) {
+                return self::$_options[$key];
             } else {
                 return false;
             }
@@ -231,13 +235,15 @@ abstract class Command
     /**
      * Get Configs
      *
-     * @return mixed
+     * @return string $key
+     *
+     * @return array|bool
      */
-    final protected function getConfigs($config = null)
+    final protected function getConfigs($key = null)
     {
-        if (null !== $config) {
-            if (array_key_exists($config, self::$_configs)) {
-                return self::$_configs[$config];
+        if (null !== $key) {
+            if (array_key_exists($key, self::$_configs)) {
+                return self::$_configs[$key];
             } else {
                 return false;
             }
@@ -249,7 +255,7 @@ abstract class Command
     /**
      * Has Arguments
      *
-     * @return boolean
+     * @return bool
      */
     final protected function hasArguments()
     {
@@ -259,12 +265,14 @@ abstract class Command
     /**
      * Has Options
      *
-     * @return boolean
+     * @return string $key
+     *
+     * @return bool
      */
-    final protected function hasOptions($option = null)
+    final protected function hasOptions($key = null)
     {
-        if (null !== $option) {
-            return array_key_exists($option, self::$_options);
+        if (null !== $key) {
+            return array_key_exists($key, self::$_options);
         }
 
         return count(self::$_options) > 0;
@@ -273,12 +281,14 @@ abstract class Command
     /**
      * Has Configs
      *
-     * @return boolean
+     * @return string $key
+     *
+     * @return bool
      */
-    final protected function hasConfigs($config = null)
+    final protected function hasConfigs($key = null)
     {
-        if (null !== $config) {
-            return array_key_exists($config, self::$_configs);
+        if (null !== $key) {
+            return array_key_exists($key, self::$_configs);
         }
 
         return count(self::$_configs) > 0;

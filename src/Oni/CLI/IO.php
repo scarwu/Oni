@@ -60,6 +60,15 @@ class IO
         'white' => '1;47'
     ];
 
+    /**
+     * Color
+     *
+     * @param string $text
+     * @param string $text_color
+     * @param string $bg_color
+     *
+     * @return string
+     */
     private static function color($text, $text_color = null, $bg_color = null)
     {
         if (isset(self::$text_color[$text_color])) {
@@ -78,9 +87,9 @@ class IO
     /**
      * Write data to STDOUT
      *
-     * @param string text
-     * @param string text_color
-     * @param string bg_color
+     * @param string $text
+     * @param string $text_color
+     * @param string $bg_color
      */
     public static function write($text, $text_color = null, $bg_color = null)
     {
@@ -94,9 +103,9 @@ class IO
     /**
      * Write data to STDOUT
      *
-     * @param string text
-     * @param string bg_color
-     * @param string bg_color
+     * @param string $text
+     * @param string $bg_color
+     * @param string $bg_color
      */
     public static function writeln($text = '', $text_color = null, $bg_color = null)
     {
@@ -106,7 +115,7 @@ class IO
     /**
      * Error
      *
-     * @param string text
+     * @param string $text
      */
     public static function error($text)
     {
@@ -116,7 +125,7 @@ class IO
     /**
      * Warning
      *
-     * @param string text
+     * @param string $text
      */
     public static function warning($text)
     {
@@ -126,7 +135,7 @@ class IO
     /**
      * Notice
      *
-     * @param string text
+     * @param string $text
      */
     public static function notice($text)
     {
@@ -136,7 +145,7 @@ class IO
     /**
      * Info
      *
-     * @param string text
+     * @param string $text
      */
     public static function info($text)
     {
@@ -146,7 +155,7 @@ class IO
     /**
      * Debug
      *
-     * @param string text
+     * @param string $text
      */
     public static function debug($text)
     {
@@ -156,7 +165,7 @@ class IO
     /**
      * Log
      *
-     * @param string text
+     * @param string $text
      */
     public static function log($text)
     {
@@ -176,12 +185,12 @@ class IO
     /**
      * Ask
      *
-     * @param string text
-     * @param function callback
-     * @param string text_color
-     * @param string bg_color
+     * @param string $text
+     * @param function $callback
+     * @param string $text_color
+     * @param string $bg_color
      *
-     * @return string
+     * @return string|bool
      */
     public static function ask($text, $callback = null, $text_color = null, $bg_color = null)
     {

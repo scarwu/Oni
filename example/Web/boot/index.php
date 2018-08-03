@@ -19,11 +19,11 @@ require "{$root}/../../vendor/autoload.php";
 // New Oni Web Application Instance
 $app = new Oni\Web\App();
 
-$app->set('name', 'WebApp');
-$app->set('controller', "{$root}/controllers");
-$app->set('model', "{$root}/models");
-$app->set('view', "{$root}/views");
-$app->set('static', "{$root}/static");
-$app->set('cache', "{$root}/cache");
+$app->setAttr('name', 'WebApp');
+$app->setAttr('controller', "{$root}/controllers");
+$app->setAttr('model', "{$root}/models");
+$app->setAttr('view', "{$root}/views");
+$app->setAttr('static', "{$root}/static");
+$app->setAttr('cache', "{$root}/cache");
 
 $app->run();

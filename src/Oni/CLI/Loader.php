@@ -24,7 +24,9 @@ class Loader
     /**
      * Load
      *
-     * @param string
+     * @param string $class_name
+     *
+     * @return bool
      */
     private static function load($class_name)
     {
@@ -57,8 +59,8 @@ class Loader
     /**
      * Set Command Path
      *
-     * @param string
-     * @param string
+     * @param string $namespace
+     * @param string $path
      */
     public static function set($namespace, $path)
     {

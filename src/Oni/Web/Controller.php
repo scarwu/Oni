@@ -10,8 +10,19 @@
 
 namespace Oni\Web;
 
+use Oni\Web\Req;
+use Oni\Web\Res;
+
 abstract class Controller
 {
+    protected $req = null;
+    protected $res = null;
+
+    public function __construct($req = null, $res = null) {
+        $this->req = (null !== $req) ? $req : new Req();
+        $this->res = (null !== $res) ? $res : new Res();
+    }
+
     public function up()
     {
         // nothing here

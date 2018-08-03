@@ -16,56 +16,85 @@ use Oni\Web\Res;
 class App
 {
     /**
-     * @var Array
+     * @var array
      */
-    private $set;
-
-    public function __construct()
-    {
-        $this->set = [
-            'name' => 'OniApp',
-            'controller' => false,
-            'controller/default' => 'Index',
-            'model' => false,
-            'view' => false,
-            'view/engine' => 'native',
-            'static' => false,
-            'cache' => false,
-            'cache/time' => 300 // 300 sec = 5 min
-        ];
-    }
+    private static $_attr = [
+        'name' => 'OniApp',
+        'controller' => false,
+        'controller/default' => 'Index',
+        'model' => false,
+        'view' => false,
+        'view/ext' => 'php',
+        'static' => false,
+        'cache' => false,
+        'cache/time' => 300 // 300 sec = 5 min
+    ];
 
     /**
-     * Set Config
-     *
-     * @param String
-     * @param String
-     * @return Object
+     * @var object
      */
-    public function set($key, $value)
+    protected $req = null;
+
+    /**
+     * @var object
+     */
+    protected $res = null;
+
+    /**
+     * Set Attr
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return object
+     */
+    public function setAttr($key, $value)
     {
-        $this->set[$key] = $value;
+        self::$_attr[$key] = $value;
 
         return $this;
     }
 
     /**
+     * Get Attr
+     *
+     * @param string $key
+     *
+     * @return object|null
+     */
+    public function getAttr($key)
+    {
+        return isset(self::$_attr[$key])
+            ? self::$_attr[$key] : null;
+    }
+
+    /**
      * Run Application
+     *
+     * @return bool
      */
     public function run()
     {
+        // Initialize Request & Response
+        $this->req = Req::init();
+        $this->res = Res::init();
+
+        // Set Attrs
+        $this->res->setAttr('view', self::$_attr['view']);
+        $this->res->setAttr('view/ext', self::$_attr['view/ext']);
+
         // Load Static File
-        if ($this->set['static'] && $this->loadStatic()) {
+        if (self::$_attr['static'] && $this->loadStatic()) {
             return true;
         }
 
         // Load Cache File
-        if ($this->set['cache'] && $this->loadCache()) {
+        if (self::$_attr['cache'] && $this->loadCache()) {
             return true;
         }
 
         // Load Controller
-        if ($this->set['controller'] && $this->loadController()) {
+        if (self::$_attr['controller'] && $this->loadController()) {
             return true;
         }
 
@@ -76,22 +105,25 @@ class App
 
     /**
      * Load Static File
+     *
+     * @return bool
      */
     private function loadStatic()
     {
-        $param = $this->param();
+        $uri = $this->req->uri();
 
-        if ('' === $param) {
+        if ('' === $uri) {
             return false;
         }
 
-        $path = $this->set['static'] . "/{$param}";
+        $prefix = self::$_attr['static'];
+        $path = "{$prefix}/{$uri}";
 
         if (!file_exists($path)) {
             return false;
         }
 
-        if ('get' !== $this->method()) {
+        if ('get' !== $this->req->method()) {
             return false;
         }
 
@@ -105,30 +137,33 @@ class App
 
     /**
      * Load Cache File
+     *
+     * @return bool
      */
     private function loadCache()
     {
-        $param = $this->param();
+        $uri = $this->req->uri();
 
-        if ('' === $param) {
+        if ('' === $uri) {
             return false;
         }
 
-        $param = md5($param);
-        $path = $this->set['cache'] . "/{$param}";
+        $hash = md5($uri);
+        $prefix = self::$_attr['cache'];
+        $path = "{$prefix}/{$hash}";
 
         if (!file_exists($path)) {
             return false;
         }
 
         // Check File Create Time
-        if (time() - filectime($path) > $this->set['cache/time']) {
+        if (time() - filectime($path) > self::$_attr['cache/time']) {
             unlink($path);
 
             return false;
         }
 
-        if ('get' !== $this->method()) {
+        if ('get' !== $this->req->method()) {
             return false;
         }
 
@@ -143,87 +178,78 @@ class App
 
     /**
      * Load Controller
+     *
+     * @return bool
      */
     private function loadController()
     {
-        $param = explode('/', $this->param());
+        $uri = explode('/', $this->req->uri());
 
         // Set Deafult Controller
-        if ('' === $param[0]) {
-            $param[0] = $this->set['controller/default'];
+        if ('' === $uri[0]) {
+            $uri[0] = self::$_attr['controller/default'];
         }
 
-        $controller_param_temp = $param;
-        $controller_name_temp = ucfirst($this->set['name']) . '\Controller';
-        $controller_path_temp = $this->set['controller'];
+        $name = ucfirst(self::$_attr['name']) . '\Controller';
+        $prefix = self::$_attr['controller'];
 
-        $controller_is_found = false;
+        $uri_temp = $uri;
+        $name_temp = $name;
+        $prefix_temp = $prefix;
 
-        $controller_param = $controller_param_temp;
-        $controller_name = $controller_name_temp;
-        $controller_path = $controller_path_temp;
+        $is_found = false;
 
         // Search Controller
-        while ($param) {
-            $file_name = ucfirst($param[0]);
+        while ($uri) {
+            $file_name = ucfirst($uri[0]);
 
-            if (file_exists("{$controller_path_temp}/{$file_name}Controller.php")) {
-                array_shift($param);
+            if (file_exists("{$prefix_temp}/{$file_name}Controller.php")) {
+                array_shift($uri);
 
-                $controller_param_temp = $param;
-                $controller_name_temp = "{$controller_name_temp}\\{$file_name}";
-                $controller_path_temp = "{$controller_path_temp}/{$file_name}";
+                $name = "{$name_temp}\\{$file_name}";
+                $prefix = "{$prefix_temp}/{$file_name}";
 
-                $controller_is_found = true;
+                $uri_temp = $uri;
+                $name_temp = $name;
+                $prefix_temp = $prefix;
 
-                $controller_param = $controller_param_temp;
-                $controller_name = $controller_name_temp;
-                $controller_path = $controller_path_temp;
-            } elseif (file_exists("{$controller_path_temp}/{$file_name}")) {
-                array_shift($param);
+                $is_found = true;
+            } elseif (file_exists("{$prefix_temp}/{$file_name}")) {
+                array_shift($uri);
 
-                $controller_param_temp = $param;
-                $controller_name_temp = "{$controller_name_temp}\\{$file_name}";
-                $controller_path_temp = "{$controller_path_temp}/{$file_name}";
+                $uri_temp = $uri;
+                $name_temp = "{$name_temp}\\{$file_name}";
+                $prefix_temp = "{$prefix_temp}/{$file_name}";
             } else {
                 break;
             }
         }
 
         // Response HTTP Status Code 404
-        if (!$controller_is_found) {
+        if (!$is_found) {
             http_response_code(404);
 
             return false;
         }
 
         // Require Controller
-        require "{$controller_path}Controller.php";
+        require "{$prefix}Controller.php";
 
         // New Controller Instance
-        $controller_name .= 'Controller';
-        $controller = new $controller_name();
-        $method = $this->method();
+        $controller_name = "{$name}Controller";
+        $instance = new $controller_name($this->req, $this->res);
 
-        if (method_exists($controller, "{$method}Action")) {
-            // Initialize Request Module
-            Req::init([
-                'method' => $method,
-                'param' => $controller_param
-            ]);
+        $method = $this->req->method();
+        $action_name = "{$method}Action";
 
-            // Initialize Response Module
-            Res::init([
-                'path' => $this->set['view']
-            ]);
+        if (method_exists($instance, $action_name)) {
 
             // Call Function: up -> xxxAction -> down
-            if (false !== $controller->up()) {
-                $action_name = "{$method}Action";
-                $controller->$action_name();
+            if (false !== $instance->up()) {
+                $instance->$action_name();
             }
 
-            $controller->down();
+            $instance->down();
 
             return true;
         }
@@ -231,46 +257,5 @@ class App
         http_response_code(501);
 
         return false;
-    }
-
-    /**
-     * Get Request Method
-     *
-     * @return String
-     */
-    private function method()
-    {
-        $method = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])
-            ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
-            : $_SERVER['REQUEST_METHOD'];
-
-        return strtolower($method);
-    }
-
-    /**
-     * Get Request Parameter
-     *
-     * @return String
-     */
-    private function param()
-    {
-        $param = null;
-
-        if (isset($_SERVER['PATH_INFO'])) {
-            $param = $_SERVER['PATH_INFO'];
-        } elseif (isset($_SERVER['REQUEST_URI']) || isset($_SERVER['PHP_SELF'])) {
-            $pattern = str_replace('/', '\/', $_SERVER['SCRIPT_NAME']);
-            $pattern = "/^$pattern/";
-
-            $param = isset($_SERVER['REQUEST_URI'])
-                ? urldecode($_SERVER['REQUEST_URI'])
-                : $_SERVER['PHP_SELF'];
-
-            $param = $param !== preg_replace($pattern, '', $param)
-                ? preg_replace($pattern, '', $param)
-                : '';
-        }
-
-        return trim($param, '/');
     }
 }
