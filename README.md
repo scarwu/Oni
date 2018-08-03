@@ -1,9 +1,9 @@
 # Oni
 
-A Simple REST Framework
+A Simple Framework
 
 ## Getting Started
 
 ### Requirement
 
-* PHP 5.4+
+* PHP 7.0+
