@@ -1,3 +1,2 @@
 vendor
-composer.lock
-example/Cache
+example/WebApp/Cache
