@@ -3,8 +3,8 @@
  * Oni Model Class
  *
  * @package     Oni
- * @author      ScarWu
- * @copyright   Copyright (c) ScarWu (https://scar.tw)
+ * @author      Scar Wu
+ * @copyright   Copyright (c) Scar Wu (https://scar.tw)
  * @link        https://github.com/scarwu/Oni
  */
 
