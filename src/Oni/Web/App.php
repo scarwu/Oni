@@ -4,14 +4,14 @@
  *
  * @package     Oni
  * @author      ScarWu
- * @copyright   Copyright (c) 2014-2015, ScarWu (http://scar.simcz.tw/)
- * @link        http://github.com/scarwu/Oni
+ * @copyright   Copyright (c) ScarWu (https://scar.tw)
+ * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni;
+namespace Oni\Web;
 
-use Oni/Req;
-use Oni/Res;
+use Oni\Web\Req;
+use Oni\Web\Res;
 
 class App
 {
@@ -85,7 +85,7 @@ class App
             return false;
         }
 
-        $path = $this->set['static'] . "/$param";
+        $path = $this->set['static'] . "/{$param}";
 
         if (!file_exists($path)) {
             return false;
@@ -97,7 +97,7 @@ class App
 
         $mime = mime_content_type($path);
 
-        header("Content-Type: $mime");
+        header("Content-Type: {$mime}");
         echo file_get_contents($path);
 
         return true;
@@ -115,7 +115,7 @@ class App
         }
 
         $param = md5($param);
-        $path = $this->set['cache'] . "/$param";
+        $path = $this->set['cache'] . "/{$param}";
 
         if (!file_exists($path)) {
             return false;
@@ -134,7 +134,8 @@ class App
 
         $mime = mime_content_type($path);
 
-        header("Content-Type: $mime");
+        header("Content-Type: {$mime}");
+
         echo file_get_contents($path);
 
         return true;
@@ -166,24 +167,24 @@ class App
         while ($param) {
             $file_name = ucfirst($param[0]);
 
-            if (file_exists("$controller_path_temp/{$file_name}Controller.php")) {
+            if (file_exists("{$controller_path_temp}/{$file_name}Controller.php")) {
                 array_shift($param);
 
                 $controller_param_temp = $param;
-                $controller_name_temp = "$controller_name_temp\\$file_name";
-                $controller_path_temp = "$controller_path_temp/$file_name";
+                $controller_name_temp = "{$controller_name_temp}\\{$file_name}";
+                $controller_path_temp = "{$controller_path_temp}/{$file_name}";
 
                 $controller_is_found = true;
 
                 $controller_param = $controller_param_temp;
                 $controller_name = $controller_name_temp;
                 $controller_path = $controller_path_temp;
-            } elseif (file_exists("$controller_path_temp/$file_name")) {
+            } elseif (file_exists("{$controller_path_temp}/{$file_name}")) {
                 array_shift($param);
 
                 $controller_param_temp = $param;
-                $controller_name_temp = "$controller_name_temp\\$file_name";
-                $controller_path_temp = "$controller_path_temp/$file_name";
+                $controller_name_temp = "{$controller_name_temp}\\{$file_name}";
+                $controller_path_temp = "{$controller_path_temp}/{$file_name}";
             } else {
                 break;
             }
@@ -197,16 +198,17 @@ class App
         }
 
         // Require Controller
-        require $controller_path . 'Controller.php';
+        require "{$controller_path}Controller.php";
 
         // New Controller Instance
         $controller_name .= 'Controller';
         $controller = new $controller_name();
+        $method = $this->method();
 
-        if (method_exists($controller, $this->method() . 'Action')) {
+        if (method_exists($controller, "{$method}Action")) {
             // Initialize Request Module
             Req::init([
-                'method' => $this->method(),
+                'method' => $method,
                 'param' => $controller_param
             ]);
 
@@ -217,8 +219,8 @@ class App
 
             // Call Function: up -> xxxAction -> down
             if (false !== $controller->up()) {
-                $method = $this->method() . 'Action';
-                $controller->$method();
+                $action_name = "{$method}Action";
+                $controller->$action_name();
             }
 
             $controller->down();

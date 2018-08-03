@@ -4,15 +4,15 @@
  *
  * @package     Oni
  * @author      ScarWu
- * @copyright   Copyright (c) 2014-2015, ScarWu (http://scar.simcz.tw/)
- * @link        http://github.com/scarwu/Oni
+ * @copyright   Copyright (c) ScarWu (https://scar.tw)
+ * @link        https://github.com/scarwu/Oni
  */
 
-namespace OniApp\Controller\Api;
+namespace WebApp\Controller\Api;
 
-use Oni\Controller;
-use Oni\Req;
-use Oni\Res;
+use Oni\Web\Controller;
+use Oni\Web\Req;
+use Oni\Web\Res;
 
 class TestController extends Controller
 {

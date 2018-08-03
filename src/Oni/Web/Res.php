@@ -4,11 +4,11 @@
  *
  * @package     Oni
  * @author      ScarWu
- * @copyright   Copyright (c) 2014-2015, ScarWu (http://scar.simcz.tw/)
- * @link        http://github.com/scarwu/Oni
+ * @copyright   Copyright (c) ScarWu (https://scar.tw)
+ * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni;
+namespace Oni\Web;
 
 class Res
 {
@@ -40,14 +40,15 @@ class Res
      */
     public static function html($_view, $_data= [])
     {
-        $_path = self::$res['path'] . "/$_view.phtml";
+        header('Content-Type: text/html');
+
+        $_path = self::$res['path'] . "/{$_view}.php";
 
         if (file_exists($_path)) {
             foreach ($_data as $_key => $_value) {
                 $$_key = $_value;
             }
 
-            header('Content-Type: text/html');
             include $_path;
         }
     }
@@ -59,8 +60,9 @@ class Res
      */
     public static function json($json = null, $option = null)
     {
+        header('Content-Type: application/json');
+
         if (null !== $json) {
-            header('Content-Type: application/json');
             echo json_encode($json, $option);
         }
     }

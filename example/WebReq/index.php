@@ -1,22 +1,22 @@
 <?php
 /**
- * Oni\Req Example
+ * Oni\Web\Req Example
  *
  * @package     Oni
  * @author      ScarWu
- * @copyright   Copyright (c) 2014-2015, ScarWu (http://scar.simcz.tw/)
- * @link        http://github.com/scarwu/Oni
+ * @copyright   Copyright (c) ScarWu (https://scar.tw)
+ * @link        https://github.com/scarwu/Oni
  */
 
 // Set Default Time Zone
 date_default_timezone_set('Etc/UTC');
 
-$root = realpath(__DIR__ . '/../..');
+$root = __DIR__ . '/..';
 
 // Require Composer Autoloader
-require "$root/vendor/autoload.php";
+require "{$root}/../vendor/autoload.php";
 
-use Oni\Req;
+use Oni\Web\Req;
 
 $req = Req::init();
 

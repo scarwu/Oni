@@ -4,11 +4,11 @@
  *
  * @package     Oni
  * @author      ScarWu
- * @copyright   Copyright (c) 2014-2015, ScarWu (http://scar.simcz.tw/)
+ * @copyright   Copyright (c) ScarWu (https://scar.tw)
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni;
+namespace Oni\Web;
 
 class Req
 {
