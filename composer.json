@@ -1,7 +1,7 @@
 {
     "name": "scarwu/oni",
     "homepage": "https://github.com/scarwu/Oni",
-    "description": "A lightweight PHP framework for Web & CLI",
+    "description": "A Lightweight PHP Framework for Web & CLI",
     "require": {
         "php": ">=7.0.0"
     },

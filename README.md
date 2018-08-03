@@ -1,6 +1,6 @@
 # Oni
 
-A lightweight PHP framework for Web & CLI
+A Lightweight PHP Framework for Web & CLI
 
 [![Build Status](https://travis-ci.org/scarwu/Oni.png?branch=master)](https://travis-ci.org/scarwu/Oni)
 
