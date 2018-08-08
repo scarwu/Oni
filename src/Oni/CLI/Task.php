@@ -24,7 +24,8 @@ abstract class Task extends Basic
     /**
      * Construct
      */
-    public function __construct($io = null) {
+    public function __construct($io = null)
+    {
         $this->io = (null !== $io) ? $io : IO::init();
     }
 

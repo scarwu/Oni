@@ -30,7 +30,8 @@ abstract class Controller extends Basic
     /**
      * Construct
      */
-    public function __construct($req = null, $res = null) {
+    public function __construct($req = null, $res = null)
+    {
         $this->req = (null !== $req) ? $req : Req::init();
         $this->res = (null !== $res) ? $res : Res::init();
     }

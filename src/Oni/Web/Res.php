@@ -25,9 +25,11 @@ class Res extends Basic
      *
      * This function is private, so this class is singleton pattern
      */
-    private function __construct() {
+    private function __construct()
+    {
+        // Set Default Attributes
         $this->_attr = [
-            'view' => false,
+            'view/path' => null,
             'view/ext' => 'php'
         ];
     }
@@ -54,16 +56,16 @@ class Res extends Basic
     {
         header('Content-Type: text/html');
 
-        $_prefix = $this->_attr['view'];
+        $_path = $this->_attr['view/path'];
         $_ext = $this->_attr['view/ext'];
-        $_path = "{$_prefix}/{$_name}.{$_ext}";
+        $_fullpath = "{$_path}/{$_name}.{$_ext}";
 
-        if (file_exists($_path)) {
+        if (file_exists($_fullpath)) {
             foreach ($_data as $_key => $_value) {
                 $$_key = $_value;
             }
 
-            include $_path;
+            include $_fullpath;
         }
     }
 

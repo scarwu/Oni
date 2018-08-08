@@ -28,23 +28,78 @@ class App extends Basic
     protected $res = null;
 
     /**
+     * @var array
+     */
+    private $_namespace_list = [];
+
+    /**
      * Construct
      */
-    public function __construct() {
+    public function __construct()
+    {
+        // Set Default Attributes
         $this->_attr = [
-            'name' => 'OniApp',
-            'controller' => null,   // Requied
+            'namespace' => 'OniApp',
+            'controller/namespace' => null,     // Requied
+            'controller/path' => null,          // Requied
             'controller/default' => 'Index',
-            'model' => null,        // Requied
-            'view' => null,         // Requied
+            'model/namespace' => null,          // Requied
+            'model/path' => null,               // Requied
+            'view/path' => null,                // Requied
             'view/ext' => 'php',
-            'static' => null,       // Requied
-            'cache' => null,        // Requied
-            'cache/time' => 300 // 300 sec = 5 min
+            'static/path' => null,              // Requied
+            'cache/path' => null,               // Requied
+            'cache/time' => 300                 // 300 sec = 5 min
         ];
 
         $this->req = Req::init();
         $this->res = Res::init();
+
+        // Namespace Autoload Register
+        spl_autoload_register(function ($class_name) {
+            $class_name = trim($class_name, '\\');
+
+            foreach ($this->_namespace_list as $namespace => $path_list) {
+                $pattern = '/^' . str_replace('\\', '\\\\', $namespace) . '/';
+
+                if (!preg_match($pattern, $class_name)) {
+                    continue;
+                }
+
+                $class_name = str_replace($namespace, '', trim($class_name, '\\'));
+                $class_name = str_replace('\\', '/', trim($class_name, '\\'));
+
+                foreach ($path_list as $path) {
+                    if (!file_exists("{$path}/{$class_name}.php")) {
+                        continue;
+                    }
+
+                    require "{$path}/{$class_name}.php";
+
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Register Namespace
+     *
+     * @param string $namespace
+     * @param string $path
+     */
+    public function registerNamespace($namespace, $path)
+    {
+        $namespace = trim($namespace, '\\');
+        $path = rtrim($path, '/');
+
+        if (!isset($this->_namespace_list[$namespace])) {
+            $this->_namespace_list[$namespace] = [];
+        }
+
+        $this->_namespace_list[$namespace][] = $path;
     }
 
     /**
@@ -54,22 +109,45 @@ class App extends Basic
      */
     public function run()
     {
+        // Register Controller Classes
+        $namespace = $this->getAttr('controller/namespace');
+        $path = $this->getAttr('controller/path');
+
+        if (null !== $namespace && null !== $path) {
+            $this->registerNamespace($namespace, $path);
+        }
+
+        // Register Model Classes
+        $namespace = $this->getAttr('model/namespace');
+        $path = $this->getAttr('model/path');
+
+        if (null !== $namespace && null !== $path) {
+            $this->registerNamespace($namespace, $path);
+        }
+
         // Set Response Attrs
-        $this->res->setAttr('view', $this->_attr['view']);
-        $this->res->setAttr('view/ext', $this->_attr['view/ext']);
+        $this->res->setAttr('view/path', $this->getAttr('view/path'));
+        $this->res->setAttr('view/ext', $this->getAttr('view/ext'));
 
         // Load Static File
-        if ($this->_attr['static'] && $this->loadStatic()) {
+        if (null !== $this->getAttr('static/path')
+            && $this->loadStatic()) {
+
             return true;
         }
 
         // Load Cache File
-        if ($this->_attr['cache'] && $this->loadCache()) {
+        if (null !== $this->getAttr('cache/path')
+            && $this->loadCache()) {
+
             return true;
         }
 
         // Load Controller
-        if ($this->_attr['controller'] && $this->loadController()) {
+        if (null !== $this->getAttr('controller/namespace')
+            && null !== $this->getAttr('controller/path')
+            && $this->loadController()) {
+
             return true;
         }
 
@@ -91,10 +169,10 @@ class App extends Basic
             return false;
         }
 
-        $prefix = $this->_attr['static'];
-        $path = "{$prefix}/{$uri}";
+        $path = $this->_attr['static/path'];
+        $fullpath = "{$path}/{$uri}";
 
-        if (!file_exists($path)) {
+        if (!file_exists($fullpath)) {
             return false;
         }
 
@@ -102,10 +180,11 @@ class App extends Basic
             return false;
         }
 
-        $mime = mime_content_type($path);
+        $mime = mime_content_type($fullpath);
 
         header("Content-Type: {$mime}");
-        echo file_get_contents($path);
+
+        echo file_get_contents($fullpath);
 
         return true;
     }
@@ -124,16 +203,16 @@ class App extends Basic
         }
 
         $hash = md5($uri);
-        $prefix = $this->_attr['cache'];
-        $path = "{$prefix}/{$hash}";
+        $path = $this->_attr['cache/path'];
+        $fullpath = "{$path}/{$hash}";
 
-        if (!file_exists($path)) {
+        if (!file_exists($fullpath)) {
             return false;
         }
 
         // Check File Create Time
-        if (time() - filectime($path) > $this->_attr['cache/time']) {
-            unlink($path);
+        if (time() - filectime($fullpath) > $this->_attr['cache/time']) {
+            unlink($fullpath);
 
             return false;
         }
@@ -142,11 +221,11 @@ class App extends Basic
             return false;
         }
 
-        $mime = mime_content_type($path);
+        $mime = mime_content_type($fullpath);
 
         header("Content-Type: {$mime}");
 
-        echo file_get_contents($path);
+        echo file_get_contents($fullpath);
 
         return true;
     }
@@ -158,9 +237,8 @@ class App extends Basic
      */
     private function loadController()
     {
-        $current_path = $this->getAttr('controller');
-        $current_namespace = $this->getAttr('name') . '\\Controller';
-
+        $namespace = $this->getAttr('controller/namespace');
+        $path = $this->getAttr('controller/path');
         $segments = explode('/', $this->req->uri());
 
         // Set Deafult Task
@@ -171,20 +249,17 @@ class App extends Basic
         foreach ($segments as $segment) {
             $segment = ucfirst($segment);
 
-            $current_path = "{$current_path}/{$segment}";
-            $current_namespace = "{$current_namespace}\\{$segment}";
+            $path = "{$path}/{$segment}";
+            $namespace = "{$namespace}\\{$segment}";
         }
 
-        if (false === file_exists("{$current_path}Controller.php")) {
+        if (false === file_exists("{$path}Controller.php")) {
             throw new Exception("Controller is not found.");
         }
 
-        // Require Controller
-        require "{$current_path}Controller.php";
-
         // New Controller Instance
-        $current_namespace = "{$current_namespace}Controller";
-        $instance = new $current_namespace($this->req, $this->res);
+        $namespace = "{$namespace}Controller";
+        $instance = new $namespace($this->req, $this->res);
 
         $method = $this->req->method();
         $action_name = "{$method}Action";

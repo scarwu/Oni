@@ -40,7 +40,8 @@ class IO extends Basic
      *
      * This function is private, so this class is singleton pattern
      */
-    private function __construct() {
+    private function __construct()
+    {
         $config_regex_rule = '/^-{2}(\w+(?:-\w+)?)(?:=(.+))?/';
         $option_regex_rule = '/^-{1}(\w+)/';
 
