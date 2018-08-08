@@ -1,6 +1,6 @@
 <?php
 /**
- * Command
+ * CLI Application
  *
  * @package     Oni
  * @author      Scar Wu
@@ -11,63 +11,57 @@
 namespace Oni\CLI;
 
 use Exception;
+use Oni\Basic;
+use Oni\CLI\In;
+use Oni\CLI\Out;
 
-abstract class Command
+class App extends Basic
 {
     /**
      * @var array
      */
-    private static $_arguments = [];
+    private static $_namespace_list = [];
 
     /**
-     * @var array
+     * @var object
      */
-    private static $_options = [];
+    protected $in = null;
 
     /**
-     * @var array
+     * @var object
      */
-    private static $_configs = [];
+    protected $out = null;
 
     /**
-     * @var string
+     * Construct
      */
-    private static $_prefix = null;
+    public function __construct() {
+        $this->_attr = [
+            'name' => 'OniApp',
+            'task' => null,     // Requied
+            'task/default' => 'Main'
+        ];
+
+        $this->in = In::init();
+        $this->out = Out::init();
+    }
 
     /**
-     * @var string
+     * Run
      */
-    protected static $_namespace = null;
-
-    /**
-     * Execute before run
-     */
-    public function up() {}
-
-    /**
-     * Execute after run
-     */
-    public function down() {}
-
-    /**
-     * Execute run
-     */
-    abstract public function run();
-
-    /**
-     * Initialize
-     */
-    final public function init()
+    public function run()
     {
+        spl_autoload_register('self::loadTask');
+
         if (null !== self::$_prefix) {
             return false;
         }
 
-        // Parse Input Command
-        $this->parseCommand();
+        // Parse Input Task
+        $this->parseTask();
 
-        // Find Command
-        list($class_name, self::$_arguments) = $this->findCommand(self::$_prefix, self::$_arguments);
+        // Find Task
+        list($class_name, self::$_arguments) = $this->findTask(self::$_prefix, self::$_arguments);
 
         if ($class_name) {
             $class = new $class_name;
@@ -87,9 +81,44 @@ abstract class Command
     }
 
     /**
-     * Parse Command
+     * Load Task
+     *
+     * @param string $class_name
+     *
+     * @return bool
      */
-    private function parseCommand()
+    private function loadTask($class_name)
+    {
+        $class_name = trim($class_name, '\\');
+
+        foreach (self::$_namespace_list as $namespace => $path_list) {
+            $pattern = '/^' . str_replace('\\', '\\\\', $namespace) . '/';
+
+            if (!preg_match($pattern, $class_name)) {
+                continue;
+            }
+
+            $class_name = str_replace($namespace, '', trim($class_name, '\\'));
+            $class_name = str_replace('\\', '/', trim($class_name, '\\'));
+
+            foreach ($path_list as $path) {
+                if (!file_exists("{$path}/{$class_name}.php")) {
+                    continue;
+                }
+
+                require "{$path}/{$class_name}.php";
+
+                return true;
+            }
+        }
+
+        throw new Exception("Class: {$class_name} is not found.");
+    }
+
+    /**
+     * Parse Task
+     */
+    private function parseTask()
     {
         $config_regex_rule = '/^-{2}(\w+(?:-\w+)?)(?:=(.+))?/';
         $option_regex_rule = '/^-{1}(\w+)/';
@@ -136,21 +165,21 @@ abstract class Command
     }
 
     /**
-     * Find Command
+     * Find Task
      *
      * @param string $prefix
      * @param array $arguments
      *
      * @return array
      */
-    final protected function findCommand($prefix, $arguments)
+    final protected function findTask($prefix, $arguments)
     {
         $error_return = [
             false,
             $arguments
         ];
 
-        $pattern = '/^' . str_replace('\\', '\\\\', self::$_namespace) . '\\\\(\w+)Command$/';
+        $pattern = '/^' . str_replace('\\', '\\\\', self::$_namespace) . '\\\\(\w+)Task$/';
 
         if (!preg_match($pattern, $prefix, $match)) {
             return $error_return;
@@ -168,7 +197,7 @@ abstract class Command
 
                 $class_name = self::$_namespace . '\\';
                 $class_name .= implode('\\', $class_name_list) . '\\';
-                $class_name .= ucfirst($arguments[0]) . 'Command';
+                $class_name .= ucfirst($arguments[0]) . 'Task';
 
                 try {
                     if (class_exists($class_name)) {
@@ -184,113 +213,11 @@ abstract class Command
 
         if (count($class_name_list) > 1) {
             return [
-                self::$_namespace . '\\' . implode('\\', $class_name_list) . 'Command',
+                self::$_namespace . '\\' . implode('\\', $class_name_list) . 'Task',
                 $arguments
             ];
         }
 
         return $error_return;
-    }
-
-    /**
-     * Get Options
-     *
-     * @return string $key
-     *
-     * @return array|bool
-     */
-    final protected function getArguments($key = null)
-    {
-        if (null !== $key) {
-            if (array_key_exists($key, self::$_arguments)) {
-                return self::$_arguments[$key];
-            } else {
-                return false;
-            }
-        }
-
-        return self::$_arguments;
-    }
-
-    /**
-     * Get Options
-     *
-     * @return string $key
-     *
-     * @return array|bool
-     */
-    final protected function getOptions($key = null)
-    {
-        if (null !== $key) {
-            if (array_key_exists($key, self::$_options)) {
-                return self::$_options[$key];
-            } else {
-                return false;
-            }
-        }
-
-        return self::$_options;
-    }
-
-    /**
-     * Get Configs
-     *
-     * @return string $key
-     *
-     * @return array|bool
-     */
-    final protected function getConfigs($key = null)
-    {
-        if (null !== $key) {
-            if (array_key_exists($key, self::$_configs)) {
-                return self::$_configs[$key];
-            } else {
-                return false;
-            }
-        }
-
-        return self::$_configs;
-    }
-
-    /**
-     * Has Arguments
-     *
-     * @return bool
-     */
-    final protected function hasArguments()
-    {
-        return count(self::$_arguments) > 0;
-    }
-
-    /**
-     * Has Options
-     *
-     * @return string $key
-     *
-     * @return bool
-     */
-    final protected function hasOptions($key = null)
-    {
-        if (null !== $key) {
-            return array_key_exists($key, self::$_options);
-        }
-
-        return count(self::$_options) > 0;
-    }
-
-    /**
-     * Has Configs
-     *
-     * @return string $key
-     *
-     * @return bool
-     */
-    final protected function hasConfigs($key = null)
-    {
-        if (null !== $key) {
-            return array_key_exists($key, self::$_configs);
-        }
-
-        return count(self::$_configs) > 0;
     }
 }

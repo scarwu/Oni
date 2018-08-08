@@ -1,6 +1,6 @@
 <?php
 /**
- * Command Read
+ * Read Task
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,10 +10,9 @@
 
 namespace CLIApp\Main;
 
-use Oni\CLI\Command;
-use Oni\CLI\IO;
+use Oni\CLI\Task;
 
-class ReadCommand extends Command
+class ReadTask extends Task
 {
     public function run()
     {
@@ -22,8 +21,8 @@ class ReadCommand extends Command
 
     	// or
 
-        $name = IO::ask("What is your name? ");
+        $name = $this->in->ask("What is your name? ");
 
-        IO::log("Hi, $name!");
+        $this->out->log("Hi, $name!");
     }
 }

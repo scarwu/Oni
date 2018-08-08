@@ -1,6 +1,6 @@
 <?php
 /**
- * Oni Request Module
+ * Request
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,19 +10,22 @@
 
 namespace Oni\Web;
 
-class Req
-{
-    private function __construct() {}
+use Exception;
+use Oni\Basic;
 
+class Req extends Basic
+{
     /**
      * @var object
      */
     private static $_instance = null;
 
     /**
-     * @var array
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
      */
-    private static $_attr = [];
+    private function __construct() {}
 
     /**
      * Initialize
@@ -34,34 +37,6 @@ class Req
         }
 
         return self::$_instance;
-    }
-
-    /**
-     * Set Attr
-     *
-     * @param string $key
-     * @param string $value
-     *
-     * @return object
-     */
-    public function setAttr($key, $value)
-    {
-        self::$_attr[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Get Attr
-     *
-     * @param string $key
-     *
-     * @return string|null
-     */
-    public function getAttr($key)
-    {
-        return isset(self::$_attr[$key])
-            ? self::$_attr[$key] : null;
     }
 
     /**

@@ -17,8 +17,10 @@ $root = __DIR__;
 // Require Composer Autoloader
 require "{$root}/../../vendor/autoload.php";
 
-// Register Oni CLI Autoloader
-Oni\CLI\Loader::set('CLIApp', "{$root}/commands");
-Oni\CLI\Loader::register();
+// New Oni CLI Application Instance
+$app = new Oni\CLI\App();
 
-(new CLIApp\MainCommand)->Init();
+$app->setAttr('name', 'CLIApp');
+$app->setAttr('task', "{$root}/tasks");
+
+$app->run();

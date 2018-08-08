@@ -1,6 +1,6 @@
 <?php
 /**
- * IO
+ * Output
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,9 +10,34 @@
 
 namespace Oni\CLI;
 
-class IO
+use Exception;
+use Oni\Basic;
+
+class Out extends Basic
 {
+    /**
+     * @var object
+     */
+    private static $_instance = null;
+
+    /**
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
+     */
     private function __construct() {}
+
+    /**
+     * Initialize
+     */
+    public static function init()
+    {
+        if (null === self::$_instance) {
+            self::$_instance = new self;
+        }
+
+        return self::$_instance;
+    }
 
     /**
      * @var array
@@ -69,7 +94,7 @@ class IO
      *
      * @return string
      */
-    private static function color($text, $text_color = null, $bg_color = null)
+    private function color($text, $text_color = null, $bg_color = null)
     {
         if (isset(self::$text_color[$text_color])) {
             $color = self::$text_color[$text_color];
@@ -91,7 +116,7 @@ class IO
      * @param string $text_color
      * @param string $bg_color
      */
-    public static function write($text, $text_color = null, $bg_color = null)
+    public function write($text, $text_color = null, $bg_color = null)
     {
         if (null !== $text_color || null !== $bg_color) {
             $text = self::color($text, $text_color, $bg_color);
@@ -107,7 +132,7 @@ class IO
      * @param string $bg_color
      * @param string $bg_color
      */
-    public static function writeln($text = '', $text_color = null, $bg_color = null)
+    public function writeln($text = '', $text_color = null, $bg_color = null)
     {
         self::write("{$text}\n", $text_color, $bg_color);
     }
@@ -117,7 +142,7 @@ class IO
      *
      * @param string $text
      */
-    public static function error($text)
+    public function error($text)
     {
         self::write("{$text}\n", 'red');
     }
@@ -127,7 +152,7 @@ class IO
      *
      * @param string $text
      */
-    public static function warning($text)
+    public function warning($text)
     {
         self::write("{$text}\n", 'yellow');
     }
@@ -137,7 +162,7 @@ class IO
      *
      * @param string $text
      */
-    public static function notice($text)
+    public function notice($text)
     {
         self::write("{$text}\n", 'green');
     }
@@ -147,7 +172,7 @@ class IO
      *
      * @param string $text
      */
-    public static function info($text)
+    public function info($text)
     {
         self::write("{$text}\n", 'dark_gray');
     }
@@ -157,7 +182,7 @@ class IO
      *
      * @param string $text
      */
-    public static function debug($text)
+    public function debug($text)
     {
         self::write("{$text}\n", 'light_gray');
     }
@@ -167,43 +192,8 @@ class IO
      *
      * @param string $text
      */
-    public static function log($text)
+    public function log($text)
     {
         self::write("{$text}\n");
-    }
-
-    /**
-     * Read STDIN
-     *
-     * @return string
-     */
-    public static function read()
-    {
-        return trim(fgets(STDIN));
-    }
-
-    /**
-     * Ask
-     *
-     * @param string $text
-     * @param function $callback
-     * @param string $text_color
-     * @param string $bg_color
-     *
-     * @return string|bool
-     */
-    public static function ask($text, $callback = null, $text_color = null, $bg_color = null)
-    {
-        if (null === $callback) {
-            $callback = function() {
-                return true;
-            };
-        }
-
-        do {
-            self::write($text, $text_color, $bg_color);
-        } while (!$callback($answer = self::read()));
-
-        return $answer;
     }
 }

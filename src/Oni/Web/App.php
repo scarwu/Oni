@@ -1,6 +1,6 @@
 <?php
 /**
- * Oni Application
+ * Web Application
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,26 +10,13 @@
 
 namespace Oni\Web;
 
+use Exception;
+use Oni\Basic;
 use Oni\Web\Req;
 use Oni\Web\Res;
 
-class App
+class App extends Basic
 {
-    /**
-     * @var array
-     */
-    private static $_attr = [
-        'name' => 'OniApp',
-        'controller' => false,
-        'controller/default' => 'Index',
-        'model' => false,
-        'view' => false,
-        'view/ext' => 'php',
-        'static' => false,
-        'cache' => false,
-        'cache/time' => 300 // 300 sec = 5 min
-    ];
-
     /**
      * @var object
      */
@@ -41,31 +28,23 @@ class App
     protected $res = null;
 
     /**
-     * Set Attr
-     *
-     * @param string $key
-     * @param string $value
-     *
-     * @return object
+     * Construct
      */
-    public function setAttr($key, $value)
-    {
-        self::$_attr[$key] = $value;
+    public function __construct() {
+        $this->_attr = [
+            'name' => 'OniApp',
+            'controller' => null,   // Requied
+            'controller/default' => 'Index',
+            'model' => null,        // Requied
+            'view' => null,         // Requied
+            'view/ext' => 'php',
+            'static' => null,       // Requied
+            'cache' => null,        // Requied
+            'cache/time' => 300 // 300 sec = 5 min
+        ];
 
-        return $this;
-    }
-
-    /**
-     * Get Attr
-     *
-     * @param string $key
-     *
-     * @return object|null
-     */
-    public function getAttr($key)
-    {
-        return isset(self::$_attr[$key])
-            ? self::$_attr[$key] : null;
+        $this->req = Req::init();
+        $this->res = Res::init();
     }
 
     /**
@@ -75,26 +54,22 @@ class App
      */
     public function run()
     {
-        // Initialize Request & Response
-        $this->req = Req::init();
-        $this->res = Res::init();
-
-        // Set Attrs
-        $this->res->setAttr('view', self::$_attr['view']);
-        $this->res->setAttr('view/ext', self::$_attr['view/ext']);
+        // Set Response Attrs
+        $this->res->setAttr('view', $this->_attr['view']);
+        $this->res->setAttr('view/ext', $this->_attr['view/ext']);
 
         // Load Static File
-        if (self::$_attr['static'] && $this->loadStatic()) {
+        if ($this->_attr['static'] && $this->loadStatic()) {
             return true;
         }
 
         // Load Cache File
-        if (self::$_attr['cache'] && $this->loadCache()) {
+        if ($this->_attr['cache'] && $this->loadCache()) {
             return true;
         }
 
         // Load Controller
-        if (self::$_attr['controller'] && $this->loadController()) {
+        if ($this->_attr['controller'] && $this->loadController()) {
             return true;
         }
 
@@ -116,7 +91,7 @@ class App
             return false;
         }
 
-        $prefix = self::$_attr['static'];
+        $prefix = $this->_attr['static'];
         $path = "{$prefix}/{$uri}";
 
         if (!file_exists($path)) {
@@ -149,7 +124,7 @@ class App
         }
 
         $hash = md5($uri);
-        $prefix = self::$_attr['cache'];
+        $prefix = $this->_attr['cache'];
         $path = "{$prefix}/{$hash}";
 
         if (!file_exists($path)) {
@@ -157,7 +132,7 @@ class App
         }
 
         // Check File Create Time
-        if (time() - filectime($path) > self::$_attr['cache/time']) {
+        if (time() - filectime($path) > $this->_attr['cache/time']) {
             unlink($path);
 
             return false;
@@ -187,11 +162,11 @@ class App
 
         // Set Deafult Controller
         if ('' === $uri[0]) {
-            $uri[0] = self::$_attr['controller/default'];
+            $uri[0] = $this->_attr['controller/default'];
         }
 
-        $name = ucfirst(self::$_attr['name']) . '\Controller';
-        $prefix = self::$_attr['controller'];
+        $name = ucfirst($this->_attr['name']) . '\Controller';
+        $prefix = $this->_attr['controller'];
 
         $uri_temp = $uri;
         $name_temp = $name;

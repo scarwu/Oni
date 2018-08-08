@@ -1,6 +1,6 @@
 <?php
 /**
- * Oni Model Class
+ * Model
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,7 +10,10 @@
 
 namespace Oni\Web;
 
-class Model
+use Exception;
+use Oni\Basic;
+
+class Model extends Basic
 {
 
 }

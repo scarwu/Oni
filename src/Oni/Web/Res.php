@@ -1,6 +1,6 @@
 <?php
 /**
- * Oni Response Module
+ * Response
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,22 +10,27 @@
 
 namespace Oni\Web;
 
-class Res
-{
-    private function __construct() {}
+use Exception;
+use Oni\Basic;
 
+class Res extends Basic
+{
     /**
      * @var object
      */
     private static $_instance = null;
 
     /**
-     * @var array
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
      */
-    private static $_attr = [
-        'view' => false,
-        'view/ext' => 'php'
-    ];
+    private function __construct() {
+        $this->_attr = [
+            'view' => false,
+            'view/ext' => 'php'
+        ];
+    }
 
     /**
      * Initialize
@@ -40,45 +45,17 @@ class Res
     }
 
     /**
-     * Set Attr
-     *
-     * @param string $key
-     * @param string $value
-     *
-     * @return object
-     */
-    public function setAttr($key, $value)
-    {
-        self::$_attr[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Get Attr
-     *
-     * @param string $key
-     *
-     * @return object|null
-     */
-    public function getAttr($key)
-    {
-        return isset(self::$_attr[$key])
-            ? self::$_attr[$key] : null;
-    }
-
-    /**
      * Render HTML
      *
      * @param string $_name
      * @param array $_data
      */
-    public static function html($_name, $_data = [])
+    public function html($_name, $_data = [])
     {
         header('Content-Type: text/html');
 
-        $_prefix = self::$_attr['view'];
-        $_ext = self::$_attr['view/ext'];
+        $_prefix = $this->_attr['view'];
+        $_ext = $this->_attr['view/ext'];
         $_path = "{$_prefix}/{$_name}.{$_ext}";
 
         if (file_exists($_path)) {
@@ -96,7 +73,7 @@ class Res
      * @param array $data
      * @param integer $option
      */
-    public static function json($data = null, $option = null)
+    public function json($data = null, $option = null)
     {
         header('Content-Type: application/json');
 

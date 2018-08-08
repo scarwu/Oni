@@ -1,6 +1,6 @@
 <?php
 /**
- * Command Parse
+ * Parse Task
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,25 +10,24 @@
 
 namespace CLIApp\Main;
 
-use Oni\CLI\Command;
-use Oni\CLI\IO;
+use Oni\CLI\Task;
 
-class ParseCommand extends Command
+class ParseTask extends Task
 {
     public function run()
     {
         if ($this->hasArguments()) {
-            IO::debug('Arguments:');
+            $this->out->debug('Arguments:');
             var_dump($this->getArguments());
         }
 
         if ($this->hasOptions()) {
-            IO::debug('Options:');
+            $this->out->debug('Options:');
             var_dump($this->getOptions());
         }
 
         if ($this->hasConfigs()) {
-            IO::debug('Configs:');
+            $this->out->debug('Configs:');
             var_dump($this->getConfigs());
         }
     }

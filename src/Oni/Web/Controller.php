@@ -1,6 +1,6 @@
 <?php
 /**
- * Oni Controller Class
+ * Controller
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,26 +10,42 @@
 
 namespace Oni\Web;
 
+use Exception;
+use Oni\Basic;
 use Oni\Web\Req;
 use Oni\Web\Res;
 
-abstract class Controller
+abstract class Controller extends Basic
 {
+    /**
+     * @var array
+     */
     protected $req = null;
+
+    /**
+     * @var array
+     */
     protected $res = null;
 
+    /**
+     * Construct
+     */
     public function __construct($req = null, $res = null) {
-        $this->req = (null !== $req) ? $req : new Req();
-        $this->res = (null !== $res) ? $res : new Res();
+        $this->req = (null !== $req) ? $req : Req::init();
+        $this->res = (null !== $res) ? $res : Res::init();
     }
 
-    public function up()
-    {
-        // nothing here
-    }
+    /**
+     * Up Function
+     *
+     * Execute before xxxAction
+     */
+    public function up() {}
 
-    public function down()
-    {
-        // nothing here
-    }
+    /**
+     * Down Function
+     *
+     * Execute after xxxAction
+     */
+    public function down() {}
 }
