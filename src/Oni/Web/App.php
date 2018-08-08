@@ -113,16 +113,18 @@ class App extends Basic
      */
     private function loadStatic()
     {
+        $path = $this->getAttr('static/path');
         $uri = $this->req->uri();
 
-        if ('' === $uri) {
+        if (false !== is_string($path)
+            || '' === $uri) {
+
             return false;
         }
 
-        $path = $this->_attr['static/path'];
         $fullpath = "{$path}/{$uri}";
 
-        if (!file_exists($fullpath)) {
+        if (false === file_exists($fullpath)) {
             return false;
         }
 
@@ -146,22 +148,23 @@ class App extends Basic
      */
     private function loadCache()
     {
+        $path = $this->getAttr('cache/path');
         $uri = $this->req->uri();
 
-        if ('' === $uri) {
+        if (false !== is_string($path)
+            || '' === $uri) {
+
             return false;
         }
 
-        $hash = md5($uri);
-        $path = $this->_attr['cache/path'];
-        $fullpath = "{$path}/{$hash}";
+        $fullpath = "{$path}/" . md5($uri);
 
-        if (!file_exists($fullpath)) {
+        if (false === file_exists($fullpath)) {
             return false;
         }
 
         // Check File Create Time
-        if (time() - filectime($fullpath) > $this->_attr['cache/time']) {
+        if (time() - filectime($fullpath) > $this->getAttr('cache/time')) {
             unlink($fullpath);
 
             return false;
@@ -193,7 +196,7 @@ class App extends Basic
 
         // Set Deafult Task
         if ('' === $segments[0]) {
-            $segments[0] = $this->_attr['controller/default'];
+            $segments[0] = $this->getAttr('controller/default');
         }
 
         foreach ($segments as $segment) {
