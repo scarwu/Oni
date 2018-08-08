@@ -8,7 +8,7 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace CLIApp\Main;
+namespace CLIApp\Task;
 
 use Oni\CLI\Task;
 
@@ -16,10 +16,10 @@ class HelpTask extends Task
 {
     public function run()
     {
-        $this->out->info('Try above tasks:');
-        $this->out->info('    ./boot.php help');
-        $this->out->info('    ./boot.php read');
-        $this->out->info('    ./boot.php color');
-        $this->out->info('    ./boot.php parse');
+        $this->io->info('Try above tasks:');
+        $this->io->info('    ./boot.php help');
+        $this->io->info('    ./boot.php read');
+        $this->io->info('    ./boot.php color');
+        $this->io->info('    ./boot.php parse');
     }
 }

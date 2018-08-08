@@ -22,5 +22,6 @@ $app = new Oni\CLI\App();
 
 $app->setAttr('name', 'CLIApp');
 $app->setAttr('task', "{$root}/tasks");
+$app->setAttr('task/default', 'Help');
 
 $app->run();

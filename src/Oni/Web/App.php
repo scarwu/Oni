@@ -158,61 +158,33 @@ class App extends Basic
      */
     private function loadController()
     {
-        $uri = explode('/', $this->req->uri());
+        $current_path = $this->getAttr('controller');
+        $current_namespace = $this->getAttr('name') . '\\Controller';
 
-        // Set Deafult Controller
-        if ('' === $uri[0]) {
-            $uri[0] = $this->_attr['controller/default'];
+        $segments = explode('/', $this->req->uri());
+
+        // Set Deafult Task
+        if ('' === $segments[0]) {
+            $segments[0] = $this->_attr['controller/default'];
         }
 
-        $name = ucfirst($this->_attr['name']) . '\Controller';
-        $prefix = $this->_attr['controller'];
+        foreach ($segments as $segment) {
+            $segment = ucfirst($segment);
 
-        $uri_temp = $uri;
-        $name_temp = $name;
-        $prefix_temp = $prefix;
-
-        $is_found = false;
-
-        // Search Controller
-        while ($uri) {
-            $file_name = ucfirst($uri[0]);
-
-            if (file_exists("{$prefix_temp}/{$file_name}Controller.php")) {
-                array_shift($uri);
-
-                $name = "{$name_temp}\\{$file_name}";
-                $prefix = "{$prefix_temp}/{$file_name}";
-
-                $uri_temp = $uri;
-                $name_temp = $name;
-                $prefix_temp = $prefix;
-
-                $is_found = true;
-            } elseif (file_exists("{$prefix_temp}/{$file_name}")) {
-                array_shift($uri);
-
-                $uri_temp = $uri;
-                $name_temp = "{$name_temp}\\{$file_name}";
-                $prefix_temp = "{$prefix_temp}/{$file_name}";
-            } else {
-                break;
-            }
+            $current_path = "{$current_path}/{$segment}";
+            $current_namespace = "{$current_namespace}\\{$segment}";
         }
 
-        // Response HTTP Status Code 404
-        if (!$is_found) {
-            http_response_code(404);
-
-            return false;
+        if (false === file_exists("{$current_path}Controller.php")) {
+            throw new Exception("Controller is not found.");
         }
 
         // Require Controller
-        require "{$prefix}Controller.php";
+        require "{$current_path}Controller.php";
 
         // New Controller Instance
-        $controller_name = "{$name}Controller";
-        $instance = new $controller_name($this->req, $this->res);
+        $current_namespace = "{$current_namespace}Controller";
+        $instance = new $current_namespace($this->req, $this->res);
 
         $method = $this->req->method();
         $action_name = "{$method}Action";

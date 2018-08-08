@@ -8,7 +8,7 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace CLIApp\Main;
+namespace CLIApp\Task;
 
 use Oni\CLI\Task;
 
@@ -16,13 +16,13 @@ class ReadTask extends Task
 {
     public function run()
     {
-        // IO::write("What is your name? ");
-        // $name = IO::read();
+        // $this->io->write("What is your name? ");
+        // $name = $this->io->read();
 
     	// or
 
-        $name = $this->in->ask("What is your name? ");
+        $name = $this->io->ask('What is your name? ');
 
-        $this->out->log("Hi, $name!");
+        $this->io->log("Hi, {$name}!");
     }
 }
