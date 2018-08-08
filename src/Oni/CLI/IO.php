@@ -328,7 +328,7 @@ class IO extends Basic
      */
     public function writeln($text = '', $text_color = null, $bg_color = null)
     {
-        self::write("{$text}\n", $text_color, $bg_color);
+        $this->write("{$text}\n", $text_color, $bg_color);
     }
 
     /**
@@ -338,7 +338,7 @@ class IO extends Basic
      */
     public function error($text)
     {
-        self::write("{$text}\n", 'red');
+        $this->write("{$text}\n", 'red');
     }
 
     /**
@@ -348,7 +348,7 @@ class IO extends Basic
      */
     public function warning($text)
     {
-        self::write("{$text}\n", 'yellow');
+        $this->write("{$text}\n", 'yellow');
     }
 
     /**
@@ -358,7 +358,7 @@ class IO extends Basic
      */
     public function notice($text)
     {
-        self::write("{$text}\n", 'green');
+        $this->write("{$text}\n", 'green');
     }
 
     /**
@@ -368,7 +368,7 @@ class IO extends Basic
      */
     public function info($text)
     {
-        self::write("{$text}\n", 'dark_gray');
+        $this->write("{$text}\n", 'dark_gray');
     }
 
     /**
@@ -378,7 +378,7 @@ class IO extends Basic
      */
     public function debug($text)
     {
-        self::write("{$text}\n", 'light_gray');
+        $this->write("{$text}\n", 'light_gray');
     }
 
     /**
@@ -388,6 +388,6 @@ class IO extends Basic
      */
     public function log($text)
     {
-        self::write("{$text}\n");
+        $this->write("{$text}\n");
     }
 }
