@@ -69,23 +69,34 @@ class App extends Basic
     {
         $namespace = $this->getAttr('task/namespace');
         $path = $this->getAttr('task/path');
-        $segments = $this->io->getArguments();
+        $arguments = $this->io->getArguments();
 
         // Set Deafult Task
-        if (0 === sizeof($segments)) {
-            $segments[] = $this->getAttr('task/default');
+        if (0 === sizeof($arguments)) {
+            $arguments[] = $this->getAttr('task/default');
         }
 
-        foreach ($segments as $segment) {
-            $segment = ucfirst($segment);
+        while (0 < sizeof($arguments)) {
+            $argument = $arguments[0];
+            $argument = ucfirst($argument);
 
-            $path = "{$path}/{$segment}";
-            $namespace = "{$namespace}\\{$segment}";
+            if (false === file_exists("{$path}/{$argument}")
+                && false === file_exists("{$path}/{$argument}Task.php")) {
+
+                break;
+            }
+
+            $path = "{$path}/{$argument}";
+            $namespace = "{$namespace}\\{$argument}";
+
+            array_shift($arguments);
         }
 
         if (false === file_exists("{$path}Task.php")) {
             throw new Exception("Task is not found.");
         }
+
+        $this->io->replaceArguments($arguments);
 
         // New Task Instance
         $namespace = "{$namespace}Task";

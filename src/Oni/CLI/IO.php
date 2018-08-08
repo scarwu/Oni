@@ -97,23 +97,43 @@ class IO extends Basic
     }
 
     /**
+     * Replace Arguments
+     *
+     * @return array $data
+     */
+    public function replaceArguments($data)
+    {
+        $this->_arguments = is_array($data) ? $data : [];
+    }
+
+    /**
      * Get Arguments
      *
-     * @return string $key
+     * @return integer $index
      *
      * @return array|bool
      */
-    public function getArguments($key = null)
+    public function getArguments($index = null)
     {
-        if (null !== $key) {
-            if (array_key_exists($key, $this->_arguments)) {
-                return $this->_arguments[$key];
+        if (is_integer($index)) {
+            if (array_key_exists($index, $this->_arguments)) {
+                return $this->_arguments[$index];
             } else {
                 return false;
             }
         }
 
         return $this->_arguments;
+    }
+
+    /**
+     * Has Arguments
+     *
+     * @return bool
+     */
+    public function hasArguments()
+    {
+        return sizeof($this->_arguments) > 0;
     }
 
     /**
@@ -125,7 +145,7 @@ class IO extends Basic
      */
     public function getOptions($key = null)
     {
-        if (null !== $key) {
+        if (is_string($key)) {
             if (array_key_exists($key, $this->_options)) {
                 return $this->_options[$key];
             } else {
@@ -137,6 +157,22 @@ class IO extends Basic
     }
 
     /**
+     * Has Options
+     *
+     * @return string $key
+     *
+     * @return bool
+     */
+    public function hasOptions($key = null)
+    {
+        if (is_string($key)) {
+            return array_key_exists($key, $this->_options);
+        }
+
+        return sizeof($this->_options) > 0;
+    }
+
+    /**
      * Get Configs
      *
      * @return string $key
@@ -145,7 +181,7 @@ class IO extends Basic
      */
     public function getConfigs($key = null)
     {
-        if (null !== $key) {
+        if (is_string($key)) {
             if (array_key_exists($key, $this->_configs)) {
                 return $this->_configs[$key];
             } else {
@@ -157,32 +193,6 @@ class IO extends Basic
     }
 
     /**
-     * Has Arguments
-     *
-     * @return bool
-     */
-    public function hasArguments()
-    {
-        return count($this->_arguments) > 0;
-    }
-
-    /**
-     * Has Options
-     *
-     * @return string $key
-     *
-     * @return bool
-     */
-    public function hasOptions($key = null)
-    {
-        if (null !== $key) {
-            return array_key_exists($key, $this->_options);
-        }
-
-        return count($this->_options) > 0;
-    }
-
-    /**
      * Has Configs
      *
      * @return string $key
@@ -191,11 +201,11 @@ class IO extends Basic
      */
     public function hasConfigs($key = null)
     {
-        if (null !== $key) {
+        if (is_string($key)) {
             return array_key_exists($key, $this->_configs);
         }
 
-        return count($this->_configs) > 0;
+        return sizeof($this->_configs) > 0;
     }
 
     /**
@@ -228,7 +238,7 @@ class IO extends Basic
 
         do {
             $this->write($text, $text_color, $bg_color);
-        } while (!$callback($answer = $this->read()));
+        } while (false === $callback($answer = $this->read()));
 
         return $answer;
     }
