@@ -12,6 +12,7 @@ namespace Oni\Web;
 
 use Exception;
 use Oni\Basic;
+use Oni\Loader;
 use Oni\Web\Req;
 use Oni\Web\Res;
 
@@ -26,11 +27,6 @@ class App extends Basic
      * @var object
      */
     protected $res = null;
-
-    /**
-     * @var array
-     */
-    private $_namespace_list = [];
 
     /**
      * Construct
@@ -54,52 +50,6 @@ class App extends Basic
 
         $this->req = Req::init();
         $this->res = Res::init();
-
-        // Namespace Autoload Register
-        spl_autoload_register(function ($class_name) {
-            $class_name = trim($class_name, '\\');
-
-            foreach ($this->_namespace_list as $namespace => $path_list) {
-                $pattern = '/^' . str_replace('\\', '\\\\', $namespace) . '/';
-
-                if (!preg_match($pattern, $class_name)) {
-                    continue;
-                }
-
-                $class_name = str_replace($namespace, '', trim($class_name, '\\'));
-                $class_name = str_replace('\\', '/', trim($class_name, '\\'));
-
-                foreach ($path_list as $path) {
-                    if (!file_exists("{$path}/{$class_name}.php")) {
-                        continue;
-                    }
-
-                    require "{$path}/{$class_name}.php";
-
-                    return true;
-                }
-            }
-
-            return false;
-        });
-    }
-
-    /**
-     * Register Namespace
-     *
-     * @param string $namespace
-     * @param string $path
-     */
-    public function registerNamespace($namespace, $path)
-    {
-        $namespace = trim($namespace, '\\');
-        $path = rtrim($path, '/');
-
-        if (!isset($this->_namespace_list[$namespace])) {
-            $this->_namespace_list[$namespace] = [];
-        }
-
-        $this->_namespace_list[$namespace][] = $path;
     }
 
     /**
@@ -114,7 +64,7 @@ class App extends Basic
         $path = $this->getAttr('controller/path');
 
         if (null !== $namespace && null !== $path) {
-            $this->registerNamespace($namespace, $path);
+            Loader::append($namespace, $path);
         }
 
         // Register Model Classes
@@ -122,7 +72,7 @@ class App extends Basic
         $path = $this->getAttr('model/path');
 
         if (null !== $namespace && null !== $path) {
-            $this->registerNamespace($namespace, $path);
+            Loader::append($namespace, $path);
         }
 
         // Set Response Attrs

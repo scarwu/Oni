@@ -12,6 +12,7 @@ namespace Oni\CLI;
 
 use Exception;
 use Oni\Basic;
+use Oni\Loader;
 use Oni\CLI\IO;
 
 class App extends Basic
@@ -20,11 +21,6 @@ class App extends Basic
      * @var object
      */
     protected $io = null;
-
-    /**
-     * @var array
-     */
-    private $_namespace_list = [];
 
     /**
      * Construct
@@ -40,52 +36,6 @@ class App extends Basic
         ];
 
         $this->io = IO::init();
-
-        // Namespace Autoload Register
-        spl_autoload_register(function ($class_name) {
-            $class_name = trim($class_name, '\\');
-
-            foreach ($this->_namespace_list as $namespace => $path_list) {
-                $pattern = '/^' . str_replace('\\', '\\\\', $namespace) . '/';
-
-                if (!preg_match($pattern, $class_name)) {
-                    continue;
-                }
-
-                $class_name = str_replace($namespace, '', trim($class_name, '\\'));
-                $class_name = str_replace('\\', '/', trim($class_name, '\\'));
-
-                foreach ($path_list as $path) {
-                    if (!file_exists("{$path}/{$class_name}.php")) {
-                        continue;
-                    }
-
-                    require "{$path}/{$class_name}.php";
-
-                    return true;
-                }
-            }
-
-            return false;
-        });
-    }
-
-    /**
-     * Register Namespace
-     *
-     * @param string $namespace
-     * @param string $path
-     */
-    public function registerNamespace($namespace, $path)
-    {
-        $namespace = trim($namespace, '\\');
-        $path = rtrim($path, '/');
-
-        if (!isset($this->_namespace_list[$namespace])) {
-            $this->_namespace_list[$namespace] = [];
-        }
-
-        $this->_namespace_list[$namespace][] = $path;
     }
 
     /**
@@ -98,7 +48,7 @@ class App extends Basic
         $path = $this->getAttr('task/path');
 
         if (null !== $namespace && null !== $path) {
-            $this->registerNamespace($namespace, $path);
+            Loader::append($namespace, $path);
         }
 
         // Load Task
