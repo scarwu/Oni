@@ -1,6 +1,6 @@
 <?php
 /**
- * Index Controller Example
+ * Main Controller
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,11 +10,11 @@
 
 namespace WebApp\Controller;
 
-use Oni\Web\Controller;
+use Oni\Web\Controller\Page as Controller;
 
-class IndexController extends Controller
+class MainController extends Controller
 {
-    public function getAction()
+    public function defaultAction()
     {
         $this->res->html('index', [
             'title' => 'Oni - A Lightweight PHP Framework for Web & CLI',
@@ -22,6 +22,13 @@ class IndexController extends Controller
             'query' => json_encode($this->req->query()),
             'content' => json_encode($this->req->content()),
             'file' => json_encode($this->req->file())
+        ]);
+    }
+
+    public function errorAction()
+    {
+        $this->res->html('error',[
+            'title' => 'Oni - Error Page'
         ]);
     }
 }

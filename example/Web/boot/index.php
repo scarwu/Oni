@@ -19,7 +19,6 @@ require "{$root}/../../vendor/autoload.php";
 // New Oni Web Application Instance
 $app = new Oni\Web\App();
 
-$app->setAttr('namespace', 'WebApp');
 $app->setAttr('controller/namespace', 'WebApp\Controller');
 $app->setAttr('controller/path', "{$root}/controllers");
 $app->setAttr('model/namespace', 'WebApp\Model');

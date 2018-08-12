@@ -14,8 +14,13 @@ use Oni\CLI\Task;
 
 class ParseTask extends Task
 {
-    public function run()
+    public function run($params = null)
     {
+        if (null !== $params) {
+            $this->io->debug('Params:');
+            var_dump($params);
+        }
+
         if ($this->io->hasArguments()) {
             $this->io->debug('Arguments:');
             var_dump($this->io->getArguments());

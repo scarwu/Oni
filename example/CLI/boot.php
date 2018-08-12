@@ -20,7 +20,6 @@ require "{$root}/../../vendor/autoload.php";
 // New Oni CLI Application Instance
 $app = new Oni\CLI\App();
 
-$app->setAttr('namespace', 'CLIApp');
 $app->setAttr('task/namespace', 'CLIApp\Task');
 $app->setAttr('task/path', "{$root}/tasks");
 $app->setAttr('task/default', 'Help');

@@ -97,16 +97,6 @@ class IO extends Basic
     }
 
     /**
-     * Replace Arguments
-     *
-     * @return array $data
-     */
-    public function replaceArguments($data)
-    {
-        $this->_arguments = is_array($data) ? $data : [];
-    }
-
-    /**
      * Get Arguments
      *
      * @return integer $index

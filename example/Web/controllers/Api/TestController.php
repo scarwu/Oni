@@ -1,6 +1,6 @@
 <?php
 /**
- * Api/Test Controller Example
+ * Api/Test Controller
  *
  * @package     Oni
  * @author      Scar Wu
@@ -10,7 +10,7 @@
 
 namespace WebApp\Controller\Api;
 
-use Oni\Web\Controller;
+use Oni\Web\Controller\Rest as Controller;
 
 class TestController extends Controller
 {

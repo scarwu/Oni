@@ -1,6 +1,6 @@
 <?php
 /**
- * Controller
+ * Rest
  *
  * @package     Oni
  * @author      Scar Wu
@@ -8,14 +8,14 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni\Web;
+namespace Oni\Web\Controller;
 
 use Exception;
 use Oni\Basic;
 use Oni\Web\Req;
 use Oni\Web\Res;
 
-abstract class Controller extends Basic
+abstract class Rest extends Basic
 {
     /**
      * @var array
@@ -34,6 +34,11 @@ abstract class Controller extends Basic
     {
         $this->req = (null !== $req) ? $req : Req::init();
         $this->res = (null !== $res) ? $res : Res::init();
+
+        // Set Default Attributes
+        $this->_attr = [
+            'mode' => 'rest'
+        ];
     }
 
     /**

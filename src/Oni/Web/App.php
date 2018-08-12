@@ -35,10 +35,12 @@ class App extends Basic
     {
         // Set Default Attributes
         $this->_attr = [
-            'namespace' => 'OniApp',
             'controller/namespace' => null,     // Requied
             'controller/path' => null,          // Requied
-            'controller/default' => 'Index',
+            'controller/default' => 'Main',
+            'controller/default/action' => 'default',
+            'controller/error' => 'Main',
+            'controller/error/action' => 'error',
             'model/namespace' => null,          // Requied
             'model/path' => null,               // Requied
             'view/path' => null,                // Requied
@@ -192,45 +194,78 @@ class App extends Basic
     {
         $namespace = $this->getAttr('controller/namespace');
         $path = $this->getAttr('controller/path');
-        $segments = explode('/', $this->req->uri());
+        $params = explode('/', $this->req->uri());
+        $params = '' !== $params[0] ? $params : [];
 
-        // Set Deafult Task
-        if ('' === $segments[0]) {
-            $segments[0] = $this->getAttr('controller/default');
+        foreach ($params as $param) {
+            $param = $params[0];
+            $param = ucfirst($param);
+
+            if (false === file_exists("{$path}/{$param}")
+                && false === file_exists("{$path}/{$param}Controller.php")) {
+
+                break;
+            }
+
+            $path = "{$path}/{$param}";
+            $namespace = "{$namespace}\\{$param}";
+
+            array_shift($params);
         }
 
-        foreach ($segments as $segment) {
-            $segment = ucfirst($segment);
-
-            $path = "{$path}/{$segment}";
-            $namespace = "{$namespace}\\{$segment}";
-        }
-
+        // Rewrite Controller
         if (false === file_exists("{$path}Controller.php")) {
-            throw new Exception("Controller is not found.");
+            $controller = $this->getAttr('controller/default');
+            $controller = ucfirst($controller);
+
+            if (false === file_exists("{$path}/{$controller}Controller.php")) {
+                $controller = $this->getAttr('controller/error');
+                $controller = ucfirst($controller);
+
+                if (false === file_exists("{$path}/{$controller}Controller.php")) {
+                    http_response_code(400);
+
+                    return false;
+                }
+            }
+
+            $namespace = "{$namespace}\\{$controller}";
         }
 
         // New Controller Instance
         $namespace = "{$namespace}Controller";
         $instance = new $namespace($this->req, $this->res);
 
-        $method = $this->req->method();
-        $action_name = "{$method}Action";
-
-        if (method_exists($instance, $action_name)) {
-
-            // Call Function: up -> xxxAction -> down
-            if (false !== $instance->up()) {
-                $instance->$action_name();
+        switch ($instance->getAttr('mode')) {
+        case 'page':
+            if (0 === count($params)) {
+                $action_name = $this->getAttr('controller/default/action') . 'Action';
+            } else {
+                $action_name = array_shift($params) . 'Action';
             }
 
-            $instance->down();
+            break;
+        case 'rest':
+            $action_name = $this->req->method() . 'Action';
 
-            return true;
+            if (false === method_exists($instance, $action_name)) {
+                http_response_code(501);
+
+                return false;
+            }
+
+            break;
+        default:
+            return false;
         }
 
-        http_response_code(501);
+        // Call Function: up -> xxxAction -> down
+        if (false !== $instance->up()) {
+            $instance->$action_name($params);
+        }
 
-        return false;
+        $instance->down();
+
+        return true;
     }
 }

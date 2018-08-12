@@ -69,41 +69,42 @@ class App extends Basic
     {
         $namespace = $this->getAttr('task/namespace');
         $path = $this->getAttr('task/path');
-        $arguments = $this->io->getArguments();
+        $params = $this->io->getArguments();
 
-        // Set Deafult Task
-        if (0 === sizeof($arguments)) {
-            $arguments[] = $this->getAttr('task/default');
-        }
+        while (0 < sizeof($params)) {
+            $param = $params[0];
+            $param = ucfirst($param);
 
-        while (0 < sizeof($arguments)) {
-            $argument = $arguments[0];
-            $argument = ucfirst($argument);
-
-            if (false === file_exists("{$path}/{$argument}")
-                && false === file_exists("{$path}/{$argument}Task.php")) {
+            if (false === file_exists("{$path}/{$param}")
+                && false === file_exists("{$path}/{$param}Task.php")) {
 
                 break;
             }
 
-            $path = "{$path}/{$argument}";
-            $namespace = "{$namespace}\\{$argument}";
+            $path = "{$path}/{$param}";
+            $namespace = "{$namespace}\\{$param}";
 
-            array_shift($arguments);
+            array_shift($params);
         }
 
+        // Rewrite Task
         if (false === file_exists("{$path}Task.php")) {
-            throw new Exception("Task is not found.");
-        }
+            $default = $this->getAttr('task/default');
+            $default = ucfirst($default);
 
-        $this->io->replaceArguments($arguments);
+            if (false === file_exists("{$path}/{$default}Task.php")) {
+                return false;
+            }
+
+            $namespace = "{$namespace}\\{$default}";
+        }
 
         // New Task Instance
         $namespace = "{$namespace}Task";
         $instance = new $namespace($this->io);
 
         if (false !== $instance->up()) {
-            $instance->run();
+            $instance->run($params);
         }
 
         $instance->down();
