@@ -8,9 +8,10 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni\Web;
+namespace Oni\Web\Store;
 
 use Exception;
+use PDO;
 use Oni\Basic;
 
 class Database extends Basic
