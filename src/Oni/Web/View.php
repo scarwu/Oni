@@ -139,18 +139,18 @@ class View extends Basic
     /**
      * Load Partial
      *
-     * @param string $_sub_path
+     * @param string $_subPath
      *
      * @return string
      */
-    private function loadPartial($_sub_path)
+    private function loadPartial($_subPath)
     {
         $_result = '';
 
-        if (is_string($_sub_path)) {
+        if (is_string($_subPath)) {
             $_path = $this->getAttr('path');
             $_ext = $this->getAttr('ext');
-            $_fullpath = "{$_path}/{$_sub_path}.{$_ext}";
+            $_fullpath = "{$_path}/{$_subPath}.{$_ext}";
 
             if (file_exists($_fullpath)) {
                 foreach ($this->data as $_key => $_value) {

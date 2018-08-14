@@ -41,18 +41,18 @@ class IO extends Basic
      */
     private function __construct()
     {
-        $config_regex_rule = '/^-{2}(\w+(?:-\w+)?)(?:=(.+))?/';
-        $option_regex_rule = '/^-{1}(\w+)/';
+        $configRegexRule = '/^-{2}(\w+(?:-\w+)?)(?:=(.+))?/';
+        $optionRegexRule = '/^-{1}(\w+)/';
 
         $argv = array_slice($_SERVER['argv'], 1);
 
         // arguments
         while ($argv) {
-            if (preg_match($config_regex_rule, $argv[0])) {
+            if (preg_match($configRegexRule, $argv[0])) {
                 break;
             }
 
-            if (preg_match($option_regex_rule, $argv[0])) {
+            if (preg_match($optionRegexRule, $argv[0])) {
                 break;
             }
 
@@ -61,19 +61,19 @@ class IO extends Basic
 
         // options & configs
         while ($value = array_shift($argv)) {
-            if (preg_match($config_regex_rule, $value, $match)) {
+            if (preg_match($configRegexRule, $value, $match)) {
                 $this->_configs[$match[1]] = isset($match[2]) ? $match[2] : null;
             }
 
-            if (preg_match($option_regex_rule, $value, $match)) {
+            if (preg_match($optionRegexRule, $value, $match)) {
                 $this->_options[$match[1]] = null;
 
                 if (isset($argv[0])) {
-                    if (preg_match($config_regex_rule, $argv[0])) {
+                    if (preg_match($configRegexRule, $argv[0])) {
                         continue;
                     }
 
-                    if (preg_match($option_regex_rule, $argv[0])) {
+                    if (preg_match($optionRegexRule, $argv[0])) {
                         continue;
                     }
 
@@ -212,12 +212,12 @@ class IO extends Basic
      *
      * @param string $text
      * @param function $callback
-     * @param string $text_color
-     * @param string $bg_color
+     * @param string $textColor
+     * @param string $bgColor
      *
      * @return string|bool
      */
-    public function ask($text, $callback = null, $text_color = null, $bg_color = null)
+    public function ask($text, $callback = null, $textColor = null, $bgColor = null)
     {
         if (null === $callback) {
             $callback = function() {
@@ -226,7 +226,7 @@ class IO extends Basic
         }
 
         do {
-            $this->write($text, $text_color, $bg_color);
+            $this->write($text, $textColor, $bgColor);
         } while (false === $callback($answer = $this->read()));
 
         return $answer;
@@ -235,7 +235,7 @@ class IO extends Basic
     /**
      * @var array
      */
-    private static $text_color = [
+    private static $textColor = [
         'black' => '0;30',
         'red' => '0;31',
         'green' => '0;32',
@@ -258,7 +258,7 @@ class IO extends Basic
     /**
      * @var array
      */
-    private static $bg_color = [
+    private static $bgColor = [
         'black' => '0;40',
         'red' => '0;41',
         'green' => '0;42',
@@ -282,20 +282,20 @@ class IO extends Basic
      * Color
      *
      * @param string $text
-     * @param string $text_color
-     * @param string $bg_color
+     * @param string $textColor
+     * @param string $bgColor
      *
      * @return string
      */
-    private function color($text, $text_color = null, $bg_color = null)
+    private function color($text, $textColor = null, $bgColor = null)
     {
-        if (isset(self::$text_color[$text_color])) {
-            $color = self::$text_color[$text_color];
+        if (isset(self::$textColor[$textColor])) {
+            $color = self::$textColor[$textColor];
             $text = "\033[{$color}m{$text}\033[m";
         }
 
-        if (isset(self::$bg_color[$bg_color])) {
-            $color = self::$bg_color[$bg_color];
+        if (isset(self::$bgColor[$bgColor])) {
+            $color = self::$bgColor[$bgColor];
             $text = "\033[{$color}m{$text}\033[m";
         }
 
@@ -306,13 +306,13 @@ class IO extends Basic
      * Write data to STDOUT
      *
      * @param string $text
-     * @param string $text_color
-     * @param string $bg_color
+     * @param string $textColor
+     * @param string $bgColor
      */
-    public function write($text, $text_color = null, $bg_color = null)
+    public function write($text, $textColor = null, $bgColor = null)
     {
-        if (null !== $text_color || null !== $bg_color) {
-            $text = $this->color($text, $text_color, $bg_color);
+        if (null !== $textColor || null !== $bgColor) {
+            $text = $this->color($text, $textColor, $bgColor);
         }
 
         fwrite(STDOUT, $text);
@@ -322,12 +322,12 @@ class IO extends Basic
      * Write data to STDOUT
      *
      * @param string $text
-     * @param string $bg_color
-     * @param string $bg_color
+     * @param string $bgColor
+     * @param string $bgColor
      */
-    public function writeln($text = '', $text_color = null, $bg_color = null)
+    public function writeln($text = '', $textColor = null, $bgColor = null)
     {
-        $this->write("{$text}\n", $text_color, $bg_color);
+        $this->write("{$text}\n", $textColor, $bgColor);
     }
 
     /**

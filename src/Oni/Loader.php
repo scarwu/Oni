@@ -20,35 +20,35 @@ class Loader
     /**
      * @var array
      */
-    private static $_namespace_list = [];
+    private static $_namespaceList = [];
 
     /**
      * Construct
      *
      * This function is private, so this class is singleton pattern
      */
-    private function __construct() {
-
+    private function __construct()
+    {
         // Namespace Autoload Register
-        spl_autoload_register(function ($class_name) {
-            $class_name = trim($class_name, '\\');
+        spl_autoload_register(function ($className) {
+            $className = trim($className, '\\');
 
-            foreach (self::$_namespace_list as $namespace => $path_list) {
+            foreach (self::$_namespaceList as $namespace => $pathList) {
                 $pattern = '/^' . str_replace('\\', '\\\\', $namespace) . '/';
 
-                if (!preg_match($pattern, $class_name)) {
+                if (!preg_match($pattern, $className)) {
                     continue;
                 }
 
-                $class_name = str_replace($namespace, '', trim($class_name, '\\'));
-                $class_name = str_replace('\\', '/', trim($class_name, '\\'));
+                $className = str_replace($namespace, '', trim($className, '\\'));
+                $className = str_replace('\\', '/', trim($className, '\\'));
 
-                foreach ($path_list as $path) {
-                    if (!file_exists("{$path}/{$class_name}.php")) {
+                foreach ($pathList as $path) {
+                    if (!file_exists("{$path}/{$className}.php")) {
                         continue;
                     }
 
-                    require "{$path}/{$class_name}.php";
+                    require "{$path}/{$className}.php";
 
                     return true;
                 }
@@ -81,11 +81,11 @@ class Loader
         $namespace = trim($namespace, '\\');
         $path = rtrim($path, '/');
 
-        if (!isset(self::$_namespace_list[$namespace])) {
-            self::$_namespace_list[$namespace] = [];
+        if (!isset(self::$_namespaceList[$namespace])) {
+            self::$_namespaceList[$namespace] = [];
         }
 
-        self::$_namespace_list[$namespace][] = $path;
+        self::$_namespaceList[$namespace][] = $path;
 
         return true;
     }

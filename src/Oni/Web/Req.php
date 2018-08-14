@@ -148,13 +148,13 @@ class Req
     public function content()
     {
         switch ($this->contentType()) {
-        case 'application/x-www-form-urlencoded':
-        case 'multipart/form-data':
-            return $_POST;
-        case 'application/json':
-            return json_decode($this->body(), true);
-        default:
-            return $this->body();
+            case 'application/x-www-form-urlencoded':
+            case 'multipart/form-data':
+                return $_POST;
+            case 'application/json':
+                return json_decode($this->body(), true);
+            default:
+                return $this->body();
         }
     }
 
@@ -164,9 +164,9 @@ class Req
     public function file()
     {
         switch ($this->contentType()) {
-        case 'multipart/form-data':
-        default:
-            return $_FILES;
+            case 'multipart/form-data':
+            default:
+                return $_FILES;
         }
     }
 
