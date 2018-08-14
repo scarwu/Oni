@@ -1,6 +1,6 @@
 <?php
 /**
- * Api/Test Controller
+ * Api/Basic Controller
  *
  * @package     Oni
  * @author      Scar Wu
@@ -12,10 +12,13 @@ namespace WebApp\Controller\Api;
 
 use Oni\Web\Controller\Rest as Controller;
 
-class TestController extends Controller
+class BasicController extends Controller
 {
     private $data;
 
+    /**
+     * Lifecycle Functions
+     */
     public function up()
     {
         $this->data = [
@@ -39,23 +42,30 @@ class TestController extends Controller
         ];
     }
 
+    public function down() {
+        var_dump($this->data);
+    }
+
+    /**
+     * Actions
+     */
     public function getAction()
     {
-        var_dump($this->data);
+
     }
 
     public function postAction()
     {
-        var_dump($this->data);
+
     }
 
     public function putAction()
     {
-        var_dump($this->data);
+
     }
 
     public function deleteAction()
     {
-        var_dump($this->data);
+
     }
 }

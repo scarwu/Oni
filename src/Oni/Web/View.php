@@ -137,30 +137,44 @@ class View extends Basic
     }
 
     /**
+     * Load Partial
+     *
+     * @param string $_sub_path
+     *
+     * @return string
+     */
+    private function loadPartial($_sub_path)
+    {
+        $_result = '';
+
+        if (is_string($_sub_path)) {
+            $_path = $this->getAttr('path');
+            $_ext = $this->getAttr('ext');
+            $_fullpath = "{$_path}/{$_sub_path}.{$_ext}";
+
+            if (file_exists($_fullpath)) {
+                foreach ($this->data as $_key => $_value) {
+                    $$_key = $_value;
+                }
+
+                ob_start();
+                include $_fullpath;
+                $_result = ob_get_contents();
+                ob_end_clean();
+            }
+        }
+
+        return $_result;
+    }
+
+    /**
      * Load Content
      *
      * @return string
      */
     private function loadContent()
     {
-        $_path = $this->getAttr('path');
-        $_ext = $this->getAttr('ext');
-
-        $_fullpath = "{$_path}/{$this->contentPath}.{$_ext}";
-        $_result = '';
-
-        if (file_exists($_fullpath)) {
-            foreach ($this->data as $_key => $_value) {
-                $$_key = $_value;
-            }
-
-            ob_start();
-            include $_fullpath;
-            $_result = ob_get_contents();
-            ob_end_clean();
-        }
-
-        return $_result;
+        return $this->loadPartial($this->contentPath);
     }
 
     /**
@@ -170,23 +184,6 @@ class View extends Basic
      */
     public function render()
     {
-        $_path = $this->getAttr('path');
-        $_ext = $this->getAttr('ext');
-
-        $_fullpath = "{$_path}/{$this->layoutPath}.{$_ext}";
-        $_result = '';
-
-        if (file_exists($_fullpath)) {
-            foreach ($this->data as $_key => $_value) {
-                $$_key = $_value;
-            }
-
-            ob_start();
-            include $_fullpath;
-            $_result = ob_get_contents();
-            ob_end_clean();
-        }
-
-        return $_result;
+        return $this->loadPartial($this->layoutPath);
     }
 }

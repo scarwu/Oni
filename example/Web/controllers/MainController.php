@@ -14,9 +14,22 @@ use Oni\Web\Controller\Page as Controller;
 
 class MainController extends Controller
 {
+    /**
+     * Lifecycle Functions
+     */
+    public function up() {
+        $this->view->setLayoutPath('index');
+    }
+
+    public function down() {
+        $this->res->html($this->view->render());
+    }
+
+    /**
+     * Actions
+     */
     public function defaultAction()
     {
-        $this->view->setLayoutPath('index');
         $this->view->setContentPath('main/default');
         $this->view->setData([
             'title' => 'Oni - A Lightweight PHP Framework for Web & CLI',
@@ -40,18 +53,13 @@ class MainController extends Controller
                 ]
             ]
         ]);
-
-        $this->res->html($this->view->render());
     }
 
     public function errorAction()
     {
-        $this->view->setLayoutPath('index');
         $this->view->setContentPath('main/error');
         $this->view->setData([
             'title' => 'Oni - Error Page'
         ]);
-
-        $this->res->html($this->view->render());
     }
 }

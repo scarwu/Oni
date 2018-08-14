@@ -14,36 +14,41 @@ use Oni\Web\Controller\Page as Controller;
 
 class AboutController extends Controller
 {
+    /**
+     * Lifecycle Functions
+     */
+    public function up() {
+        $this->view->setLayoutPath('index');
+    }
+
+    public function down() {
+        $this->res->html($this->view->render());
+    }
+
+    /**
+     * Actions
+     */
     public function defaultAction()
     {
-        $this->view->setLayoutPath('index');
         $this->view->setContentPath('about/default');
         $this->view->setData([
             'title' => 'Oni - About / Default Page'
         ]);
-
-        $this->res->html($this->view->render());
     }
 
     public function mvcAction()
     {
-        $this->view->setLayoutPath('index');
         $this->view->setContentPath('about/mvc');
         $this->view->setData([
             'title' => 'Oni - About / MVC Page'
         ]);
-
-        $this->res->html($this->view->render());
     }
 
     public function mvvmAction()
     {
-        $this->view->setLayoutPath('index');
         $this->view->setContentPath('about/mvvm');
         $this->view->setData([
             'title' => 'Oni - About / MVVM Page'
         ]);
-
-        $this->res->html($this->view->render());
     }
 }
