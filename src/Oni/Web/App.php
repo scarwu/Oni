@@ -37,9 +37,9 @@ class App extends Basic
         $this->_attr = [
             'controller/namespace' => null,     // Requied
             'controller/path' => null,          // Requied
-            'controller/default' => 'Main',
+            'controller/default/handler' => 'Main',
             'controller/default/action' => 'default',
-            'controller/error' => 'Main',
+            'controller/error/handler' => 'Main',
             'controller/error/action' => 'error',
             'model/namespace' => null,          // Requied
             'model/path' => null,               // Requied
@@ -50,6 +50,7 @@ class App extends Basic
             'cache/time' => 300                 // 300 sec = 5 min
         ];
 
+        // Set Instances
         $this->req = Req::init();
         $this->res = Res::init();
     }
@@ -61,13 +62,19 @@ class App extends Basic
      */
     public function run()
     {
-        // Register Controller Classes
-        $namespace = $this->getAttr('controller/namespace');
-        $path = $this->getAttr('controller/path');
-
-        if (null !== $namespace && null !== $path) {
-            Loader::append($namespace, $path);
+        // Load Static File
+        if (null !== $this->getAttr('static/path') && $this->loadStatic()) {
+            return true;
         }
+
+        // Load Cache File
+        if (null !== $this->getAttr('cache/path') && $this->loadCache()) {
+            return true;
+        }
+
+        // Set Response Attrs
+        $this->res->setAttr('view/path', $this->getAttr('view/path'));
+        $this->res->setAttr('view/ext', $this->getAttr('view/ext'));
 
         // Register Model Classes
         $namespace = $this->getAttr('model/namespace');
@@ -77,35 +84,23 @@ class App extends Basic
             Loader::append($namespace, $path);
         }
 
-        // Set Response Attrs
-        $this->res->setAttr('view/path', $this->getAttr('view/path'));
-        $this->res->setAttr('view/ext', $this->getAttr('view/ext'));
+        // Register Controller Classes & Load
+        $namespace = $this->getAttr('controller/namespace');
+        $path = $this->getAttr('controller/path');
 
-        // Load Static File
-        if (null !== $this->getAttr('static/path')
-            && $this->loadStatic()) {
+        if (null !== $namespace && null !== $path) {
+            Loader::append($namespace, $path);
 
-            return true;
-        }
-
-        // Load Cache File
-        if (null !== $this->getAttr('cache/path')
-            && $this->loadCache()) {
-
-            return true;
-        }
-
-        // Load Controller
-        if (null !== $this->getAttr('controller/namespace')
-            && null !== $this->getAttr('controller/path')
-            && $this->loadController()) {
-
-            return true;
+            if ($this->loadController()) {
+                return true;
+            }
         }
 
         if (200 === http_response_code()) {
             http_response_code(404);
         }
+
+        return false;
     }
 
     /**
@@ -118,9 +113,7 @@ class App extends Basic
         $path = $this->getAttr('static/path');
         $uri = $this->req->uri();
 
-        if (false !== is_string($path)
-            || '' === $uri) {
-
+        if (false === is_string($path) || '' === $uri) {
             return false;
         }
 
@@ -153,9 +146,7 @@ class App extends Basic
         $path = $this->getAttr('cache/path');
         $uri = $this->req->uri();
 
-        if (false !== is_string($path)
-            || '' === $uri) {
-
+        if (false === is_string($path) || '' === $uri) {
             return false;
         }
 
@@ -194,6 +185,7 @@ class App extends Basic
     {
         $namespace = $this->getAttr('controller/namespace');
         $path = $this->getAttr('controller/path');
+
         $params = explode('/', $this->req->uri());
         $params = '' !== $params[0] ? $params : [];
 
@@ -215,40 +207,69 @@ class App extends Basic
 
         // Rewrite Controller
         if (false === file_exists("{$path}Controller.php")) {
-            $controller = $this->getAttr('controller/default');
-            $controller = ucfirst($controller);
+            $namespace = $this->getAttr('controller/namespace');
+            $path = $this->getAttr('controller/path');
+            $handler = ucfirst($this->getAttr('controller/default/handler'));
+            $action = $this->getAttr('controller/default/action') . 'Action';
 
-            if (false === file_exists("{$path}/{$controller}Controller.php")) {
-                $controller = $this->getAttr('controller/error');
-                $controller = ucfirst($controller);
+            if (false === file_exists("{$path}/{$handler}Controller.php")) {
+                $handler = ucfirst($this->getAttr('controller/error/handler'));
+                $action = $this->getAttr('controller/error/action') . 'Action';
 
-                if (false === file_exists("{$path}/{$controller}Controller.php")) {
+                if (false === file_exists("{$path}/{$handler}Controller.php")) {
                     http_response_code(400);
 
                     return false;
                 }
             }
 
-            $namespace = "{$namespace}\\{$controller}";
+            $namespace = "{$namespace}\\{$handler}Controller";
+        } else {
+            $namespace = "{$namespace}Controller";
+            $action = null;
         }
 
-        // New Controller Instance
-        $namespace = "{$namespace}Controller";
         $instance = new $namespace($this->req, $this->res);
 
         switch ($instance->getAttr('mode')) {
         case 'page':
-            if (0 === count($params)) {
-                $action_name = $this->getAttr('controller/default/action') . 'Action';
-            } else {
-                $action_name = array_shift($params) . 'Action';
+            if (null === $action) {
+                if (0 === count($params)) {
+                    $action = $this->getAttr('controller/default/action') . 'Action';
+                } else {
+                    $action = array_shift($params) . 'Action';
+                }
+            }
+
+            if (false === method_exists($instance, $action)) {
+                $namespace = $this->getAttr('controller/namespace');
+                $path = $this->getAttr('controller/path');
+
+                $handler = $this->getAttr('controller/error/handler');
+                $handler = ucfirst($handler);
+
+                if (false === file_exists("{$path}/{$handler}Controller.php")) {
+                    http_response_code(400);
+
+                    return false;
+                }
+
+                $namespace = "{$namespace}\\{$handler}Controller";
+                $instance = new $namespace($this->req, $this->res);
+                $action = $this->getAttr('controller/error/action') . 'Action';
+
+                if (false === method_exists($instance, $action)) {
+                    http_response_code(400);
+
+                    return false;
+                }
             }
 
             break;
         case 'rest':
-            $action_name = $this->req->method() . 'Action';
+            $action = $this->req->method() . 'Action';
 
-            if (false === method_exists($instance, $action_name)) {
+            if (false === method_exists($instance, $action)) {
                 http_response_code(501);
 
                 return false;
@@ -261,7 +282,7 @@ class App extends Basic
 
         // Call Function: up -> xxxAction -> down
         if (false !== $instance->up()) {
-            $instance->$action_name($params);
+            $instance->$action($params);
         }
 
         $instance->down();

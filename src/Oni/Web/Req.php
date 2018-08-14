@@ -54,6 +54,17 @@ class Req extends Basic
     }
 
     /**
+     * Content Length
+     *
+     * @return integer
+     */
+    public function contentLength()
+    {
+        return isset($_SERVER['CONTENT_LENGTH']) && '' !== $_SERVER['CONTENT_LENGTH']
+            ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+    }
+
+    /**
      * Content Type
      *
      * @return string|null
@@ -61,11 +72,43 @@ class Req extends Basic
     public function contentType()
     {
         // Content Type
+        //     * text/plain
         //     * multipart/form-data
+        //     * multipart/form-data; boundary=----WebKitFormBoundaryKw2qnJFfEWBNPPYK
         //     * application/x-www-form-urlencoded
         //     * application/json
-        return isset($_SERVER['CONTENT_TYPE'])
-            ? $_SERVER['CONTENT_TYPE'] : null;
+        return isset($_SERVER['CONTENT_TYPE']) && '' !== $_SERVER['CONTENT_TYPE']
+            ? explode(';', $_SERVER['CONTENT_TYPE'])[0] : null;
+    }
+
+    /**
+     * Get Protocol
+     *
+     * @return string
+     */
+    public function protocol()
+    {
+        return strtolower($_SERVER['SERVER_PROTOCOL']);
+    }
+
+    /**
+     * Get Scheme
+     *
+     * @return string
+     */
+    public function scheme()
+    {
+        return strtolower($_SERVER['REQUEST_SCHEME']);
+    }
+
+    /**
+     * Get Host
+     *
+     * @return string
+     */
+    public function host()
+    {
+        return $_SERVER['HTTP_HOST'];
     }
 
     /**
@@ -87,6 +130,14 @@ class Req extends Basic
     }
 
     /**
+     * Body
+     */
+    public function body()
+    {
+        return file_get_contents('php://input');
+    }
+
+    /**
      * Query
      */
     public function query()
@@ -101,12 +152,12 @@ class Req extends Basic
     {
         switch ($this->contentType()) {
         case 'application/x-www-form-urlencoded':
-            return urldecode(file_get_contents('php://input'));
-        case 'application/json':
-            return json_decode(file_get_contents('php://input'), true);
         case 'multipart/form-data':
-        default:
             return $_POST;
+        case 'application/json':
+            return json_decode($this->body(), true);
+        default:
+            return $this->body();
         }
     }
 
@@ -128,7 +179,6 @@ class Req extends Basic
     public function isAjax()
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
-            ? $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest'
-            : false;
+            && 'XMLHttpRequest' === $_SERVER['HTTP_X_REQUESTED_WITH'];
     }
 }

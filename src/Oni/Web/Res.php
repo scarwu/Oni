@@ -56,8 +56,8 @@ class Res extends Basic
     {
         header('Content-Type: text/html');
 
-        $_path = $this->_attr['view/path'];
-        $_ext = $this->_attr['view/ext'];
+        $_path = $this->getAttr('view/path');
+        $_ext = $this->getAttr('view/ext');
         $_fullpath = "{$_path}/{$_name}.{$_ext}";
 
         if (file_exists($_fullpath)) {

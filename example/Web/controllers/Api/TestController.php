@@ -14,15 +14,20 @@ use Oni\Web\Controller\Rest as Controller;
 
 class TestController extends Controller
 {
-    private $option;
     private $data;
 
     public function up()
     {
-        $this->option = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE;
         $this->data = [
             'method' => $this->req->method(),
-            'method' => $this->req->method(),
+            'protocol' => $this->req->protocol(),
+            'scheme' => $this->req->scheme(),
+            'host' => $this->req->host(),
+            'uri' => $this->req->uri(),
+            'isAjax' => $this->req->isAjax(),
+            'contentLength' => $this->req->contentLength(),
+            'contentType' => $this->req->contentType(),
+            'body' => $this->req->body(),
             'query' => $this->req->query(),
             'content' => $this->req->content(),
             'file' => $this->req->file(),
@@ -36,21 +41,21 @@ class TestController extends Controller
 
     public function getAction()
     {
-        $this->res->json($this->data, $this->option);
+        var_dump($this->data);
     }
 
     public function postAction()
     {
-        $this->res->json($this->data, $this->option);
+        var_dump($this->data);
     }
 
     public function putAction()
     {
-        $this->res->json($this->data, $this->option);
+        var_dump($this->data);
     }
 
     public function deleteAction()
     {
-        $this->res->json($this->data, $this->option);
+        var_dump($this->data);
     }
 }

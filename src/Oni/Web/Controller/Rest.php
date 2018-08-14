@@ -32,13 +32,14 @@ abstract class Rest extends Basic
      */
     public function __construct($req = null, $res = null)
     {
-        $this->req = (null !== $req) ? $req : Req::init();
-        $this->res = (null !== $res) ? $res : Res::init();
-
         // Set Default Attributes
         $this->_attr = [
             'mode' => 'rest'
         ];
+
+        // Set Instances
+        $this->req = (null !== $req) ? $req : Req::init();
+        $this->res = (null !== $res) ? $res : Res::init();
     }
 
     /**

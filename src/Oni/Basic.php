@@ -37,7 +37,7 @@ abstract class Basic
      *
      * @param string $key
      *
-     * @return string|null
+     * @return mixed
      */
     final public function getAttr($key)
     {

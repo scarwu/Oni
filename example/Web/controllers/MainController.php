@@ -16,18 +16,33 @@ class MainController extends Controller
 {
     public function defaultAction()
     {
-        $this->res->html('index', [
+        $this->res->html('main/default', [
             'title' => 'Oni - A Lightweight PHP Framework for Web & CLI',
-            'method' => $this->req->method(),
-            'query' => json_encode($this->req->query()),
-            'content' => json_encode($this->req->content()),
-            'file' => json_encode($this->req->file())
+            'data' => [
+                'method' => $this->req->method(),
+                'protocol' => $this->req->protocol(),
+                'scheme' => $this->req->scheme(),
+                'host' => $this->req->host(),
+                'uri' => $this->req->uri(),
+                'isAjax' => $this->req->isAjax(),
+                'contentLength' => $this->req->contentLength(),
+                'contentType' => $this->req->contentType(),
+                'body' => $this->req->body(),
+                'query' => $this->req->query(),
+                'content' => $this->req->content(),
+                'file' => $this->req->file(),
+                'native' => [
+                    'server' => $_SERVER,
+                    'post' => $_POST,
+                    'get' => $_GET
+                ]
+            ]
         ]);
     }
 
     public function errorAction()
     {
-        $this->res->html('error',[
+        $this->res->html('main/error', [
             'title' => 'Oni - Error Page'
         ]);
     }

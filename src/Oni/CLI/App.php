@@ -29,12 +29,13 @@ class App extends Basic
     {
         // Set Default Attributes
         $this->_attr = [
-            'namespace' => 'OniApp',
-            'task/namespace' => null,   // Requied
-            'task/path' => null,        // Requied
-            'task/default' => 'Main'
+            'task/namespace' => null,    // Requied
+            'task/path' => null,         // Requied
+            'task/default/handler' => 'Main',
+            'task/error/handler' => 'Main'
         ];
 
+        // Set Instance
         $this->io = IO::init();
     }
 
@@ -43,21 +44,19 @@ class App extends Basic
      */
     public function run()
     {
-        // Register Task Classes
+        // Register Task Classes & Load
         $namespace = $this->getAttr('task/namespace');
         $path = $this->getAttr('task/path');
 
         if (null !== $namespace && null !== $path) {
             Loader::append($namespace, $path);
+
+            if ($this->loadTask()) {
+                return true;
+            }
         }
 
-        // Load Task
-        if (null !== $this->getAttr('task/namespace')
-            && null !== $this->getAttr('task/path')
-            && $this->loadTask()) {
-
-            return true;
-        }
+        return false;
     }
 
     /**
@@ -89,18 +88,19 @@ class App extends Basic
 
         // Rewrite Task
         if (false === file_exists("{$path}Task.php")) {
-            $default = $this->getAttr('task/default');
-            $default = ucfirst($default);
+            $namespace = $this->getAttr('task/namespace');
+            $path = $this->getAttr('task/path');
+            $handler = ucfirst($this->getAttr('task/default/handler'));
 
-            if (false === file_exists("{$path}/{$default}Task.php")) {
+            if (false === file_exists("{$path}/{$handler}Task.php")) {
                 return false;
             }
 
-            $namespace = "{$namespace}\\{$default}";
+            $namespace = "{$namespace}\\{$handler}Task";
+        } else {
+            $namespace = "{$namespace}Task";
         }
 
-        // New Task Instance
-        $namespace = "{$namespace}Task";
         $instance = new $namespace($this->io);
 
         if (false !== $instance->up()) {
