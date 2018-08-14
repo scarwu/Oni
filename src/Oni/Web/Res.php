@@ -10,10 +10,7 @@
 
 namespace Oni\Web;
 
-use Exception;
-use Oni\Basic;
-
-class Res extends Basic
+class Res extends
 {
     /**
      * @var object
@@ -25,14 +22,7 @@ class Res extends Basic
      *
      * This function is private, so this class is singleton pattern
      */
-    private function __construct()
-    {
-        // Set Default Attributes
-        $this->_attr = [
-            'view/path' => null,
-            'view/ext' => 'php'
-        ];
-    }
+    private function __construct() {}
 
     /**
      * Initialize
@@ -47,26 +37,25 @@ class Res extends Basic
     }
 
     /**
+     * Redirect
+     *
+     * @param string $path
+     */
+    public function redirect($path)
+    {
+        header("Location: {$path}");
+    }
+
+    /**
      * Render HTML
      *
-     * @param string $_name
-     * @param array $_data
+     * @param string $data
      */
-    public function html($_name, $_data = [])
+    public function html($data)
     {
         header('Content-Type: text/html');
 
-        $_path = $this->getAttr('view/path');
-        $_ext = $this->getAttr('view/ext');
-        $_fullpath = "{$_path}/{$_name}.{$_ext}";
-
-        if (file_exists($_fullpath)) {
-            foreach ($_data as $_key => $_value) {
-                $$_key = $_value;
-            }
-
-            include $_fullpath;
-        }
+        echo $data;
     }
 
     /**

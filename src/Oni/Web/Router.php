@@ -10,7 +10,6 @@
 
 namespace Oni\Web;
 
-use Exception;
 use Oni\Basic;
 
 class Router extends Basic

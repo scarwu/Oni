@@ -10,7 +10,6 @@
 
 namespace Oni\Web\Store;
 
-use Exception;
 use PDO;
 use Oni\Basic;
 

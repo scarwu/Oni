@@ -10,7 +10,6 @@
 
 namespace Oni\Web\Controller;
 
-use Exception;
 use Oni\Basic;
 use Oni\Web\Req;
 use Oni\Web\Res;

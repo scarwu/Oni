@@ -10,7 +10,6 @@
 
 namespace Oni\Web\Store;
 
-use Exception;
 use Memcached;
 use Oni\Basic;
 

@@ -10,10 +10,7 @@
 
 namespace Oni\Web;
 
-use Exception;
-use Oni\Basic;
-
-class Req extends Basic
+class Req extends
 {
     /**
      * @var object

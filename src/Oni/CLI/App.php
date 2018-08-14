@@ -10,7 +10,6 @@
 
 namespace Oni\CLI;
 
-use Exception;
 use Oni\Basic;
 use Oni\Loader;
 use Oni\CLI\IO;

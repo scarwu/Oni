@@ -16,22 +16,31 @@ class AboutController extends Controller
 {
     public function defaultAction()
     {
-        $this->res->html('about/default', [
+        $this->view->setLayoutPath('index');
+        $this->view->setContentPath('about/default');
+
+        $this->res->html($this->view->render([
             'title' => 'Oni - About / Default Page'
-        ]);
+        ]));
     }
 
     public function mvcAction()
     {
-        $this->res->html('about/mvc', [
+        $this->view->setLayoutPath('index');
+        $this->view->setContentPath('about/mvc');
+
+        $this->res->html($this->view->render([
             'title' => 'Oni - About / MVC Page'
-        ]);
+        ]));
     }
 
     public function mvvmAction()
     {
-        $this->res->html('about/mvvm', [
+        $this->view->setLayoutPath('index');
+        $this->view->setContentPath('about/mvvm');
+
+        $this->res->html($this->view->render([
             'title' => 'Oni - About / MVVM Page'
-        ]);
+        ]));
     }
 }

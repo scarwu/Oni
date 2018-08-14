@@ -10,11 +10,11 @@
 
 namespace Oni\Web;
 
-use Exception;
 use Oni\Basic;
 use Oni\Loader;
 use Oni\Web\Req;
 use Oni\Web\Res;
+use Oni\Web\View;
 
 class App extends Basic
 {
@@ -71,10 +71,6 @@ class App extends Basic
         if (null !== $this->getAttr('cache/path') && $this->loadCache()) {
             return true;
         }
-
-        // Set Response Attrs
-        $this->res->setAttr('view/path', $this->getAttr('view/path'));
-        $this->res->setAttr('view/ext', $this->getAttr('view/ext'));
 
         // Register Model Classes
         $namespace = $this->getAttr('model/namespace');
@@ -229,7 +225,12 @@ class App extends Basic
             $action = null;
         }
 
-        $instance = new $namespace($this->req, $this->res);
+        // Set View Attrs
+        $view = View::init();
+        $view->setAttr('path', $this->getAttr('view/path'));
+        $view->setAttr('ext', $this->getAttr('view/ext'));
+
+        $instance = new $namespace($this->req, $this->res, $view);
 
         switch ($instance->getAttr('mode')) {
         case 'page':
@@ -255,7 +256,7 @@ class App extends Basic
                 }
 
                 $namespace = "{$namespace}\\{$handler}Controller";
-                $instance = new $namespace($this->req, $this->res);
+                $instance = new $namespace($this->req, $this->res, $view);
                 $action = $this->getAttr('controller/error/action') . 'Action';
 
                 if (false === method_exists($instance, $action)) {

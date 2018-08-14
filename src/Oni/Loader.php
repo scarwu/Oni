@@ -10,8 +10,6 @@
 
 namespace Oni;
 
-use Exception;
-
 class Loader
 {
     /**
