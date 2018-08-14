@@ -10,7 +10,7 @@
 
 namespace Oni\Web;
 
-class Req extends
+class Req
 {
     /**
      * @var object

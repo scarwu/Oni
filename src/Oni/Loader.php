@@ -63,9 +63,17 @@ class Loader
      *
      * @param string $namespace
      * @param string $path
+     *
+     * @return bool
      */
     public static function append($namespace, $path)
     {
+        if (false === is_string($namespace)
+            || false === is_string($path)) {
+
+            return false;
+        }
+
         if (null === self::$_instance) {
             self::$_instance = new self;
         }
@@ -78,5 +86,7 @@ class Loader
         }
 
         self::$_namespace_list[$namespace][] = $path;
+
+        return true;
     }
 }

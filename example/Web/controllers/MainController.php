@@ -18,8 +18,7 @@ class MainController extends Controller
     {
         $this->view->setLayoutPath('index');
         $this->view->setContentPath('main/default');
-
-        $this->res->html($this->view->render([
+        $this->view->setData([
             'title' => 'Oni - A Lightweight PHP Framework for Web & CLI',
             'data' => [
                 'method' => $this->req->method(),
@@ -40,16 +39,19 @@ class MainController extends Controller
                     'get' => $_GET
                 ]
             ]
-        ]));
+        ]);
+
+        $this->res->html($this->view->render());
     }
 
     public function errorAction()
     {
         $this->view->setLayoutPath('index');
         $this->view->setContentPath('main/error');
-
-        $this->res->html($this->view->render([
+        $this->view->setData([
             'title' => 'Oni - Error Page'
-        ]));
+        ]);
+
+        $this->res->html($this->view->render());
     }
 }

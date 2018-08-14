@@ -5,6 +5,5 @@ script:
   - php ./example/CLI/boot.php parse arg1 arg2 /arg3/arg4 -opt1 -opt2 opt_arg --cfg1 skip --cfg2=cfg_arg
 language: php
 php:
-  - 7.0
   - 7.1
   - 7.2

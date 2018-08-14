@@ -10,7 +10,7 @@
 
 namespace Oni\Web;
 
-class Res extends
+class Res
 {
     /**
      * @var object
@@ -43,7 +43,9 @@ class Res extends
      */
     public function redirect($path)
     {
-        header("Location: {$path}");
+        if (is_string($path)) {
+            header("Location: {$path}");
+        }
     }
 
     /**
@@ -55,7 +57,9 @@ class Res extends
     {
         header('Content-Type: text/html');
 
-        echo $data;
+        if (is_string($data)) {
+            echo $data;
+        }
     }
 
     /**
@@ -64,11 +68,11 @@ class Res extends
      * @param array $data
      * @param integer $option
      */
-    public function json($data = null, $option = null)
+    public function json($data, $option = null)
     {
         header('Content-Type: application/json');
 
-        if (null !== $data) {
+        if (is_string($data)) {
             echo json_encode($data, $option);
         }
     }

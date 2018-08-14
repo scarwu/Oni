@@ -11,6 +11,7 @@
 namespace Oni\Web;
 
 use Oni\Basic;
+use Oni\Web\Helper;
 
 class View extends Basic
 {
@@ -57,31 +58,70 @@ class View extends Basic
     private $contentPath = null;
 
     /**
+     * @var array
+     */
+    private $data = [];
+
+    /**
      * Set Layout Path
      *
      * @param string $path
+     *
+     * @return bool
      */
     public function setLayoutPath($path)
     {
+        if (false === is_string($path)) {
+            return false;
+        }
+
         $this->layoutPath = $path;
+
+        return true;
     }
 
     /**
      * Set Content Path
      *
      * @param string $path
+     *
+     * @return bool
      */
     public function setContentPath($path)
     {
+        if (false === is_string($path)) {
+            return false;
+        }
+
         $this->contentPath = $path;
+
+        return true;
+    }
+
+    /**
+     * Set Data
+     *
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function setData($data)
+    {
+        if (false === is_array($data)) {
+            return false;
+        }
+
+        $this->data = $data;
+
+        return true;
     }
 
     /**
      * Get Layout Path
      *
-     * @param string $path
+     * @return string
      */
-    public function getLayoutPath($path)
+    public function getLayoutPath()
     {
         return $this->layoutPath;
     }
@@ -89,30 +129,17 @@ class View extends Basic
     /**
      * Get Content Path
      *
-     * @param string $path
+     * @return string
      */
-    public function getContentPath($path)
+    public function getContentPath()
     {
         return $this->contentPath;
     }
 
     /**
-     * Load Layout
-     */
-    private function loadLayout()
-    {
-        $_path = $this->getAttr('path');
-        $_ext = $this->getAttr('ext');
-
-        $_fullpath = "{$_path}/{$this->layoutPath}.{$_ext}";
-
-        if (file_exists($_fullpath)) {
-            include $_fullpath;
-        }
-    }
-
-    /**
      * Load Content
+     *
+     * @return string
      */
     private function loadContent()
     {
@@ -120,27 +147,45 @@ class View extends Basic
         $_ext = $this->getAttr('ext');
 
         $_fullpath = "{$_path}/{$this->contentPath}.{$_ext}";
+        $_result = '';
 
         if (file_exists($_fullpath)) {
+            foreach ($this->data as $_key => $_value) {
+                $$_key = $_value;
+            }
+
+            ob_start();
             include $_fullpath;
+            $_result = ob_get_contents();
+            ob_end_clean();
         }
+
+        return $_result;
     }
 
     /**
      * Render
      *
-     * @param array $_data
+     * @return string
      */
-    public function render($_data = [])
+    public function render()
     {
-        foreach ($_data as $_key => $_value) {
-            $$_key = $_value;
-        }
+        $_path = $this->getAttr('path');
+        $_ext = $this->getAttr('ext');
 
-        ob_start();
-        $this->loadLayout();
-        $_result = ob_get_contents();
-        ob_end_clean();
+        $_fullpath = "{$_path}/{$this->layoutPath}.{$_ext}";
+        $_result = '';
+
+        if (file_exists($_fullpath)) {
+            foreach ($this->data as $_key => $_value) {
+                $$_key = $_value;
+            }
+
+            ob_start();
+            include $_fullpath;
+            $_result = ob_get_contents();
+            ob_end_clean();
+        }
 
         return $_result;
     }
