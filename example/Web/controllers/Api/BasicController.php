@@ -42,7 +42,8 @@ class BasicController extends Controller
         ];
     }
 
-    public function down() {
+    public function down()
+    {
         var_dump($this->data);
     }
 

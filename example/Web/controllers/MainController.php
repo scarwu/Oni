@@ -17,11 +17,13 @@ class MainController extends Controller
     /**
      * Lifecycle Functions
      */
-    public function up() {
+    public function up()
+    {
         $this->view->setLayoutPath('index');
     }
 
-    public function down() {
+    public function down()
+    {
         $this->res->html($this->view->render());
     }
 
