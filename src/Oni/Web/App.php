@@ -202,11 +202,11 @@ class App extends Basic
         }
 
         // Rewrite Controller
+        $action = null;
+
         if (false === file_exists("{$path}Controller.php")) {
-            $namespace = $this->getAttr('controller/namespace');
             $path = $this->getAttr('controller/path');
             $handler = ucfirst($this->getAttr('controller/default/handler'));
-            $action = $this->getAttr('controller/default/action') . 'Action';
 
             if (false === file_exists("{$path}/{$handler}Controller.php")) {
                 $handler = ucfirst($this->getAttr('controller/error/handler'));
@@ -219,10 +219,10 @@ class App extends Basic
                 }
             }
 
+            $namespace = $this->getAttr('controller/namespace');
             $namespace = "{$namespace}\\{$handler}Controller";
         } else {
             $namespace = "{$namespace}Controller";
-            $action = null;
         }
 
         // Set View Attrs
