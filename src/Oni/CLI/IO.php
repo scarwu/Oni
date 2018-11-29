@@ -35,6 +35,52 @@ class IO extends Basic
     private $_configs = [];
 
     /**
+     * @var array
+     */
+    private static $textColor = [
+        'black' => '0;30',
+        'red' => '0;31',
+        'green' => '0;32',
+        'brown' => '0;33',
+        'blue' => '0;34',
+        'purple' => '0;35',
+        'cyan' => '0;36',
+        'light_gray' => '0;37',
+
+        'dark_gray' => '1;30',
+        'light_red' => '1;31',
+        'light_green' => '1;32',
+        'yellow' => '1;33',
+        'light_blue' => '1;34',
+        'light_purple' => '1;35',
+        'light_cyan' => '1;36',
+        'white' => '1;37'
+    ];
+
+    /**
+     * @var array
+     */
+    private static $bgColor = [
+        'black' => '0;40',
+        'red' => '0;41',
+        'green' => '0;42',
+        'brown' => '0;43',
+        'blue' => '0;44',
+        'purple' => '0;45',
+        'cyan' => '0;46',
+        'light_gray' => '0;47',
+
+        'dark_gray' => '1;40',
+        'light_red' => '1;41',
+        'light_green' => '1;42',
+        'yellow' => '1;43',
+        'light_blue' => '1;44',
+        'light_purple' => '1;45',
+        'light_cyan' => '1;46',
+        'white' => '1;47'
+    ];
+
+    /**
      * Construct
      *
      * This function is private, so this class is singleton pattern
@@ -233,50 +279,110 @@ class IO extends Basic
     }
 
     /**
-     * @var array
+     * Menu Render
+     *
+     * @param array $options
+     * @param integer $selectedIndex
      */
-    private static $textColor = [
-        'black' => '0;30',
-        'red' => '0;31',
-        'green' => '0;32',
-        'brown' => '0;33',
-        'blue' => '0;34',
-        'purple' => '0;35',
-        'cyan' => '0;36',
-        'light_gray' => '0;37',
-
-        'dark_gray' => '1;30',
-        'light_red' => '1;31',
-        'light_green' => '1;32',
-        'yellow' => '1;33',
-        'light_blue' => '1;34',
-        'light_purple' => '1;35',
-        'light_cyan' => '1;36',
-        'white' => '1;37'
-    ];
+    private function menuRender($options, $selectedIndex) {
+        foreach ($options as $currentIndex => $option) {
+            if ($selectedIndex === $currentIndex) {
+                $this->writeln("> {$option}");
+            } else {
+                $this->writeln("  {$option}");
+            }
+        }
+    }
 
     /**
-     * @var array
+     * Menu Input
+     *
+     * @param array $options
      */
-    private static $bgColor = [
-        'black' => '0;40',
-        'red' => '0;41',
-        'green' => '0;42',
-        'brown' => '0;43',
-        'blue' => '0;44',
-        'purple' => '0;45',
-        'cyan' => '0;46',
-        'light_gray' => '0;47',
+    public function menuInput($options) {
+        $totalIndex = count($options);
+        $selectedIndex = 0;
+        $isBreakLoop = false;
+        $char = null;
 
-        'dark_gray' => '1;40',
-        'light_red' => '1;41',
-        'light_green' => '1;42',
-        'yellow' => '1;43',
-        'light_blue' => '1;44',
-        'light_purple' => '1;45',
-        'light_cyan' => '1;46',
-        'white' => '1;47'
-    ];
+        readline_callback_handler_install('', function() {});
+
+        do {
+            switch (ord($char)) {
+            case 10: // Enter Key
+                $isBreakLoop = true;
+
+                break;
+            case 65: // Up Key
+                if ($selectedIndex - 1 >= 0) {
+                    $selectedIndex--;
+                }
+
+                break;
+            case 66: // Down Key
+                if ($selectedIndex + 1 < $totalIndex) {
+                    $selectedIndex++;
+                }
+
+                break;
+            }
+
+            if ($isBreakLoop) {
+                break;
+            }
+
+            $this->menuRender($options, $selectedIndex);
+        } while ($char = stream_get_contents(STDIN, 1));
+
+        readline_callback_handler_remove();
+
+        return $selectedIndex;
+    }
+
+    /**
+     * Menu Select
+     *
+     * @param array $options
+     */
+    public function menuSelect($options) {
+        $totalIndex = count($options);
+        $selectedIndex = 0;
+        $isBreakLoop = false;
+        $char = null;
+
+        readline_callback_handler_install('', function() {});
+
+        do {
+            switch (ord($char)) {
+            case 10: // Enter Key
+                $isBreakLoop = true;
+
+                break;
+            case 65: // Up Key
+                if ($selectedIndex - 1 >= 0) {
+                    $selectedIndex--;
+                }
+
+                break;
+            case 66: // Down Key
+                if ($selectedIndex + 1 < $totalIndex) {
+                    $selectedIndex++;
+                }
+
+                break;
+            }
+
+            if ($isBreakLoop) {
+                break;
+            }
+
+            $this->menuRender($options, $selectedIndex);
+        } while ($char = stream_get_contents(STDIN, 1));
+
+        readline_callback_handler_remove();
+
+        return $selectedIndex;
+    }
 
     /**
      * Color

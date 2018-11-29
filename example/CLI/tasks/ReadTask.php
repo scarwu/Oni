@@ -16,6 +16,12 @@ class ReadTask extends Task
 {
     public function run()
     {
+        $this->io->writeln("What is your gender?");
+        $gender = $this->io->menuSelect([
+            'male',
+            'female'
+        ]);
+
         // $this->io->write("What is your name? ");
         // $name = $this->io->read();
 
@@ -23,6 +29,10 @@ class ReadTask extends Task
 
         $name = $this->io->ask('What is your name? ');
 
-        $this->io->log("Hi, {$name}!");
+        if (0 === $gender) {
+            $this->io->log("Hi, Mr.{$name}!");
+        } else {
+            $this->io->log("Hi, Ms.{$name}!");
+        }
     }
 }
