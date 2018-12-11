@@ -34,50 +34,59 @@ class IO extends Basic
      */
     private $_configs = [];
 
+    // ANSI Escape Code
+    const ESC = "\x1b";
+    const CSI = self::ESC . '[';
+    const OSC = self::ESC . ']';
+
+    // Control Charater
+    const BEL = "\x07";
+    const SEP = ';';
+
     /**
      * @var array
      */
-    private static $textColor = [
-        'black' => '0;30',
-        'red' => '0;31',
-        'green' => '0;32',
-        'brown' => '0;33',
-        'blue' => '0;34',
-        'purple' => '0;35',
-        'cyan' => '0;36',
-        'light_gray' => '0;37',
-
-        'dark_gray' => '1;30',
-        'light_red' => '1;31',
-        'light_green' => '1;32',
-        'yellow' => '1;33',
-        'light_blue' => '1;34',
-        'light_purple' => '1;35',
-        'light_cyan' => '1;36',
-        'white' => '1;37'
+    private static $fgColorMapping = [
+        'black'         => '30',
+        'red'           => '31',
+        'green'         => '32',
+        'yellow'        => '33',
+        'blue'          => '34',
+        'magenta'       => '35',
+        'cyan'          => '36',
+        'white'         => '37',
+        'default'       => '39',
+        'brightBlack'   => '90',
+        'brightRed'     => '91',
+        'brightGreen'   => '92',
+        'brightYellow'  => '93',
+        'brightBlue'    => '94',
+        'brightMagenta' => '95',
+        'brightCyan'    => '96',
+        'brightWhite'   => '97'
     ];
 
     /**
      * @var array
      */
-    private static $bgColor = [
-        'black' => '0;40',
-        'red' => '0;41',
-        'green' => '0;42',
-        'brown' => '0;43',
-        'blue' => '0;44',
-        'purple' => '0;45',
-        'cyan' => '0;46',
-        'light_gray' => '0;47',
-
-        'dark_gray' => '1;40',
-        'light_red' => '1;41',
-        'light_green' => '1;42',
-        'yellow' => '1;43',
-        'light_blue' => '1;44',
-        'light_purple' => '1;45',
-        'light_cyan' => '1;46',
-        'white' => '1;47'
+    private static $bgColorMapping = [
+        'black'         => '40',
+        'red'           => '41',
+        'green'         => '42',
+        'yellow'        => '43',
+        'blue'          => '44',
+        'magenta'       => '45',
+        'cyan'          => '46',
+        'white'         => '47',
+        'default'       => '49',
+        'brightBlack'   => '100',
+        'brightRed'     => '101',
+        'brightGreen'   => '102',
+        'brightYellow'  => '103',
+        'brightBlue'    => '104',
+        'brightMagenta' => '105',
+        'brightCyan'    => '106',
+        'brightWhite'   => '107'
     ];
 
     /**
@@ -258,12 +267,12 @@ class IO extends Basic
      *
      * @param string $text
      * @param function $callback
-     * @param string $textColor
+     * @param string $fgColor
      * @param string $bgColor
      *
      * @return string|bool
      */
-    public function ask($text, $callback = null, $textColor = null, $bgColor = null)
+    public function ask($text, $callback = null, $fgColor = null, $bgColor = null)
     {
         if (null === $callback) {
             $callback = function() {
@@ -272,7 +281,7 @@ class IO extends Basic
         }
 
         do {
-            $this->write($text, $textColor, $bgColor);
+            $this->write($text, $fgColor, $bgColor);
         } while (false === $callback($answer = $this->read()));
 
         return $answer;
@@ -388,37 +397,43 @@ class IO extends Basic
      * Color
      *
      * @param string $text
-     * @param string $textColor
+     * @param string $fgColor
      * @param string $bgColor
      *
      * @return string
      */
-    private function color($text, $textColor = null, $bgColor = null)
+    private function color($text, $fgColor = null, $bgColor = null)
     {
-        if (isset(self::$textColor[$textColor])) {
-            $color = self::$textColor[$textColor];
-            $text = "\033[{$color}m{$text}\033[m";
+        $startCodes = [];
+        $stopCodes = [];
+
+        if (isset(self::$fgColorMapping[$fgColor])) {
+            $startCodes[] = self::$fgColorMapping[$fgColor];
+            $stopCodes[] = 39;
         }
 
-        if (isset(self::$bgColor[$bgColor])) {
-            $color = self::$bgColor[$bgColor];
-            $text = "\033[{$color}m{$text}\033[m";
+        if (isset(self::$bgColorMapping[$bgColor])) {
+            $startCodes[] = self::$bgColorMapping[$bgColor];
+            $stopCodes[] = 49;
         }
 
-        return $text;
+        $start = self::CSI . implode(';', $startCodes) . 'm';
+        $end = self::CSI . implode(';', $stopCodes) . 'm';
+
+        return "{$start}{$text}{$end}";
     }
 
     /**
      * Write data to STDOUT
      *
      * @param string $text
-     * @param string $textColor
+     * @param string $fgColor
      * @param string $bgColor
      */
-    public function write($text, $textColor = null, $bgColor = null)
+    public function write($text, $fgColor = null, $bgColor = null)
     {
-        if (null !== $textColor || null !== $bgColor) {
-            $text = $this->color($text, $textColor, $bgColor);
+        if (null !== $fgColor || null !== $bgColor) {
+            $text = $this->color($text, $fgColor, $bgColor);
         }
 
         fwrite(STDOUT, $text);
@@ -431,9 +446,9 @@ class IO extends Basic
      * @param string $bgColor
      * @param string $bgColor
      */
-    public function writeln($text = '', $textColor = null, $bgColor = null)
+    public function writeln($text = '', $fgColor = null, $bgColor = null)
     {
-        $this->write("{$text}\n", $textColor, $bgColor);
+        $this->write("{$text}\n", $fgColor, $bgColor);
     }
 
     /**
@@ -473,7 +488,7 @@ class IO extends Basic
      */
     public function info($text)
     {
-        $this->write("{$text}\n", 'dark_gray');
+        $this->write("{$text}\n", 'brightBlack');
     }
 
     /**
@@ -483,7 +498,7 @@ class IO extends Basic
      */
     public function debug($text)
     {
-        $this->write("{$text}\n", 'light_gray');
+        $this->write("{$text}\n", 'white');
     }
 
     /**

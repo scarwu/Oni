@@ -20,20 +20,20 @@ class ColorTask extends Task
         $this->io->write('X', 'black');
         $this->io->write('X', 'red');
         $this->io->write('X', 'green');
-        $this->io->write('X', 'brown');
-        $this->io->write('X', 'blue');
-        $this->io->write('X', 'purple');
-        $this->io->write('X', 'cyan');
-        $this->io->write('X', 'light_gray');
-
-        $this->io->write('X', 'dark_gray');
-        $this->io->write('X', 'light_red');
-        $this->io->write('X', 'light_green');
         $this->io->write('X', 'yellow');
-        $this->io->write('X', 'light_blue');
-        $this->io->write('X', 'light_purple');
-        $this->io->write('X', 'light_cyan');
+        $this->io->write('X', 'blue');
+        $this->io->write('X', 'magenta');
+        $this->io->write('X', 'cyan');
         $this->io->write('X', 'white');
+        $this->io->write('X', 'default');
+        $this->io->write('X', 'brightBlack');
+        $this->io->write('X', 'brightRed');
+        $this->io->write('X', 'brightGreen');
+        $this->io->write('X', 'brightYellow');
+        $this->io->write('X', 'brightBlue');
+        $this->io->write('X', 'brightMagenta');
+        $this->io->write('X', 'brightCyan');
+        $this->io->write('X', 'brightWhite');
 
         $this->io->writeln();
 
@@ -41,41 +41,41 @@ class ColorTask extends Task
         $this->io->write('X', null, 'black');
         $this->io->write('X', null, 'red');
         $this->io->write('X', null, 'green');
-        $this->io->write('X', null, 'brown');
-        $this->io->write('X', null, 'blue');
-        $this->io->write('X', null, 'purple');
-        $this->io->write('X', null, 'cyan');
-        $this->io->write('X', null, 'light_gray');
-
-        $this->io->write('X', null, 'dark_gray');
-        $this->io->write('X', null, 'light_red');
-        $this->io->write('X', null, 'light_green');
         $this->io->write('X', null, 'yellow');
-        $this->io->write('X', null, 'light_blue');
-        $this->io->write('X', null, 'light_purple');
-        $this->io->write('X', null, 'light_cyan');
+        $this->io->write('X', null, 'blue');
+        $this->io->write('X', null, 'magenta');
+        $this->io->write('X', null, 'cyan');
         $this->io->write('X', null, 'white');
+        $this->io->write('X', null, 'default');
+        $this->io->write('X', null, 'brightBlack');
+        $this->io->write('X', null, 'brightRed');
+        $this->io->write('X', null, 'brightGreen');
+        $this->io->write('X', null, 'brightYellow');
+        $this->io->write('X', null, 'brightBlue');
+        $this->io->write('X', null, 'brightMagenta');
+        $this->io->write('X', null, 'brightCyan');
+        $this->io->write('X', null, 'brightWhite');
 
         $this->io->writeln();
 
         // Text & Background Colors
-        $this->io->write('X', 'white', 'black');
-        $this->io->write('X', 'light_cyan', 'red');
-        $this->io->write('X', 'light_purple', 'green');
-        $this->io->write('X', 'light_blue', 'brown');
-        $this->io->write('X', 'yellow', 'blue');
-        $this->io->write('X', 'light_green', 'purple');
-        $this->io->write('X', 'light_red', 'cyan');
-        $this->io->write('X', 'dark_gray', 'light_gray');
-
-        $this->io->write('X', 'light_gray', 'dark_gray');
-        $this->io->write('X', 'cyan', 'light_red');
-        $this->io->write('X', 'purple', 'light_green');
-        $this->io->write('X', 'blue', 'yellow');
-        $this->io->write('X', 'brown', 'light_blue');
-        $this->io->write('X', 'green', 'light_purple');
-        $this->io->write('X', 'red', 'light_cyan');
-        $this->io->write('X', 'black', 'white');
+        $this->io->write('X', 'black',          'brightWhite');
+        $this->io->write('X', 'red',            'brightCyan');
+        $this->io->write('X', 'green',          'brightMagenta');
+        $this->io->write('X', 'yellow',         'brightBlue');
+        $this->io->write('X', 'blue',           'brightYellow');
+        $this->io->write('X', 'magenta',        'brightGreen');
+        $this->io->write('X', 'cyan',           'brightRed');
+        $this->io->write('X', 'white',          'brightBlack');
+        $this->io->write('X', 'default',        'default');
+        $this->io->write('X', 'brightBlack',    'white');
+        $this->io->write('X', 'brightRed',      'cyan');
+        $this->io->write('X', 'brightGreen',    'magenta');
+        $this->io->write('X', 'brightYellow',   'blue');
+        $this->io->write('X', 'brightBlue',     'yellow');
+        $this->io->write('X', 'brightMagenta',  'green');
+        $this->io->write('X', 'brightCyan',     'red');
+        $this->io->write('X', 'brightWhite',    'black');
 
         $this->io->writeln();
     }
