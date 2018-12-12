@@ -11,7 +11,7 @@
 namespace Oni\CLI;
 
 use Oni\Basic;
-use Oni\CLI\IO\ANSIEscapeCode as AEC;
+use Oni\CLI\Helper\ANSIEscapeCode as AEC;
 
 class IO extends Basic
 {
