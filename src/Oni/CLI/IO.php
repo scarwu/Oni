@@ -11,6 +11,7 @@
 namespace Oni\CLI;
 
 use Oni\Basic;
+use Oni\CLI\IO\ANSIEscapeCode as AEC;
 
 class IO extends Basic
 {
@@ -33,61 +34,6 @@ class IO extends Basic
      * @var array
      */
     private $_configs = [];
-
-    // ANSI Escape Code
-    const ESC = "\x1b";
-    const CSI = self::ESC . '[';
-    const OSC = self::ESC . ']';
-
-    // Control Charater
-    const BEL = "\x07";
-    const SEP = ';';
-
-    /**
-     * @var array
-     */
-    private static $fgColorMapping = [
-        'black'         => '30',
-        'red'           => '31',
-        'green'         => '32',
-        'yellow'        => '33',
-        'blue'          => '34',
-        'magenta'       => '35',
-        'cyan'          => '36',
-        'white'         => '37',
-        'default'       => '39',
-        'brightBlack'   => '90',
-        'brightRed'     => '91',
-        'brightGreen'   => '92',
-        'brightYellow'  => '93',
-        'brightBlue'    => '94',
-        'brightMagenta' => '95',
-        'brightCyan'    => '96',
-        'brightWhite'   => '97'
-    ];
-
-    /**
-     * @var array
-     */
-    private static $bgColorMapping = [
-        'black'         => '40',
-        'red'           => '41',
-        'green'         => '42',
-        'yellow'        => '43',
-        'blue'          => '44',
-        'magenta'       => '45',
-        'cyan'          => '46',
-        'white'         => '47',
-        'default'       => '49',
-        'brightBlack'   => '100',
-        'brightRed'     => '101',
-        'brightGreen'   => '102',
-        'brightYellow'  => '103',
-        'brightBlue'    => '104',
-        'brightMagenta' => '105',
-        'brightCyan'    => '106',
-        'brightWhite'   => '107'
-    ];
 
     /**
      * Construct
@@ -294,13 +240,10 @@ class IO extends Basic
      * @param integer $selectedIndex
      */
     private function menuRender($options, $selectedIndex) {
-        foreach ($options as $currentIndex => $option) {
-            if ($selectedIndex === $currentIndex) {
-                $this->writeln("> {$option}");
-            } else {
-                $this->writeln("  {$option}");
-            }
-        }
+        $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex) {
+            return ($selectedIndex === $currentIndex)
+                ? "> {$option}" : "  {$option}";
+        }, $options, array_keys($options))));
     }
 
     /**
@@ -308,45 +251,45 @@ class IO extends Basic
      *
      * @param array $options
      */
-    public function menuInput($options) {
-        $totalIndex = count($options);
-        $selectedIndex = 0;
-        $isBreakLoop = false;
-        $char = null;
+    // public function menuInput($options) {
+    //     $totalIndex = count($options);
+    //     $selectedIndex = 0;
+    //     $isBreakLoop = false;
+    //     $char = null;
 
-        readline_callback_handler_install('', function() {});
+    //     readline_callback_handler_install('', function() {});
 
-        do {
-            switch (ord($char)) {
-            case 10: // Enter Key
-                $isBreakLoop = true;
+    //     do {
+    //         switch (ord($char)) {
+    //         case 10: // Enter Key
+    //             $isBreakLoop = true;
 
-                break;
-            case 65: // Up Key
-                if ($selectedIndex - 1 >= 0) {
-                    $selectedIndex--;
-                }
+    //             break;
+    //         case 65: // Up Key
+    //             if ($selectedIndex - 1 >= 0) {
+    //                 $selectedIndex--;
+    //             }
 
-                break;
-            case 66: // Down Key
-                if ($selectedIndex + 1 < $totalIndex) {
-                    $selectedIndex++;
-                }
+    //             break;
+    //         case 66: // Down Key
+    //             if ($selectedIndex + 1 < $totalIndex) {
+    //                 $selectedIndex++;
+    //             }
 
-                break;
-            }
+    //             break;
+    //         }
 
-            if ($isBreakLoop) {
-                break;
-            }
+    //         if ($isBreakLoop) {
+    //             break;
+    //         }
 
-            $this->menuRender($options, $selectedIndex);
-        } while ($char = stream_get_contents(STDIN, 1));
+    //         $this->menuRender($options, $selectedIndex);
+    //     } while ($char = stream_get_contents(STDIN, 1));
 
-        readline_callback_handler_remove();
+    //     readline_callback_handler_remove();
 
-        return $selectedIndex;
-    }
+    //     return $selectedIndex;
+    // }
 
     /**
      * Menu Select
@@ -359,6 +302,10 @@ class IO extends Basic
         $isBreakLoop = false;
         $char = null;
 
+        $wWidth = (int) exec('tput cols');
+        $wHeight = (int) exec('tput lines');
+        $bHeight = count($options);
+
         readline_callback_handler_install('', function() {});
 
         do {
@@ -386,41 +333,15 @@ class IO extends Basic
             }
 
             $this->menuRender($options, $selectedIndex);
+
+            $this->write(AEC::moveTo(0, $wHeight - $bHeight));
         } while ($char = stream_get_contents(STDIN, 1));
+
+        $this->writeln(AEC::moveTo(0, $wHeight));
 
         readline_callback_handler_remove();
 
         return $selectedIndex;
-    }
-
-    /**
-     * Color
-     *
-     * @param string $text
-     * @param string $fgColor
-     * @param string $bgColor
-     *
-     * @return string
-     */
-    private function color($text, $fgColor = null, $bgColor = null)
-    {
-        $startCodes = [];
-        $stopCodes = [];
-
-        if (isset(self::$fgColorMapping[$fgColor])) {
-            $startCodes[] = self::$fgColorMapping[$fgColor];
-            $stopCodes[] = 39;
-        }
-
-        if (isset(self::$bgColorMapping[$bgColor])) {
-            $startCodes[] = self::$bgColorMapping[$bgColor];
-            $stopCodes[] = 49;
-        }
-
-        $start = self::CSI . implode(';', $startCodes) . 'm';
-        $end = self::CSI . implode(';', $stopCodes) . 'm';
-
-        return "{$start}{$text}{$end}";
     }
 
     /**
@@ -433,7 +354,7 @@ class IO extends Basic
     public function write($text, $fgColor = null, $bgColor = null)
     {
         if (null !== $fgColor || null !== $bgColor) {
-            $text = $this->color($text, $fgColor, $bgColor);
+            $text = AEC::color($text, $fgColor, $bgColor);
         }
 
         fwrite(STDOUT, $text);
