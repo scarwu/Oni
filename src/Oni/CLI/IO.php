@@ -308,6 +308,8 @@ class IO extends Basic
 
         readline_callback_handler_install('', function() {});
 
+        $this->write(AEC::cursorHide());
+
         do {
             switch (ord($char)) {
             case 10: // Enter Key
@@ -337,7 +339,8 @@ class IO extends Basic
             $this->write(AEC::moveTo(0, $wHeight - $bHeight));
         } while ($char = stream_get_contents(STDIN, 1));
 
-        $this->writeln(AEC::moveTo(0, $wHeight));
+        $this->write(AEC::moveTo(0, $wHeight));
+        $this->writeln(AEC::cursorShow());
 
         readline_callback_handler_remove();
 

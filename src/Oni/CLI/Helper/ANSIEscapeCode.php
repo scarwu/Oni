@@ -123,4 +123,22 @@ final class ANSIEscapeCode
 
         return "{$start}{$text}{$end}";
     }
+
+    /**
+     * Cursor Show
+     *
+     * @return string
+     */
+    public static function cursorShow() {
+        return self::CSI . '?25h';
+    }
+
+    /**
+     * Cursor Hide
+     *
+     * @return string
+     */
+    public static function cursorHide() {
+        return self::CSI . '?25l';
+    }
 }
