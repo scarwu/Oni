@@ -234,64 +234,6 @@ class IO extends Basic
     }
 
     /**
-     * Menu Render
-     *
-     * @param array $options
-     * @param integer $selectedIndex
-     */
-    private function menuRender($options, $selectedIndex) {
-        $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex) {
-            return ($selectedIndex === $currentIndex)
-                ? "> {$option}" : "  {$option}";
-        }, $options, array_keys($options))));
-    }
-
-    /**
-     * Menu Input
-     *
-     * @param array $options
-     */
-    // public function menuInput($options) {
-    //     $totalIndex = count($options);
-    //     $selectedIndex = 0;
-    //     $isBreakLoop = false;
-    //     $char = null;
-
-    //     readline_callback_handler_install('', function() {});
-
-    //     do {
-    //         switch (ord($char)) {
-    //         case 10: // Enter Key
-    //             $isBreakLoop = true;
-
-    //             break;
-    //         case 65: // Up Key
-    //             if ($selectedIndex - 1 >= 0) {
-    //                 $selectedIndex--;
-    //             }
-
-    //             break;
-    //         case 66: // Down Key
-    //             if ($selectedIndex + 1 < $totalIndex) {
-    //                 $selectedIndex++;
-    //             }
-
-    //             break;
-    //         }
-
-    //         if ($isBreakLoop) {
-    //             break;
-    //         }
-
-    //         $this->menuRender($options, $selectedIndex);
-    //     } while ($char = stream_get_contents(STDIN, 1));
-
-    //     readline_callback_handler_remove();
-
-    //     return $selectedIndex;
-    // }
-
-    /**
      * Menu Select
      *
      * @param array $options
@@ -300,6 +242,7 @@ class IO extends Basic
         $totalIndex = count($options);
         $selectedIndex = 0;
         $isBreakLoop = false;
+        $isFirstLoop = true;
         $char = null;
 
         $wWidth = (int) exec('tput cols');
@@ -308,6 +251,7 @@ class IO extends Basic
 
         readline_callback_handler_install('', function() {});
 
+        // Set Cursor is Hide
         $this->write(AEC::cursorHide());
 
         do {
@@ -334,12 +278,22 @@ class IO extends Basic
                 break;
             }
 
-            $this->menuRender($options, $selectedIndex);
+            // Set Cursor Prev
+            if (false === $isFirstLoop) {
+                $this->write(AEC::cursorPrev($totalIndex - 1));
+            } else {
+                $isFirstLoop = false;
+            }
 
-            $this->write(AEC::moveTo(0, $wHeight - $bHeight));
+            // Print Menu
+            $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex) {
+                return ($selectedIndex === $currentIndex)
+                    ? "> {$option}" : "  {$option}";
+            }, $options, array_keys($options))));
+
         } while ($char = stream_get_contents(STDIN, 1));
 
-        $this->write(AEC::moveTo(0, $wHeight));
+        // Set Cursor is Show
         $this->writeln(AEC::cursorShow());
 
         readline_callback_handler_remove();

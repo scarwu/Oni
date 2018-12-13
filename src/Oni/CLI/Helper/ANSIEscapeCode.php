@@ -64,24 +64,24 @@ final class ANSIEscapeCode
     /**
      * Cursor Position
      *
-     * @param string $x
-     * @param string $y
+     * @param integer $x
+     * @param integer $y
      *
      * @return string
      */
-    public static function CUP($x, $y) {
+    public static function CUP($x = 0, $y = 0) {
         return self::CSI . ($y + 1) . self::SEP . ($x + 1) . 'H';
     }
 
     /**
      * CUP: Move To
      *
-     * @param string $x
-     * @param string $y
+     * @param integer $x
+     * @param integer $y
      *
      * @return string
      */
-    public static function moveTo($x, $y) {
+    public static function moveTo($x = 0, $y = 0) {
         return self::CUP($x, $y);
     }
 
@@ -106,20 +106,20 @@ final class ANSIEscapeCode
     public static function color($text, $fgColor = null, $bgColor = null)
     {
         $startCodes = [];
-        $stopCodes = [];
+        $endCodes = [];
 
         if (isset(self::$colorMapping[$fgColor]['fg'])) {
             $startCodes[] = self::$colorMapping[$fgColor]['fg'];
-            $stopCodes[] = 39;
+            $endCodes[] = 39;
         }
 
         if (isset(self::$colorMapping[$bgColor]['bg'])) {
             $startCodes[] = self::$colorMapping[$bgColor]['bg'];
-            $stopCodes[] = 49;
+            $endCodes[] = 49;
         }
 
         $start = self::SGR($startCodes);
-        $end = self::SGR($stopCodes);
+        $end = self::SGR($endCodes);
 
         return "{$start}{$text}{$end}";
     }
@@ -140,5 +140,89 @@ final class ANSIEscapeCode
      */
     public static function cursorHide() {
         return self::CSI . '?25l';
+    }
+
+    /**
+     * Cursor Up
+     *
+     * @param integer $n
+     *
+     * @return string
+     */
+    public static function cursorUp($n = 1) {
+        return self::CSI . "{$n}A";
+    }
+
+    /**
+     * Cursor Down
+     *
+     * @param integer $n
+     *
+     * @return string
+     */
+    public static function cursorDown($n = 1) {
+        return self::CSI . "{$n}B";
+    }
+
+    /**
+     * Cursor Left
+     *
+     * @param integer $n
+     *
+     * @return string
+     */
+    public static function cursorLeft($n = 1) {
+        return self::CSI . "{$n}C";
+    }
+
+    /**
+     * Cursor Right
+     *
+     * @param integer $n
+     *
+     * @return string
+     */
+    public static function cursorRight($n = 1) {
+        return self::CSI . "{$n}D";
+    }
+
+    /**
+     * Cursor Next
+     *
+     * @param integer $n
+     *
+     * @return string
+     */
+    public static function cursorNext($n = 1) {
+        return self::CSI . "{$n}E";
+    }
+
+    /**
+     * Cursor Prev
+     *
+     * @param integer $n
+     *
+     * @return string
+     */
+    public static function cursorPrev($n = 1) {
+        return self::CSI . "{$n}F";
+    }
+
+    /**
+     * Cursor Save
+     *
+     * @return string
+     */
+    public static function cursorSave() {
+        return self::CSI . (('Apple_Terminal' === getenv('TERM_PROGRAM')) ? '7' : 's');
+    }
+
+    /**
+     * Cursor Load
+     *
+     * @return string
+     */
+    public static function cursorLoad() {
+        return self::CSI . (('Apple_Terminal' === getenv('TERM_PROGRAM')) ? '8' : 'u');
     }
 }
