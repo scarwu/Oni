@@ -53,7 +53,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function SGR($param) {
+    public static function SGR($param)
+    {
         if (is_array($param)) {
             $param = implode(self::SEP, $param);
         }
@@ -69,7 +70,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function CUP($x = 0, $y = 0) {
+    public static function CUP($x = 0, $y = 0)
+    {
         return self::CSI . ($y + 1) . self::SEP . ($x + 1) . 'H';
     }
 
@@ -81,7 +83,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function moveTo($x = 0, $y = 0) {
+    public static function moveTo($x = 0, $y = 0)
+    {
         return self::CUP($x, $y);
     }
 
@@ -90,7 +93,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function reset() {
+    public static function reset()
+    {
         return self::SGR(0);
     }
 
@@ -129,7 +133,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorShow() {
+    public static function cursorShow()
+    {
         return self::CSI . '?25h';
     }
 
@@ -138,7 +143,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorHide() {
+    public static function cursorHide()
+    {
         return self::CSI . '?25l';
     }
 
@@ -149,7 +155,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorUp($n = 1) {
+    public static function cursorUp($n = 1)
+    {
         return self::CSI . "{$n}A";
     }
 
@@ -160,7 +167,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorDown($n = 1) {
+    public static function cursorDown($n = 1)
+    {
         return self::CSI . "{$n}B";
     }
 
@@ -171,7 +179,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorLeft($n = 1) {
+    public static function cursorLeft($n = 1)
+    {
         return self::CSI . "{$n}C";
     }
 
@@ -182,7 +191,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorRight($n = 1) {
+    public static function cursorRight($n = 1)
+    {
         return self::CSI . "{$n}D";
     }
 
@@ -193,7 +203,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorNext($n = 1) {
+    public static function cursorNext($n = 1)
+    {
         return self::CSI . "{$n}E";
     }
 
@@ -204,7 +215,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorPrev($n = 1) {
+    public static function cursorPrev($n = 1)
+    {
         return self::CSI . "{$n}F";
     }
 
@@ -213,7 +225,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorSave() {
+    public static function cursorSave()
+    {
         return self::CSI . (('Apple_Terminal' === getenv('TERM_PROGRAM')) ? '7' : 's');
     }
 
@@ -222,7 +235,8 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function cursorLoad() {
+    public static function cursorLoad()
+    {
         return self::CSI . (('Apple_Terminal' === getenv('TERM_PROGRAM')) ? '8' : 'u');
     }
 }

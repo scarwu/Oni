@@ -238,7 +238,8 @@ class IO extends Basic
      *
      * @param array $options
      */
-    public function menuSelect($options) {
+    public function menuSelect($options)
+    {
         $totalIndex = count($options);
         $selectedIndex = 0;
         $isBreakLoop = false;
@@ -247,7 +248,6 @@ class IO extends Basic
 
         $wWidth = (int) exec('tput cols');
         $wHeight = (int) exec('tput lines');
-        $bHeight = count($options);
 
         readline_callback_handler_install('', function() {});
 
@@ -285,11 +285,20 @@ class IO extends Basic
                 $isFirstLoop = false;
             }
 
+            // Get Skip Index
+            $skipIndex = $selectedIndex < $wHeight
+                ? 0 : $selectedIndex - $wHeight + 1;
+
+            // Get Current Options
+            $currentOptions = array_slice($options, $skipIndex, $wHeight);
+
             // Print Menu
-            $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex) {
-                return ($selectedIndex === $currentIndex)
-                    ? "> {$option}" : "  {$option}";
-            }, $options, array_keys($options))));
+            $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex, $skipIndex) {
+                $padding = (($selectedIndex - $skipIndex) === $currentIndex)
+                    ? '> ' : '  ';
+
+                return AEC::CSI . "2K{$padding}{$option}";
+            }, $currentOptions, array_keys($currentOptions))));
 
         } while ($char = stream_get_contents(STDIN, 1));
 
@@ -336,7 +345,7 @@ class IO extends Basic
      */
     public function error($text)
     {
-        $this->write("{$text}\n", 'red');
+        $this->writeln($text, 'red');
     }
 
     /**
@@ -346,7 +355,7 @@ class IO extends Basic
      */
     public function warning($text)
     {
-        $this->write("{$text}\n", 'yellow');
+        $this->writeln($text, 'yellow');
     }
 
     /**
@@ -356,7 +365,7 @@ class IO extends Basic
      */
     public function notice($text)
     {
-        $this->write("{$text}\n", 'green');
+        $this->writeln($text, 'green');
     }
 
     /**
@@ -366,7 +375,7 @@ class IO extends Basic
      */
     public function info($text)
     {
-        $this->write("{$text}\n", 'brightBlack');
+        $this->writeln($text, 'brightBlack');
     }
 
     /**
@@ -376,7 +385,7 @@ class IO extends Basic
      */
     public function debug($text)
     {
-        $this->write("{$text}\n", 'white');
+        $this->writeln($text, 'white');
     }
 
     /**
@@ -386,6 +395,6 @@ class IO extends Basic
      */
     public function log($text)
     {
-        $this->write("{$text}\n");
+        $this->writeln($text);
     }
 }
