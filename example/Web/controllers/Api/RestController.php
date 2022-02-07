@@ -1,6 +1,6 @@
 <?php
 /**
- * Api/Basic Controller
+ * Api/Rest Controller
  *
  * @package     Oni
  * @author      Scar Wu
@@ -12,7 +12,7 @@ namespace WebApp\Controller\Api;
 
 use Oni\Web\Controller\Rest as Controller;
 
-class BasicController extends Controller
+class RestController extends Controller
 {
     private $data;
 
@@ -44,7 +44,7 @@ class BasicController extends Controller
 
     public function down()
     {
-        var_dump($this->data);
+        // do nothing
     }
 
     /**
@@ -52,21 +52,21 @@ class BasicController extends Controller
      */
     public function getAction()
     {
-
+        $this->res->json($this->data);
     }
 
     public function postAction()
     {
-
+        $this->res->json($this->data);
     }
 
     public function putAction()
     {
-
+        $this->res->json($this->data);
     }
 
     public function deleteAction()
     {
-
+        $this->res->json($this->data);
     }
 }

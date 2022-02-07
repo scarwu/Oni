@@ -17,6 +17,16 @@ use Oni\CLI\IO;
 class App extends Basic
 {
     /**
+     * @var array
+     */
+    protected $_attr = [
+        'task/namespace'        => null,    // Requied
+        'task/path'             => null,    // Requied
+        'task/default/handler'  => 'Main',
+        'task/error/handler'    => 'Main'
+    ];
+
+    /**
      * @var object
      */
     protected $io = null;
@@ -26,15 +36,6 @@ class App extends Basic
      */
     public function __construct()
     {
-        // Set Default Attributes
-        $this->_attr = [
-            'task/namespace' => null,    // Requied
-            'task/path' => null,         // Requied
-            'task/default/handler' => 'Main',
-            'task/error/handler' => 'Main'
-        ];
-
-        // Set Instance
         $this->io = IO::init();
     }
 

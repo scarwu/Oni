@@ -21,20 +21,6 @@ class View extends Basic
     private static $_instance = null;
 
     /**
-     * Construct
-     *
-     * This function is private, so this class is singleton pattern
-     */
-    private function __construct()
-    {
-        // Set Default Attributes
-        $this->_attr = [
-            'path' => null,
-            'ext' => 'php'
-        ];
-    }
-
-    /**
      * Initialize
      */
     public static function init()
@@ -46,6 +32,20 @@ class View extends Basic
         return self::$_instance;
     }
 
+    /**
+     * @var array
+     */
+    protected $_attr = [
+        'path' => null,
+        'ext' => 'php'
+    ];
+
+    /**
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
+     */
+    private function __construct() {}
 
     /**
      * @var string

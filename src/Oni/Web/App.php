@@ -18,6 +18,22 @@ use Oni\Web\View;
 
 class App extends Basic
 {
+    protected $_attr = [
+        'controller/namespace'          => null,        // Requied
+        'controller/path'               => null,        // Requied
+        'controller/default/handler'    => 'Main',
+        'controller/default/action'     => 'default',
+        'controller/error/handler'      => 'Main',
+        'controller/error/action'       => 'error',
+        'model/namespace'               => null,        // Requied
+        'model/path'                    => null,        // Requied
+        'view/path'                     => null,        // Requied
+        'view/ext'                      => 'php',
+        'static/path'                   => null,        // Requied
+        'cache/path'                    => null,        // Requied
+        'cache/time'                    => 300          // 300 sec = 5 min
+    ];
+
     /**
      * @var object
      */
@@ -33,24 +49,6 @@ class App extends Basic
      */
     public function __construct()
     {
-        // Set Default Attributes
-        $this->_attr = [
-            'controller/namespace' => null,     // Requied
-            'controller/path' => null,          // Requied
-            'controller/default/handler' => 'Main',
-            'controller/default/action' => 'default',
-            'controller/error/handler' => 'Main',
-            'controller/error/action' => 'error',
-            'model/namespace' => null,          // Requied
-            'model/path' => null,               // Requied
-            'view/path' => null,                // Requied
-            'view/ext' => 'php',
-            'static/path' => null,              // Requied
-            'cache/path' => null,               // Requied
-            'cache/time' => 300                 // 300 sec = 5 min
-        ];
-
-        // Set Instances
         $this->req = Req::init();
         $this->res = Res::init();
     }
@@ -250,7 +248,7 @@ class App extends Basic
                 $handler = ucfirst($handler);
 
                 if (false === file_exists("{$path}/{$handler}Controller.php")) {
-                    http_response_code(400);
+                    http_response_code(404);
 
                     return false;
                 }
@@ -260,10 +258,26 @@ class App extends Basic
                 $action = $this->getAttr('controller/error/action') . 'Action';
 
                 if (false === method_exists($instance, $action)) {
-                    http_response_code(400);
+                    http_response_code(404);
 
                     return false;
                 }
+            }
+
+            break;
+        case 'ajax':
+            if (null === $action) {
+                if (0 === count($params)) {
+                    $action = $this->getAttr('controller/default/action') . 'Action';
+                } else {
+                    $action = array_shift($params) . 'Action';
+                }
+            }
+
+            if (false === method_exists($instance, $action)) {
+                http_response_code(501);
+
+                return false;
             }
 
             break;

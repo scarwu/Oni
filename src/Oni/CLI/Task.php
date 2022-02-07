@@ -16,7 +16,7 @@ use Oni\CLI\IO;
 abstract class Task extends Basic
 {
     /**
-     * @var array
+     * @var object
      */
     protected $io = null;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Page
+ * Ajax
  *
  * @package     Oni
  * @author      Scar Wu
@@ -13,15 +13,14 @@ namespace Oni\Web\Controller;
 use Oni\Basic;
 use Oni\Web\Req;
 use Oni\Web\Res;
-use Oni\Web\View;
 
-abstract class Page extends Basic
+abstract class Ajax extends Basic
 {
     /**
      * @var array
      */
     protected $_attr = [
-        'mode' => 'page'
+        'mode' => 'ajax'
     ];
 
     /**
@@ -35,18 +34,12 @@ abstract class Page extends Basic
     protected $res = null;
 
     /**
-     * @var object
-     */
-    protected $view = null;
-
-    /**
      * Construct
      */
-    public function __construct($req = null, $res = null, $view = null)
+    public function __construct($req = null, $res = null)
     {
         $this->req = (null !== $req) ? $req : Req::init();
         $this->res = (null !== $res) ? $res : Res::init();
-        $this->view = (null !== $view) ? $view : View::init();
     }
 
     /**

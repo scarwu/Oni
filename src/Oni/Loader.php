@@ -69,8 +69,8 @@ class Loader
     public static function append($namespace, $path)
     {
         if (false === is_string($namespace)
-            || false === is_string($path)) {
-
+            || false === is_string($path)
+        ) {
             return false;
         }
 

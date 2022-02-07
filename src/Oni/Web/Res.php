@@ -18,13 +18,6 @@ class Res
     private static $_instance = null;
 
     /**
-     * Construct
-     *
-     * This function is private, so this class is singleton pattern
-     */
-    private function __construct() {}
-
-    /**
      * Initialize
      */
     public static function init()
@@ -37,13 +30,20 @@ class Res
     }
 
     /**
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
+     */
+    private function __construct() {}
+
+    /**
      * Redirect
      *
      * @param string $path
      */
     public function redirect($path)
     {
-        if (is_string($path)) {
+        if (true === is_string($path)) {
             header("Location: {$path}");
         }
     }
@@ -57,7 +57,7 @@ class Res
     {
         header('Content-Type: text/html');
 
-        if (is_string($data)) {
+        if (true === is_string($data)) {
             echo $data;
         }
     }
@@ -72,8 +72,6 @@ class Res
     {
         header('Content-Type: application/json');
 
-        if (is_string($data)) {
-            echo json_encode($data, $option);
-        }
+        echo json_encode($data, $option);
     }
 }

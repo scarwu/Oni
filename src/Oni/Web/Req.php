@@ -18,13 +18,6 @@ class Req
     private static $_instance = null;
 
     /**
-     * Construct
-     *
-     * This function is private, so this class is singleton pattern
-     */
-    private function __construct() {}
-
-    /**
      * Initialize
      */
     public static function init()
@@ -35,6 +28,13 @@ class Req
 
         return self::$_instance;
     }
+
+    /**
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
+     */
+    private function __construct() {}
 
     /**
      * Method
@@ -148,13 +148,13 @@ class Req
     public function content()
     {
         switch ($this->contentType()) {
-            case 'application/x-www-form-urlencoded':
-            case 'multipart/form-data':
-                return $_POST;
-            case 'application/json':
-                return json_decode($this->body(), true);
-            default:
-                return $this->body();
+        case 'application/x-www-form-urlencoded':
+        case 'multipart/form-data':
+            return $_POST;
+        case 'application/json':
+            return json_decode($this->body(), true);
+        default:
+            return $this->body();
         }
     }
 
