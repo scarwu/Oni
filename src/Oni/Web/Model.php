@@ -12,7 +12,4 @@ namespace Oni\Web;
 
 use Oni\Basic;
 
-class Model extends Basic
-{
-
-}
+class Model extends Basic {}

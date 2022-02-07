@@ -12,8 +12,8 @@ namespace Oni\Web;
 
 use Oni\Basic;
 use Oni\Loader;
-use Oni\Web\Req;
-use Oni\Web\Res;
+use Oni\Web\Http\Req;
+use Oni\Web\Http\Res;
 use Oni\Web\View;
 
 class App extends Basic
@@ -85,7 +85,7 @@ class App extends Basic
         if (null !== $namespace && null !== $path) {
             Loader::append($namespace, $path);
 
-            if ($this->loadController()) {
+            if (true === $this->loadController()) {
                 return true;
             }
         }
@@ -188,8 +188,8 @@ class App extends Basic
             $param = ucfirst($param);
 
             if (false === file_exists("{$path}/{$param}")
-                && false === file_exists("{$path}/{$param}Controller.php")) {
-
+                && false === file_exists("{$path}/{$param}Controller.php")
+            ) {
                 break;
             }
 

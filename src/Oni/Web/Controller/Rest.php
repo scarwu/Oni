@@ -11,8 +11,8 @@
 namespace Oni\Web\Controller;
 
 use Oni\Basic;
-use Oni\Web\Req;
-use Oni\Web\Res;
+use Oni\Web\Http\Req;
+use Oni\Web\Http\Res;
 
 abstract class Rest extends Basic
 {

@@ -147,12 +147,12 @@ class View extends Basic
     {
         $_result = '';
 
-        if (is_string($_subPath)) {
+        if (true === is_string($_subPath)) {
             $_path = $this->getAttr('path');
             $_ext = $this->getAttr('ext');
             $_fullpath = "{$_path}/{$_subPath}.{$_ext}";
 
-            if (file_exists($_fullpath)) {
+            if (true === file_exists($_fullpath)) {
                 foreach ($this->data as $_key => $_value) {
                     $$_key = $_value;
                 }

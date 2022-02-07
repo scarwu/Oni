@@ -146,7 +146,7 @@ class Router extends Basic
     {
         $method = strtolower($method);
 
-        if (!isset($this->_rule[$method])) {
+        if (false === isset($this->_rule[$method])) {
             $method = 'get';
         }
 
@@ -182,7 +182,7 @@ class Router extends Basic
                 $path = $this->regexGenerator($path);
             }
 
-            if (preg_match($path, $this->_path, $match)) {
+            if (true === (bool) preg_match($path, $this->_path, $match)) {
                 $this->_matchRoute = $path;
                 $this->_isMatch = true;
                 $this->_rule[$this->_method]['callback'][$index](array_slice($match, 1));

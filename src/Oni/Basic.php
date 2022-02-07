@@ -41,7 +41,7 @@ abstract class Basic
      */
     final public function getAttr($key)
     {
-        return isset($this->_attr[$key])
+        return (true === isset($this->_attr[$key]))
             ? $this->_attr[$key] : null;
     }
 }

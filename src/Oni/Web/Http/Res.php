@@ -8,7 +8,7 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni\Web;
+namespace Oni\Web\Http;
 
 class Res
 {

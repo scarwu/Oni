@@ -8,7 +8,7 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni\Web;
+namespace Oni\Web\Http;
 
 class Req
 {
@@ -117,9 +117,9 @@ class Req
     {
         $uri = null;
 
-        if (isset($_SERVER['PATH_INFO'])) {
+        if (true === isset($_SERVER['PATH_INFO'])) {
             $uri = $_SERVER['PATH_INFO'];
-        } elseif (isset($_SERVER['REQUEST_URI'])) {
+        } elseif (true === isset($_SERVER['REQUEST_URI'])) {
             $uri = explode('?', $_SERVER['REQUEST_URI'])[0];
         }
 
@@ -164,9 +164,9 @@ class Req
     public function file()
     {
         switch ($this->contentType()) {
-            case 'multipart/form-data':
-            default:
-                return $_FILES;
+        case 'multipart/form-data':
+        default:
+            return $_FILES;
         }
     }
 

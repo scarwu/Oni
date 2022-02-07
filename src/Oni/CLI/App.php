@@ -51,7 +51,7 @@ class App extends Basic
         if (null !== $namespace && null !== $path) {
             Loader::append($namespace, $path);
 
-            if ($this->loadTask()) {
+            if (true === $this->loadTask()) {
                 return true;
             }
         }
@@ -75,8 +75,8 @@ class App extends Basic
             $param = ucfirst($param);
 
             if (false === file_exists("{$path}/{$param}")
-                && false === file_exists("{$path}/{$param}Task.php")) {
-
+                && false === file_exists("{$path}/{$param}Task.php")
+            ) {
                 break;
             }
 

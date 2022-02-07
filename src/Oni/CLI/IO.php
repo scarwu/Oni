@@ -48,11 +48,11 @@ class IO extends Basic
 
         // arguments
         while ($argv) {
-            if (preg_match($configRegexRule, $argv[0])) {
+            if (true === (bool) preg_match($configRegexRule, $argv[0])) {
                 break;
             }
 
-            if (preg_match($optionRegexRule, $argv[0])) {
+            if (true === (bool) preg_match($optionRegexRule, $argv[0])) {
                 break;
             }
 
@@ -61,19 +61,19 @@ class IO extends Basic
 
         // options & configs
         while ($value = array_shift($argv)) {
-            if (preg_match($configRegexRule, $value, $match)) {
+            if (true === (bool) preg_match($configRegexRule, $value, $match)) {
                 $this->_configs[$match[1]] = isset($match[2]) ? $match[2] : null;
             }
 
-            if (preg_match($optionRegexRule, $value, $match)) {
+            if (true === (bool) preg_match($optionRegexRule, $value, $match)) {
                 $this->_options[$match[1]] = null;
 
                 if (isset($argv[0])) {
-                    if (preg_match($configRegexRule, $argv[0])) {
+                    if (true === (bool) preg_match($configRegexRule, $argv[0])) {
                         continue;
                     }
 
-                    if (preg_match($optionRegexRule, $argv[0])) {
+                    if (true === (bool) preg_match($optionRegexRule, $argv[0])) {
                         continue;
                     }
 
@@ -104,8 +104,8 @@ class IO extends Basic
      */
     public function getArguments($index = null)
     {
-        if (is_integer($index)) {
-            if (array_key_exists($index, $this->_arguments)) {
+        if (true === is_integer($index)) {
+            if (true === array_key_exists($index, $this->_arguments)) {
                 return $this->_arguments[$index];
             } else {
                 return false;
@@ -134,8 +134,8 @@ class IO extends Basic
      */
     public function getOptions($key = null)
     {
-        if (is_string($key)) {
-            if (array_key_exists($key, $this->_options)) {
+        if (true === is_string($key)) {
+            if (true === array_key_exists($key, $this->_options)) {
                 return $this->_options[$key];
             } else {
                 return false;
@@ -154,7 +154,7 @@ class IO extends Basic
      */
     public function hasOptions($key = null)
     {
-        if (is_string($key)) {
+        if (true === is_string($key)) {
             return array_key_exists($key, $this->_options);
         }
 
@@ -170,8 +170,8 @@ class IO extends Basic
      */
     public function getConfigs($key = null)
     {
-        if (is_string($key)) {
-            if (array_key_exists($key, $this->_configs)) {
+        if (true === is_string($key)) {
+            if (true === array_key_exists($key, $this->_configs)) {
                 return $this->_configs[$key];
             } else {
                 return false;
@@ -190,7 +190,7 @@ class IO extends Basic
      */
     public function hasConfigs($key = null)
     {
-        if (is_string($key)) {
+        if (true === is_string($key)) {
             return array_key_exists($key, $this->_configs);
         }
 
@@ -289,12 +289,12 @@ class IO extends Basic
      */
     private function color($text, $textColor = null, $bgColor = null)
     {
-        if (isset(self::$textColor[$textColor])) {
+        if (true === isset(self::$textColor[$textColor])) {
             $color = self::$textColor[$textColor];
             $text = "\033[{$color}m{$text}\033[m";
         }
 
-        if (isset(self::$bgColor[$bgColor])) {
+        if (true === isset(self::$bgColor[$bgColor])) {
             $color = self::$bgColor[$bgColor];
             $text = "\033[{$color}m{$text}\033[m";
         }
