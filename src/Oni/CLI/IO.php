@@ -11,6 +11,7 @@
 namespace Oni\CLI;
 
 use Oni\Basic;
+use Oni\CLI\Helper\ANSIEscapeCode as AEC;
 
 class IO extends Basic
 {
@@ -212,12 +213,12 @@ class IO extends Basic
      *
      * @param string $text
      * @param function $callback
-     * @param string $textColor
+     * @param string $fgColor
      * @param string $bgColor
      *
      * @return string|bool
      */
-    public function ask($text, $callback = null, $textColor = null, $bgColor = null)
+    public function ask($text, $callback = null, $fgColor = null, $bgColor = null)
     {
         if (null === $callback) {
             $callback = function() {
@@ -226,93 +227,100 @@ class IO extends Basic
         }
 
         do {
-            $this->write($text, $textColor, $bgColor);
+            $this->write($text, $fgColor, $bgColor);
         } while (false === $callback($answer = $this->read()));
 
         return $answer;
     }
 
     /**
-     * @var array
-     */
-    private static $textColor = [
-        'black' => '0;30',
-        'red' => '0;31',
-        'green' => '0;32',
-        'brown' => '0;33',
-        'blue' => '0;34',
-        'purple' => '0;35',
-        'cyan' => '0;36',
-        'light_gray' => '0;37',
-
-        'dark_gray' => '1;30',
-        'light_red' => '1;31',
-        'light_green' => '1;32',
-        'yellow' => '1;33',
-        'light_blue' => '1;34',
-        'light_purple' => '1;35',
-        'light_cyan' => '1;36',
-        'white' => '1;37'
-    ];
-
-    /**
-     * @var array
-     */
-    private static $bgColor = [
-        'black' => '0;40',
-        'red' => '0;41',
-        'green' => '0;42',
-        'brown' => '0;43',
-        'blue' => '0;44',
-        'purple' => '0;45',
-        'cyan' => '0;46',
-        'light_gray' => '0;47',
-
-        'dark_gray' => '1;40',
-        'light_red' => '1;41',
-        'light_green' => '1;42',
-        'yellow' => '1;43',
-        'light_blue' => '1;44',
-        'light_purple' => '1;45',
-        'light_cyan' => '1;46',
-        'white' => '1;47'
-    ];
-
-    /**
-     * Color
+     * Menu Select
      *
-     * @param string $text
-     * @param string $textColor
-     * @param string $bgColor
-     *
-     * @return string
+     * @param array $options
      */
-    private function color($text, $textColor = null, $bgColor = null)
+    public function menuSelect($options)
     {
-        if (true === isset(self::$textColor[$textColor])) {
-            $color = self::$textColor[$textColor];
-            $text = "\033[{$color}m{$text}\033[m";
-        }
+        $totalIndex = count($options);
+        $selectedIndex = 0;
+        $isBreakLoop = false;
+        $isFirstLoop = true;
+        $char = null;
 
-        if (true === isset(self::$bgColor[$bgColor])) {
-            $color = self::$bgColor[$bgColor];
-            $text = "\033[{$color}m{$text}\033[m";
-        }
+        $wWidth = (int) exec('tput cols');
+        $wHeight = (int) exec('tput lines');
 
-        return $text;
+        readline_callback_handler_install('', function() {});
+
+        // Set Cursor is Hide
+        $this->write(AEC::cursorHide());
+
+        do {
+            switch (ord($char)) {
+            case 10: // Enter Key
+                $isBreakLoop = true;
+
+                break;
+            case 65: // Up Key
+                if ($selectedIndex - 1 >= 0) {
+                    $selectedIndex--;
+                }
+
+                break;
+            case 66: // Down Key
+                if ($selectedIndex + 1 < $totalIndex) {
+                    $selectedIndex++;
+                }
+
+                break;
+            }
+
+            if (true === $isBreakLoop) {
+                break;
+            }
+
+            // Set Cursor Prev
+            if (false === $isFirstLoop) {
+                $this->write(AEC::cursorPrev($totalIndex - 1));
+            } else {
+                $isFirstLoop = false;
+            }
+
+            // Get Skip Index
+            $skipIndex = $selectedIndex < $wHeight
+                ? 0 : $selectedIndex - $wHeight + 1;
+
+            // Get Current Options
+            $currentOptions = array_slice($options, $skipIndex, $wHeight);
+
+            // Print Menu
+            $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex, $skipIndex) {
+                $padding = (($selectedIndex - $skipIndex) === $currentIndex)
+                    ? '> ' : '  ';
+
+                return AEC::CSI . "2K{$padding}{$option}";
+            }, $currentOptions, array_keys($currentOptions))));
+
+        } while ($char = stream_get_contents(STDIN, 1));
+
+        // Set Cursor is Show
+        $this->writeln(AEC::cursorShow());
+
+        readline_callback_handler_remove();
+
+        return $selectedIndex;
     }
 
     /**
      * Write data to STDOUT
      *
      * @param string $text
-     * @param string $textColor
+     * @param string $fgColor
      * @param string $bgColor
      */
-    public function write($text, $textColor = null, $bgColor = null)
+    public function write($text, $fgColor = null, $bgColor = null)
     {
-        if (null !== $textColor || null !== $bgColor) {
-            $text = $this->color($text, $textColor, $bgColor);
+        if (null !== $fgColor || null !== $bgColor) {
+            $text = AEC::color($text, $fgColor, $bgColor);
         }
 
         fwrite(STDOUT, $text);
@@ -325,9 +333,9 @@ class IO extends Basic
      * @param string $bgColor
      * @param string $bgColor
      */
-    public function writeln($text = '', $textColor = null, $bgColor = null)
+    public function writeln($text = '', $fgColor = null, $bgColor = null)
     {
-        $this->write("{$text}\n", $textColor, $bgColor);
+        $this->write("{$text}\n", $fgColor, $bgColor);
     }
 
     /**
@@ -337,7 +345,7 @@ class IO extends Basic
      */
     public function error($text)
     {
-        $this->write("{$text}\n", 'red');
+        $this->writeln($text, 'red');
     }
 
     /**
@@ -347,7 +355,7 @@ class IO extends Basic
      */
     public function warning($text)
     {
-        $this->write("{$text}\n", 'yellow');
+        $this->writeln($text, 'yellow');
     }
 
     /**
@@ -357,7 +365,7 @@ class IO extends Basic
      */
     public function notice($text)
     {
-        $this->write("{$text}\n", 'green');
+        $this->writeln($text, 'green');
     }
 
     /**
@@ -367,7 +375,7 @@ class IO extends Basic
      */
     public function info($text)
     {
-        $this->write("{$text}\n", 'dark_gray');
+        $this->writeln($text, 'brightBlack');
     }
 
     /**
@@ -377,7 +385,7 @@ class IO extends Basic
      */
     public function debug($text)
     {
-        $this->write("{$text}\n", 'light_gray');
+        $this->writeln($text, 'white');
     }
 
     /**
@@ -387,6 +395,6 @@ class IO extends Basic
      */
     public function log($text)
     {
-        $this->write("{$text}\n");
+        $this->writeln($text);
     }
 }
