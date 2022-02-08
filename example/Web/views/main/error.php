@@ -1,5 +1,5 @@
 <?php
-use Oni\Web\View\Helper;
+use Oni\Web\Helper\HTML;
 ?>
 <h1><?=$title?></h1>
-<p>Go to <?=Helper::linkTo('/', 'home')?></p>
+<p>Go to <?=HTML::linkTo('/', 'home')?></p>

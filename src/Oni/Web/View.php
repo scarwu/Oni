@@ -11,7 +11,7 @@
 namespace Oni\Web;
 
 use Oni\Basic;
-use Oni\Web\Helper;
+use Oni\Web\Helper\HTML;
 
 class View extends Basic
 {

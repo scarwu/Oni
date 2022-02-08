@@ -44,6 +44,11 @@ final class ANSIEscapeCode
         'brightWhite'   => [ 'fg' => '97', 'bg' => '107' ]
     ];
 
+    /**
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
+     */
     private function __construct() {}
 
     /**

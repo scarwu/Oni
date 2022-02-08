@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper
+ * HTML
  *
  * @package     Oni
  * @author      Scar Wu
@@ -8,12 +8,19 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni\Web\View;
+namespace Oni\Web\Helper;
 
-class Helper {
+class HTML
+{
+    /**
+     * Construct
+     *
+     * This function is private, so this class is singleton pattern
+     */
+    private function __construct() {}
 
     /**
-     * Create Link To
+     * Link To
      *
      * @param string $link
      * @param string $name
