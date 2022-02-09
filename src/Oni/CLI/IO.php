@@ -10,7 +10,7 @@
 
 namespace Oni\CLI;
 
-use Oni\Basic;
+use Oni\Core\Basic;
 use Oni\CLI\Helper\ANSIEscapeCode as AEC;
 
 class IO extends Basic

@@ -11,7 +11,7 @@
 namespace Oni\Web\Store;
 
 use Memcached;
-use Oni\Basic;
+use Oni\Core\Basic;
 
 class Cache extends Basic
 {

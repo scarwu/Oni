@@ -10,8 +10,8 @@
 
 namespace Oni\Web;
 
-use Oni\Basic;
-use Oni\Loader;
+use Oni\Core\Basic;
+use Oni\Core\Loader;
 use Oni\Web\Http\Req;
 use Oni\Web\Http\Res;
 use Oni\Web\View;

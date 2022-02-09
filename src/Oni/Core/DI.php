@@ -1,6 +1,6 @@
 <?php
 /**
- * Model
+ * DI
  *
  * @package     Oni
  * @author      Scar Wu
@@ -8,8 +8,6 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni\Web;
+namespace Oni\Core;
 
-use Oni\Core\Basic;
-
-class Model extends Basic {}
+final class DI {}

@@ -10,7 +10,7 @@
 
 namespace Oni\Web;
 
-use Oni\Basic;
+use Oni\Core\Basic;
 use Oni\Web\Helper\HTML;
 
 class View extends Basic

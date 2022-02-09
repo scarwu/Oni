@@ -10,7 +10,7 @@
 
 namespace Oni\Web\Helper;
 
-class HTML
+final class HTML
 {
     /**
      * Construct

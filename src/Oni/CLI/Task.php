@@ -10,7 +10,7 @@
 
 namespace Oni\CLI;
 
-use Oni\Basic;
+use Oni\Core\Basic;
 use Oni\CLI\IO;
 
 abstract class Task extends Basic

@@ -11,7 +11,7 @@
 namespace Oni\Web\Store;
 
 use PDO;
-use Oni\Basic;
+use Oni\Core\Basic;
 
 class Database extends Basic
 {

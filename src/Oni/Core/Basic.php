@@ -8,7 +8,7 @@
  * @link        https://github.com/scarwu/Oni
  */
 
-namespace Oni;
+namespace Oni\Core;
 
 abstract class Basic
 {

@@ -10,7 +10,7 @@
 
 namespace Oni\Web\Controller;
 
-use Oni\Basic;
+use Oni\Core\Basic;
 use Oni\Web\Http\Req;
 use Oni\Web\Http\Res;
 

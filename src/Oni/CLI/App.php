@@ -10,8 +10,8 @@
 
 namespace Oni\CLI;
 
-use Oni\Basic;
-use Oni\Loader;
+use Oni\Core\Basic;
+use Oni\Core\Loader;
 use Oni\CLI\IO;
 
 class App extends Basic
