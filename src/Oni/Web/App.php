@@ -49,8 +49,13 @@ class App extends Basic
      */
     public function __construct()
     {
-        $this->req = Req::init();
-        $this->res = Res::init();
+        $this->req = $this->initDI('req', function () {
+            return Req::init();
+        });
+
+        $this->res = $this->initDI('res', function () {
+            return Res::init();
+        });
     }
 
     /**
@@ -223,12 +228,7 @@ class App extends Basic
             $namespace = "{$namespace}Controller";
         }
 
-        // Set View Attrs
-        $view = View::init();
-        $view->setAttr('path', $this->getAttr('view/path'));
-        $view->setAttr('ext', $this->getAttr('view/ext'));
-
-        $instance = new $namespace($this->req, $this->res, $view);
+        $instance = new $namespace();
 
         switch ($instance->getAttr('mode')) {
         case 'page':
@@ -241,6 +241,7 @@ class App extends Basic
             }
 
             if (false === method_exists($instance, $action)) {
+
                 $namespace = $this->getAttr('controller/namespace');
                 $path = $this->getAttr('controller/path');
 
@@ -254,7 +255,7 @@ class App extends Basic
                 }
 
                 $namespace = "{$namespace}\\{$handler}Controller";
-                $instance = new $namespace($this->req, $this->res, $view);
+                $instance = new $namespace();
                 $action = $this->getAttr('controller/error/action') . 'Action';
 
                 if (false === method_exists($instance, $action)) {
@@ -263,6 +264,13 @@ class App extends Basic
                     return false;
                 }
             }
+
+            // Set View Attrs
+            $view = View::init();
+            $view->setAttr('path', $this->getAttr('view/path'));
+            $view->setAttr('ext', $this->getAttr('view/ext'));
+
+            $this->setDI('view', $view);
 
             break;
         case 'ajax':
@@ -295,7 +303,9 @@ class App extends Basic
             return false;
         }
 
-        // Call Function: up -> xxxAction -> down
+        // Controller Flow
+        $instance->init();
+
         if (false !== $instance->up()) {
             $instance->$action($params);
         }

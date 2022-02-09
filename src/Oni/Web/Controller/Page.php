@@ -40,13 +40,19 @@ abstract class Page extends Basic
     protected $view = null;
 
     /**
-     * Construct
+     * Initializer
      */
-    public function __construct($req = null, $res = null, $view = null)
+    final public function init()
     {
-        $this->req = (null !== $req) ? $req : Req::init();
-        $this->res = (null !== $res) ? $res : Res::init();
-        $this->view = (null !== $view) ? $view : View::init();
+        $this->req = $this->initDI('req', function () {
+            return Req::init();
+        });
+        $this->res = $this->initDI('res', function () {
+            return Res::init();
+        });
+        $this->view = $this->initDI('view', function () {
+            return View::init();
+        });
     }
 
     /**

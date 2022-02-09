@@ -15,6 +15,55 @@ abstract class Basic
     /**
      * @var array
      */
+    private static $_di = [];
+
+    /**
+     * Set DI
+     *
+     * @param string $key
+     * @param object $object
+     *
+     * @return object
+     */
+    final public function setDI($key, $object)
+    {
+        self::$_di[$key] = $object;
+    }
+
+    /**
+     * Get DI
+     *
+     * @param string $key
+     *
+     * @return object
+     */
+    final public function getDI($key)
+    {
+        return (true === isset(self::$_di[$key]))
+            ? self::$_di[$key] : null;
+    }
+
+    /**
+     * Init DI
+     *
+     * @param string $key
+     * @param function $callback
+     *
+     * @return object
+     */
+    final public function initDI($key, $callback = null)
+    {
+        if (false === isset(self::$_di[$key])) {
+            self::$_di[$key] = true === is_callable($callback)
+                ? $callback() : null;
+        }
+
+        return self::$_di[$key];
+    }
+
+    /**
+     * @var array
+     */
     protected $_attr = [];
 
     /**

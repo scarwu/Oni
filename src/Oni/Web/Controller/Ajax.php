@@ -34,12 +34,16 @@ abstract class Ajax extends Basic
     protected $res = null;
 
     /**
-     * Construct
+     * Initializer
      */
-    public function __construct($req = null, $res = null)
+    final public function init()
     {
-        $this->req = (null !== $req) ? $req : Req::init();
-        $this->res = (null !== $res) ? $res : Res::init();
+        $this->req = $this->initDI('req', function () {
+            return Req::init();
+        });
+        $this->res = $this->initDI('res', function () {
+            return Res::init();
+        });
     }
 
     /**
