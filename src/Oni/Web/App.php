@@ -49,13 +49,8 @@ class App extends Basic
      */
     public function __construct()
     {
-        $this->req = $this->initDI('req', function () {
-            return Req::init();
-        });
-
-        $this->res = $this->initDI('res', function () {
-            return Res::init();
-        });
+        $this->req = Req::init();
+        $this->res = Res::init();
     }
 
     /**
@@ -228,10 +223,15 @@ class App extends Basic
             $namespace = "{$namespace}Controller";
         }
 
+        // Controller Flow
         $instance = new $namespace();
 
         switch ($instance->getAttr('mode')) {
         case 'page':
+            $view = View::init();
+            $view->setAttr('path', $this->getAttr('view/path'));
+            $view->setAttr('ext', $this->getAttr('view/ext'));
+
             if (null === $action) {
                 if (0 === count($params)) {
                     $action = $this->getAttr('controller/default/action') . 'Action';
@@ -241,7 +241,6 @@ class App extends Basic
             }
 
             if (false === method_exists($instance, $action)) {
-
                 $namespace = $this->getAttr('controller/namespace');
                 $path = $this->getAttr('controller/path');
 
@@ -264,13 +263,6 @@ class App extends Basic
                     return false;
                 }
             }
-
-            // Set View Attrs
-            $view = View::init();
-            $view->setAttr('path', $this->getAttr('view/path'));
-            $view->setAttr('ext', $this->getAttr('view/ext'));
-
-            $this->setDI('view', $view);
 
             break;
         case 'ajax':
@@ -302,9 +294,6 @@ class App extends Basic
         default:
             return false;
         }
-
-        // Controller Flow
-        $instance->init();
 
         if (false !== $instance->up()) {
             $instance->$action($params);

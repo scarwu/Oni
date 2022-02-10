@@ -36,9 +36,7 @@ class App extends Basic
      */
     public function __construct()
     {
-        $this->io = $this->initDI('io', function () {
-            return IO::init();
-        });
+        $this->io = IO::init();
     }
 
     /**
@@ -103,10 +101,8 @@ class App extends Basic
             $namespace = "{$namespace}Task";
         }
 
-        $instance = new $namespace();
-
         // Task Flow
-        $instance->init();
+        $instance = new $namespace();
 
         if (false !== $instance->up()) {
             $instance->run($params);

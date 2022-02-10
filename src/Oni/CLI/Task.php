@@ -21,13 +21,11 @@ abstract class Task extends Basic
     protected $io = null;
 
     /**
-     * Initializer
+     * Construct
      */
-    final public function init()
+    public function __construct()
     {
-        $this->io = $this->initDI('io', function () {
-            return IO::init();
-        });
+        $this->io = IO::init();
     }
 
     /**
