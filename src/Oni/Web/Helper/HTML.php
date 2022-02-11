@@ -27,7 +27,7 @@ final class HTML
      *
      * @return string
      */
-    public static function linkTo($link, $name)
+    public static function linkTo(string $link, string $name): string
     {
         $link = self::linkEncode($link);
 
@@ -41,7 +41,7 @@ final class HTML
      *
      * @return string
      */
-    public static function linkEncode($link)
+    public static function linkEncode(string $link): string
     {
         $segments = explode('/', $link);
         $segments = array_map('rawurlencode', $segments);

@@ -20,7 +20,7 @@ class Req
     /**
      * Initialize
      */
-    public static function init()
+    public static function init(): object
     {
         if (null === self::$_instance) {
             self::$_instance = new self;
@@ -41,7 +41,7 @@ class Req
      *
      * @return string
      */
-    public function method()
+    public function method(): string
     {
         $method = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])
             ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
@@ -53,9 +53,9 @@ class Req
     /**
      * Content Length
      *
-     * @return integer
+     * @return int
      */
-    public function contentLength()
+    public function contentLength(): int
     {
         return isset($_SERVER['CONTENT_LENGTH']) && '' !== $_SERVER['CONTENT_LENGTH']
             ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
@@ -66,7 +66,7 @@ class Req
      *
      * @return string|null
      */
-    public function contentType()
+    public function contentType(): ?string
     {
         // Content Type
         //     * text/plain
@@ -83,7 +83,7 @@ class Req
      *
      * @return string
      */
-    public function protocol()
+    public function protocol(): string
     {
         return strtolower($_SERVER['SERVER_PROTOCOL']);
     }
@@ -93,7 +93,7 @@ class Req
      *
      * @return string
      */
-    public function scheme()
+    public function scheme(): string
     {
         return strtolower($_SERVER['REQUEST_SCHEME']);
     }
@@ -103,7 +103,7 @@ class Req
      *
      * @return string
      */
-    public function host()
+    public function host(): string
     {
         return $_SERVER['HTTP_HOST'];
     }
@@ -113,7 +113,7 @@ class Req
      *
      * @return string
      */
-    public function uri()
+    public function uri(): string
     {
         $uri = null;
 
@@ -128,22 +128,28 @@ class Req
 
     /**
      * Body
+     *
+     * @return string
      */
-    public function body()
+    public function body(): string
     {
         return file_get_contents('php://input');
     }
 
     /**
      * Query
+     *
+     * @return array
      */
-    public function query()
+    public function query(): array
     {
         return $_GET;
     }
 
     /**
      * Content
+     *
+     * @return mixed
      */
     public function content()
     {
@@ -160,8 +166,10 @@ class Req
 
     /**
      * File
+     *
+     * @return array
      */
-    public function file()
+    public function file(): array
     {
         switch ($this->contentType()) {
         case 'multipart/form-data':
@@ -172,8 +180,10 @@ class Req
 
     /**
      * Is Ajax
+     *
+     * @return string
      */
-    public function isAjax()
+    public function isAjax(): string
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
             && 'XMLHttpRequest' === $_SERVER['HTTP_X_REQUESTED_WITH'];

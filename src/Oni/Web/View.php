@@ -69,12 +69,8 @@ class View extends Basic
      *
      * @return bool
      */
-    public function setLayoutPath($path)
+    public function setLayoutPath(string $path): bool
     {
-        if (false === is_string($path)) {
-            return false;
-        }
-
         $this->layoutPath = $path;
 
         return true;
@@ -87,12 +83,8 @@ class View extends Basic
      *
      * @return bool
      */
-    public function setContentPath($path)
+    public function setContentPath(string $path): bool
     {
-        if (false === is_string($path)) {
-            return false;
-        }
-
         $this->contentPath = $path;
 
         return true;
@@ -105,12 +97,8 @@ class View extends Basic
      *
      * @return bool
      */
-    public function setData($data)
+    public function setData(array $data): bool
     {
-        if (false === is_array($data)) {
-            return false;
-        }
-
         $this->data = $data;
 
         return true;
@@ -119,9 +107,9 @@ class View extends Basic
     /**
      * Get Layout Path
      *
-     * @return string
+     * @return string|null
      */
-    public function getLayoutPath()
+    public function getLayoutPath(): ?string
     {
         return $this->layoutPath;
     }
@@ -129,9 +117,9 @@ class View extends Basic
     /**
      * Get Content Path
      *
-     * @return string
+     * @return string|null
      */
-    public function getContentPath()
+    public function getContentPath(): ?string
     {
         return $this->contentPath;
     }
@@ -143,7 +131,7 @@ class View extends Basic
      *
      * @return string
      */
-    private function loadPartial($_subPath)
+    private function loadPartial(string $_subPath): string
     {
         $_result = '';
 
@@ -172,7 +160,7 @@ class View extends Basic
      *
      * @return string
      */
-    private function loadContent()
+    private function loadContent(): string
     {
         return $this->loadPartial($this->contentPath);
     }
@@ -182,7 +170,7 @@ class View extends Basic
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         return $this->loadPartial($this->layoutPath);
     }

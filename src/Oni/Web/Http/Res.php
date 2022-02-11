@@ -20,7 +20,7 @@ class Res
     /**
      * Initialize
      */
-    public static function init()
+    public static function init(): object
     {
         if (null === self::$_instance) {
             self::$_instance = new self;
@@ -41,11 +41,9 @@ class Res
      *
      * @param string $path
      */
-    public function redirect($path)
+    public function redirect(string $path): void
     {
-        if (true === is_string($path)) {
-            header("Location: {$path}");
-        }
+        header("Location: {$path}");
     }
 
     /**
@@ -53,13 +51,11 @@ class Res
      *
      * @param string $data
      */
-    public function html($data)
+    public function html(string $data): void
     {
         header('Content-Type: text/html');
 
-        if (true === is_string($data)) {
-            echo $data;
-        }
+        echo $data;
     }
 
     /**
@@ -68,7 +64,7 @@ class Res
      * @param array $data
      * @param integer $option
      */
-    public function json($data, $option = null)
+    public function json(array $data, ?integer $option = null): void
     {
         header('Content-Type: application/json');
 

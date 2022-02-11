@@ -58,7 +58,7 @@ class App extends Basic
      *
      * @return bool
      */
-    public function run()
+    public function run(): bool
     {
         // Load Static File
         if (null !== $this->getAttr('static/path') && $this->loadStatic()) {
@@ -102,7 +102,7 @@ class App extends Basic
      *
      * @return bool
      */
-    private function loadStatic()
+    private function loadStatic(): bool
     {
         $path = $this->getAttr('static/path');
         $uri = $this->req->uri();
@@ -135,7 +135,7 @@ class App extends Basic
      *
      * @return bool
      */
-    private function loadCache()
+    private function loadCache(): bool
     {
         $path = $this->getAttr('cache/path');
         $uri = $this->req->uri();
@@ -175,7 +175,7 @@ class App extends Basic
      *
      * @return bool
      */
-    private function loadController()
+    private function loadController(): bool
     {
         $namespace = $this->getAttr('controller/namespace');
         $path = $this->getAttr('controller/path');

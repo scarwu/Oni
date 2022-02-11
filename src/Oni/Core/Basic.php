@@ -25,7 +25,7 @@ abstract class Basic
      *
      * @return object
      */
-    final public function setAttr($key, $value)
+    final public function setAttr(string $key, string $value): object
     {
         $this->_attr[$key] = $value;
 
@@ -39,7 +39,7 @@ abstract class Basic
      *
      * @return mixed
      */
-    final public function getAttr($key)
+    final public function getAttr(string $key)
     {
         return (true === isset($this->_attr[$key]))
             ? $this->_attr[$key] : null;

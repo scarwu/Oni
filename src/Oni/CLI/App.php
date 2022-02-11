@@ -42,7 +42,7 @@ class App extends Basic
     /**
      * Run
      */
-    public function run()
+    public function run(): bool
     {
         // Register Task Classes & Load
         $namespace = $this->getAttr('task/namespace');
@@ -64,7 +64,7 @@ class App extends Basic
      *
      * @return bool
      */
-    private function loadTask()
+    private function loadTask(): bool
     {
         $namespace = $this->getAttr('task/namespace');
         $path = $this->getAttr('task/path');

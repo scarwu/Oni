@@ -87,7 +87,7 @@ class IO extends Basic
     /**
      * Initialize
      */
-    public static function init()
+    public static function init(): object
     {
         if (null === self::$_instance) {
             self::$_instance = new self;
@@ -101,15 +101,15 @@ class IO extends Basic
      *
      * @return integer $index
      *
-     * @return array|bool
+     * @return mixed
      */
-    public function getArguments($index = null)
+    public function getArguments(int $index = null)
     {
         if (true === is_integer($index)) {
             if (true === array_key_exists($index, $this->_arguments)) {
                 return $this->_arguments[$index];
             } else {
-                return false;
+                return null;
             }
         }
 
@@ -121,7 +121,7 @@ class IO extends Basic
      *
      * @return bool
      */
-    public function hasArguments()
+    public function hasArguments(): bool
     {
         return sizeof($this->_arguments) > 0;
     }
@@ -131,15 +131,15 @@ class IO extends Basic
      *
      * @return string $key
      *
-     * @return array|bool
+     * @return mixed
      */
-    public function getOptions($key = null)
+    public function getOptions(?string $key = null)
     {
         if (true === is_string($key)) {
             if (true === array_key_exists($key, $this->_options)) {
                 return $this->_options[$key];
             } else {
-                return false;
+                return null;
             }
         }
 
@@ -153,7 +153,7 @@ class IO extends Basic
      *
      * @return bool
      */
-    public function hasOptions($key = null)
+    public function hasOptions(?string $key = null): bool
     {
         if (true === is_string($key)) {
             return array_key_exists($key, $this->_options);
@@ -167,15 +167,15 @@ class IO extends Basic
      *
      * @return string $key
      *
-     * @return array|bool
+     * @return mixed
      */
-    public function getConfigs($key = null)
+    public function getConfigs(?string $key = null)
     {
         if (true === is_string($key)) {
             if (true === array_key_exists($key, $this->_configs)) {
                 return $this->_configs[$key];
             } else {
-                return false;
+                return null;
             }
         }
 
@@ -189,7 +189,7 @@ class IO extends Basic
      *
      * @return bool
      */
-    public function hasConfigs($key = null)
+    public function hasConfigs(?string $key = null): bool
     {
         if (true === is_string($key)) {
             return array_key_exists($key, $this->_configs);
@@ -203,7 +203,7 @@ class IO extends Basic
      *
      * @return string
      */
-    public function read()
+    public function read(): string
     {
         return trim(fgets(STDIN));
     }
@@ -212,17 +212,17 @@ class IO extends Basic
      * Ask
      *
      * @param string $text
-     * @param function $callback
+     * @param callable $callback
      * @param string $fgColor
      * @param string $bgColor
      *
-     * @return string|bool
+     * @return string|null
      */
-    public function ask($text, $callback = null, $fgColor = null, $bgColor = null)
+    public function ask(string $text, ?callable $callback = null, ?string $fgColor = null, ?string $bgColor = null): ?string
     {
         if (null === $callback) {
             $callback = function() {
-                return true;
+                return null;
             };
         }
 
@@ -237,8 +237,10 @@ class IO extends Basic
      * Menu Select
      *
      * @param array $options
+     *
+     * @return int
      */
-    public function menuSelect($options)
+    public function menuSelect(array $options): int
     {
         $totalIndex = count($options);
         $selectedIndex = 0;
@@ -317,7 +319,7 @@ class IO extends Basic
      * @param string $fgColor
      * @param string $bgColor
      */
-    public function write($text, $fgColor = null, $bgColor = null)
+    public function write($text, $fgColor = null, $bgColor = null): void
     {
         if (null !== $fgColor || null !== $bgColor) {
             $text = AEC::color($text, $fgColor, $bgColor);
@@ -333,7 +335,7 @@ class IO extends Basic
      * @param string $bgColor
      * @param string $bgColor
      */
-    public function writeln($text = '', $fgColor = null, $bgColor = null)
+    public function writeln($text = '', $fgColor = null, $bgColor = null): void
     {
         $this->write("{$text}\n", $fgColor, $bgColor);
     }
@@ -343,7 +345,7 @@ class IO extends Basic
      *
      * @param string $text
      */
-    public function error($text)
+    public function error(string $text): void
     {
         $this->writeln($text, 'red');
     }
@@ -353,7 +355,7 @@ class IO extends Basic
      *
      * @param string $text
      */
-    public function warning($text)
+    public function warning(string $text): void
     {
         $this->writeln($text, 'yellow');
     }
@@ -363,7 +365,7 @@ class IO extends Basic
      *
      * @param string $text
      */
-    public function notice($text)
+    public function notice(string $text): void
     {
         $this->writeln($text, 'green');
     }
@@ -373,7 +375,7 @@ class IO extends Basic
      *
      * @param string $text
      */
-    public function info($text)
+    public function info(string $text): void
     {
         $this->writeln($text, 'brightBlack');
     }
@@ -383,7 +385,7 @@ class IO extends Basic
      *
      * @param string $text
      */
-    public function debug($text)
+    public function debug(string $text): void
     {
         $this->writeln($text, 'white');
     }
@@ -393,7 +395,7 @@ class IO extends Basic
      *
      * @param string $text
      */
-    public function log($text)
+    public function log(string $text): void
     {
         $this->writeln($text);
     }

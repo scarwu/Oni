@@ -66,14 +66,8 @@ final class Loader
      *
      * @return bool
      */
-    public static function append($namespace, $path)
+    public static function append(string $namespace, string $path): bool
     {
-        if (false === is_string($namespace)
-            || false === is_string($path)
-        ) {
-            return false;
-        }
-
         if (null === self::$_instance) {
             self::$_instance = new self;
         }
