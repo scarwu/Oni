@@ -72,6 +72,8 @@ class Res
     {
         header('Content-Type: application/json');
 
-        echo json_encode($data, $option);
+        echo true === isset($option)
+            ? json_encode($data, $option)
+            : json_encode($data);
     }
 }
