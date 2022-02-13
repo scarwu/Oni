@@ -21,15 +21,15 @@ abstract class Basic
      * Set Attr
      *
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      *
-     * @return object
+     * @return bool
      */
-    final public function setAttr(string $key, string $value): object
+    final public function setAttr(string $key, $value): bool
     {
         $this->_attr[$key] = $value;
 
-        return $this;
+        return true;
     }
 
     /**
