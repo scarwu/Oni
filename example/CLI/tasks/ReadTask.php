@@ -17,9 +17,11 @@ class ReadTask extends Task
     public function run()
     {
         $this->io->writeln("What is your gender?");
+
         $gender = $this->io->menuSelect([
             'male',
-            'female'
+            'female',
+            'other'
         ]);
 
         // $this->io->write("What is your name? ");

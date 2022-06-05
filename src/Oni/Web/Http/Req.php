@@ -43,7 +43,7 @@ class Req
      */
     public function method(): string
     {
-        $method = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])
+        $method = (true === isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']))
             ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
             : $_SERVER['REQUEST_METHOD'];
 
@@ -57,7 +57,7 @@ class Req
      */
     public function contentLength(): int
     {
-        return isset($_SERVER['CONTENT_LENGTH']) && '' !== $_SERVER['CONTENT_LENGTH']
+        return (true === isset($_SERVER['CONTENT_LENGTH']) && '' !== $_SERVER['CONTENT_LENGTH'])
             ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
     }
 
@@ -74,7 +74,7 @@ class Req
         //     * multipart/form-data; boundary=----WebKitFormBoundaryKw2qnJFfEWBNPPYK
         //     * application/x-www-form-urlencoded
         //     * application/json
-        return isset($_SERVER['CONTENT_TYPE']) && '' !== $_SERVER['CONTENT_TYPE']
+        return (true === isset($_SERVER['CONTENT_TYPE']) && '' !== $_SERVER['CONTENT_TYPE'])
             ? explode(';', $_SERVER['CONTENT_TYPE'])[0] : null;
     }
 
@@ -185,7 +185,7 @@ class Req
      */
     public function isAjax(): string
     {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+        return (true === isset($_SERVER['HTTP_X_REQUESTED_WITH']))
             && 'XMLHttpRequest' === $_SERVER['HTTP_X_REQUESTED_WITH'];
     }
 }

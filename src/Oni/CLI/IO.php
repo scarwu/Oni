@@ -69,7 +69,7 @@ class IO extends Basic
             if (true === (bool) preg_match($optionRegexRule, $value, $match)) {
                 $this->_options[$match[1]] = null;
 
-                if (isset($argv[0])) {
+                if (true === isset($argv[0])) {
                     if (true === (bool) preg_match($configRegexRule, $argv[0])) {
                         continue;
                     }
