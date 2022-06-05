@@ -29,7 +29,9 @@ class ReadTask extends Task
 
     	// or
 
-        $name = $this->io->ask('What is your name? ');
+        $name = $this->io->ask('What is your name? ', function ($value) {
+            return '' !== $value;
+        });
 
         if (0 === $gender) {
             $this->io->log("Hi, Mr.{$name}!");

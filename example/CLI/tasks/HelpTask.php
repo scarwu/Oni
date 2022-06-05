@@ -19,6 +19,7 @@ class HelpTask extends Task
         $this->io->info('Try above tasks:');
         $this->io->info('    ./boot.php help');
         $this->io->info('    ./boot.php read');
+        $this->io->info('    ./boot.php menu');
         $this->io->info('    ./boot.php color');
         $this->io->info('    ./boot.php parse');
     }

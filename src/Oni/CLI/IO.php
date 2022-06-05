@@ -240,9 +240,10 @@ class IO extends Basic
      *
      * @return int
      */
-    public function menuSelect(array $options): int
+    public function menuSelect(array $options, ?int $currentDisplayLines = null): int
     {
         $totalIndex = count($options);
+        $skipIndex = 0;
         $selectedIndex = 0;
         $isBreakLoop = false;
         $isFirstLoop = true;
@@ -251,6 +252,16 @@ class IO extends Basic
         $wWidth = (int) exec('tput cols');
         $wHeight = (int) exec('tput lines');
 
+        $displayLines = $totalIndex <= $wHeight
+            ? $totalIndex : $wHeight;
+
+        if (true === is_integer($currentDisplayLines)
+            && $currentDisplayLines > 0
+            && $currentDisplayLines < $displayLines
+        ) {
+            $displayLines = $currentDisplayLines;
+        }
+
         readline_callback_handler_install('', function() {});
 
         // Set Cursor is Hide
@@ -258,22 +269,40 @@ class IO extends Basic
 
         do {
             switch (ord($char)) {
-            case 10: // Enter Key
+            case AEC::KEY_CODE_ENTER:
                 $isBreakLoop = true;
 
                 break;
-            case 65: // Up Key
-                if ($selectedIndex - 1 >= 0) {
-                    $selectedIndex--;
-                }
+            case AEC::KEY_CODE_UP:
+                $selectedIndex--;
 
                 break;
-            case 66: // Down Key
-                if ($selectedIndex + 1 < $totalIndex) {
-                    $selectedIndex++;
-                }
+            case AEC::KEY_CODE_DOWN:
+                $selectedIndex++;
 
                 break;
+            case AEC::KEY_CODE_PAGE_UP:
+                $selectedIndex -= $displayLines;
+
+                break;
+            case AEC::KEY_CODE_PAGE_DOWN:
+                $selectedIndex += $displayLines;
+
+                break;
+            case AEC::KEY_CODE_HOME:
+                $selectedIndex = 0;
+
+                break;
+            case AEC::KEY_CODE_END:
+                $selectedIndex = $totalIndex;
+
+                break;
+            }
+
+            if ($selectedIndex < 0) {
+                $selectedIndex = 0;
+            } elseif ($selectedIndex >= $totalIndex) {
+                $selectedIndex = $totalIndex - 1;
             }
 
             if (true === $isBreakLoop) {
@@ -282,17 +311,20 @@ class IO extends Basic
 
             // Set Cursor Prev
             if (false === $isFirstLoop) {
-                $this->write(AEC::cursorPrev($totalIndex - 1));
+                $this->write(AEC::cursorPrev($displayLines - 1));
             } else {
                 $isFirstLoop = false;
             }
 
-            // Get Skip Index
-            $skipIndex = $selectedIndex < $wHeight
-                ? 0 : $selectedIndex - $wHeight + 1;
+            // Set Skip Index
+            if ($selectedIndex < $skipIndex) {
+                $skipIndex = $selectedIndex;
+            } else if ($selectedIndex > $skipIndex + $displayLines - 1) {
+                $skipIndex = $selectedIndex - $displayLines + 1;
+            }
 
             // Get Current Options
-            $currentOptions = array_slice($options, $skipIndex, $wHeight);
+            $currentOptions = array_slice($options, $skipIndex, $displayLines);
 
             // Print Menu
             $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex, $skipIndex) {

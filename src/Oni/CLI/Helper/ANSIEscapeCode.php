@@ -21,6 +21,17 @@ final class ANSIEscapeCode
     const BEL = "\x07";
     const SEP = ';';
 
+    // Key Code
+    const KEY_CODE_ENTER        = 10;
+    const KEY_CODE_UP           = 65;
+    const KEY_CODE_DOWN         = 66;
+    const KEY_CODE_LEFT         = 68;
+    const KEY_CODE_RIGHT        = 67;
+    const KEY_CODE_PAGE_UP      = 53;
+    const KEY_CODE_PAGE_DOWN    = 54;
+    const KEY_CODE_HOME         = 72;
+    const KEY_CODE_END          = 70;
+
     /**
      * @var array
      */
