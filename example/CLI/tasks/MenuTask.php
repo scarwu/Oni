@@ -16,7 +16,7 @@ class MenuTask extends Task
 {
     public function run()
     {
-        $count = $this->io->ask('Item counts of menu? [10] ', function ($value) {
+        $count = $this->io->ask('Item counts of menu? [10]', function ($value) {
             return true === (bool) preg_match('/^\d+$/', $value) || '' === $value;
         });
 
@@ -30,7 +30,7 @@ class MenuTask extends Task
             $count = 10;
         }
 
-        $lines = $this->io->ask('Display lines of menu? [3] ', function ($value) {
+        $lines = $this->io->ask('Display lines of menu? [3]', function ($value) {
             return true === (bool) preg_match('/^\d+$/', $value) || '' === $value;
         });
 
@@ -54,9 +54,7 @@ class MenuTask extends Task
             $list[] = sprintf('[%3d]', $index) . ' ' . md5($index);
         }
 
-        $this->io->writeln("Select Index");
-
-        $index = $this->io->menuSelect($list, $lines);
+        $index = $this->io->menuSelector("Select Index", $list, $lines);
 
         $this->io->log("You selected index is {$index}!");
     }

@@ -82,6 +82,21 @@ class IO extends Basic
                 }
             }
         }
+
+        // Set Ctrl Handler (PHP 7 >= 7.4.0, PHP 8)
+        // sapi_windows_set_ctrl_handler(function () {
+        //     switch ($event) {
+        //     case PHP_WINDOWS_EVENT_CTRL_C:
+
+        //         // Set Cursor is Show
+        //         $this->writeln(AEC::cursorShow());
+
+        //         // Remove Readline Callback
+        //         readline_callback_handler_remove();
+
+        //         break;
+        //     }
+        // });
     }
 
     /**
@@ -227,121 +242,145 @@ class IO extends Basic
         }
 
         do {
-            $this->write($text, $fgColor, $bgColor);
+            $this->write("{$text}\n> ", $fgColor, $bgColor);
         } while (false === $callback($answer = $this->read()));
 
         return $answer;
     }
 
     /**
-     * Menu Select
+     * Menu Selector
      *
+     * @param array $text
      * @param array $options
+     * @param int $specifyLimitLines
      *
      * @return int
      */
-    public function menuSelect(array $options, ?int $currentDisplayLines = null): int
+    public function menuSelector(string $text, array $options, ?int $specifyLimitLines = null): int
     {
         $totalIndex = count($options);
-        $skipIndex = 0;
-        $selectedIndex = 0;
-        $isBreakLoop = false;
-        $isFirstLoop = true;
-        $char = null;
+
+        if (0 === $totalIndex) {
+            return null;
+        }
+
+        $offsetIndex = 0;
+        $currentIndex = 0;
+        $isSelectIndex = false;
 
         $wWidth = (int) exec('tput cols');
         $wHeight = (int) exec('tput lines');
 
-        $displayLines = $totalIndex <= $wHeight
+        $limitLines = $totalIndex <= $wHeight
             ? $totalIndex : $wHeight;
 
-        if (true === is_integer($currentDisplayLines)
-            && $currentDisplayLines > 0
-            && $currentDisplayLines < $displayLines
+        if (true === is_integer($specifyLimitLines)
+            && $specifyLimitLines > 0
+            && $specifyLimitLines < $limitLines
         ) {
-            $displayLines = $currentDisplayLines;
+            $limitLines = $specifyLimitLines;
         }
 
+        $this->writeln($text);
+
+        // Install Readline Callback
         readline_callback_handler_install('', function() {});
 
         // Set Cursor is Hide
         $this->write(AEC::cursorHide());
 
-        do {
-            switch (ord($char)) {
-            case AEC::KEY_CODE_ENTER:
-                $isBreakLoop = true;
+        while (true) {
 
-                break;
-            case AEC::KEY_CODE_UP:
-                $selectedIndex--;
+            // Print Menu
+            $list = [];
 
-                break;
-            case AEC::KEY_CODE_DOWN:
-                $selectedIndex++;
+            foreach (array_slice($options, $offsetIndex, $limitLines) as $index => $option) {
+                $cursor = (($currentIndex - $offsetIndex) === $index) ? '> ' : '  ';
+                $list[] = AEC::CSI . "2K{$cursor}{$option}";
+            }
 
-                break;
-            case AEC::KEY_CODE_PAGE_UP:
-                $selectedIndex -= $displayLines;
+            $this->write(implode("\n", $list));
 
-                break;
-            case AEC::KEY_CODE_PAGE_DOWN:
-                $selectedIndex += $displayLines;
+            // Wait Typing
+            $isMatched = false;
 
-                break;
-            case AEC::KEY_CODE_HOME:
-                $selectedIndex = 0;
+            while ($char = stream_get_contents(STDIN, 1)) {
+                switch (ord($char)) {
+                case AEC::KEY_CODE_ENTER:
+                    $isSelectIndex = true;
+                    $isMatched = true;
 
-                break;
-            case AEC::KEY_CODE_END:
-                $selectedIndex = $totalIndex;
+                    break;
+                case AEC::KEY_CODE_UP:
+                    $currentIndex--;
+                    $isMatched = true;
 
+                    break;
+                case AEC::KEY_CODE_DOWN:
+                    $currentIndex++;
+                    $isMatched = true;
+
+                    break;
+                case AEC::KEY_CODE_PAGE_UP:
+                    $currentIndex -= $limitLines;
+                    $isMatched = true;
+
+                    break;
+                case AEC::KEY_CODE_PAGE_DOWN:
+                    $currentIndex += $limitLines;
+                    $isMatched = true;
+
+                    break;
+                case AEC::KEY_CODE_HOME:
+                    $currentIndex = 0;
+                    $isMatched = true;
+
+                    break;
+                case AEC::KEY_CODE_END:
+                    $currentIndex = $totalIndex;
+                    $isMatched = true;
+
+                    break;
+                }
+
+                if (true === $isMatched) {
+                    break;
+                }
+            }
+
+            if (true === $isSelectIndex) {
                 break;
             }
 
-            if ($selectedIndex < 0) {
-                $selectedIndex = 0;
-            } elseif ($selectedIndex >= $totalIndex) {
-                $selectedIndex = $totalIndex - 1;
-            }
-
-            if (true === $isBreakLoop) {
-                break;
-            }
-
-            // Set Cursor Prev
-            if (false === $isFirstLoop) {
-                $this->write(AEC::cursorPrev($displayLines - 1));
-            } else {
-                $isFirstLoop = false;
+            // Set Selected Index
+            if ($currentIndex < 0) {
+                $currentIndex = 0;
+            } elseif ($currentIndex >= $totalIndex) {
+                $currentIndex = $totalIndex - 1;
             }
 
             // Set Skip Index
-            if ($selectedIndex < $skipIndex) {
-                $skipIndex = $selectedIndex;
-            } else if ($selectedIndex > $skipIndex + $displayLines - 1) {
-                $skipIndex = $selectedIndex - $displayLines + 1;
+            if ($currentIndex < $offsetIndex) {
+                $offsetIndex = $currentIndex;
+            } else if ($currentIndex > $offsetIndex + $limitLines - 1) {
+                $offsetIndex = $currentIndex - $limitLines + 1;
             }
 
-            // Get Current Options
-            $currentOptions = array_slice($options, $skipIndex, $displayLines);
-
-            // Print Menu
-            $this->write(implode("\n", array_map(function ($option, $currentIndex) use ($selectedIndex, $skipIndex) {
-                $padding = (($selectedIndex - $skipIndex) === $currentIndex)
-                    ? '> ' : '  ';
-
-                return AEC::CSI . "2K{$padding}{$option}";
-            }, $currentOptions, array_keys($currentOptions))));
-
-        } while ($char = stream_get_contents(STDIN, 1));
+            if (1 < $limitLines) {
+                $this->write(AEC::cursorPrev($limitLines - 1)); // Set Cursor Prev
+            } else {
+                $this->write("\r"); // Set Return
+            }
+        }
 
         // Set Cursor is Show
         $this->writeln(AEC::cursorShow());
 
+        // Remove Readline Callback
         readline_callback_handler_remove();
 
-        return $selectedIndex;
+        return $currentIndex;
     }
 
     /**
