@@ -48,9 +48,19 @@ class View extends Basic
     private function __construct() {}
 
     /**
+     * @var array
+     */
+    private $data = [];
+
+    /**
      * @var string
      */
-    private $layoutPath = null;
+    private $indexPath = 'index';
+
+    /**
+     * @var string
+     */
+    private $layoutPath = 'layout';
 
     /**
      * @var string
@@ -58,9 +68,32 @@ class View extends Basic
     private $contentPath = null;
 
     /**
-     * @var array
+     * Set Data
+     *
+     * @param array $data
+     *
+     * @return bool
      */
-    private $data = [];
+    public function setData(array $data): bool
+    {
+        $this->data = $data;
+
+        return true;
+    }
+
+    /**
+     * Set Index Path
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function setIndexPath(string $path): bool
+    {
+        $this->indexPath = $path;
+
+        return true;
+    }
 
     /**
      * Set Layout Path
@@ -91,17 +124,13 @@ class View extends Basic
     }
 
     /**
-     * Set Data
+     * Get Index Path
      *
-     * @param array $data
-     *
-     * @return bool
+     * @return string|null
      */
-    public function setData(array $data): bool
+    public function getIndexPath(): ?string
     {
-        $this->data = $data;
-
-        return true;
+        return $this->indexPath;
     }
 
     /**
@@ -127,32 +156,58 @@ class View extends Basic
     /**
      * Load Partial
      *
-     * @param string $_subPath
+     * @param string $_targetPath
      *
      * @return string
      */
-    private function loadPartial(string $_subPath): string
+    private function loadPartial(string $_targetPath): string
     {
         $_result = '';
 
-        if (true === is_string($_subPath)) {
+        if (true === is_string($_targetPath)) {
             $_path = $this->getAttr('path');
             $_ext = $this->getAttr('ext');
-            $_fullpath = "{$_path}/{$_subPath}.{$_ext}";
+            $_currentPath = null;
 
-            if (true === file_exists($_fullpath)) {
+            if (true === file_exists("{$_targetPath}.{$_ext}")) {
+                $_currentPath = "{$_targetPath}.{$_ext}";
+            } else if (true === file_exists("{$_path}/{$_targetPath}.{$_ext}")) {
+                $_currentPath = "{$_path}/{$_targetPath}.{$_ext}";
+            }
+
+            if (true === is_string($_currentPath)) {
                 foreach ($this->data as $_key => $_value) {
                     $$_key = $_value;
                 }
 
                 ob_start();
-                include $_fullpath;
+                include $_currentPath;
                 $_result = ob_get_contents();
                 ob_end_clean();
             }
         }
 
         return $_result;
+    }
+
+    /**
+     * Load Index
+     *
+     * @return string
+     */
+    private function loadIndex(): string
+    {
+        return $this->loadPartial($this->indexPath);
+    }
+
+    /**
+     * Load Layout
+     *
+     * @return string
+     */
+    private function loadLayout(): string
+    {
+        return $this->loadPartial($this->layoutPath);
     }
 
     /**
@@ -172,6 +227,6 @@ class View extends Basic
      */
     public function render(): string
     {
-        return $this->loadPartial($this->layoutPath);
+        return $this->loadIndex();
     }
 }
