@@ -52,6 +52,6 @@ class AjaxController extends Controller
      */
     public function defaultAction()
     {
-        $this->res->json($this->data);
+        return $this->data;
     }
 }

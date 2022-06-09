@@ -3,6 +3,6 @@
     <title><?=$title?></title>
 </head>
 <body>
-    <?=$this->loadContent()?>
+    <?=$this->loadLayout()?>
 </body>
 </html>

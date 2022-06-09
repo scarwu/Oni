@@ -52,21 +52,21 @@ class RestController extends Controller
      */
     public function getAction()
     {
-        $this->res->json($this->data);
+        return $this->data;
     }
 
     public function postAction()
     {
-        $this->res->json($this->data);
+        return $this->data;
     }
 
     public function putAction()
     {
-        $this->res->json($this->data);
+        return $this->data;
     }
 
     public function deleteAction()
     {
-        $this->res->json($this->data);
+        return $this->data;
     }
 }

@@ -19,12 +19,12 @@ class MainController extends Controller
      */
     public function up()
     {
-        $this->view->setLayoutPath('index');
+        // pass
     }
 
     public function down()
     {
-        $this->res->html($this->view->render());
+        // pass
     }
 
     /**
@@ -32,7 +32,6 @@ class MainController extends Controller
      */
     public function defaultAction($params = [])
     {
-        $this->view->setContentPath('main/default');
         $this->view->setData([
             'title' => 'Oni - A Lightweight PHP Framework for Web & CLI',
             'data' => [
@@ -62,7 +61,6 @@ class MainController extends Controller
 
     public function errorAction()
     {
-        $this->view->setContentPath('main/error');
         $this->view->setData([
             'title' => 'Oni - Error Page'
         ]);

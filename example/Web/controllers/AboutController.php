@@ -19,12 +19,12 @@ class AboutController extends Controller
      */
     public function up()
     {
-        $this->view->setLayoutPath('index');
+        // pass
     }
 
     public function down()
     {
-        $this->res->html($this->view->render());
+        // pass
     }
 
     /**
@@ -32,7 +32,6 @@ class AboutController extends Controller
      */
     public function defaultAction()
     {
-        $this->view->setContentPath('about/default');
         $this->view->setData([
             'title' => 'Oni - About / Default Page'
         ]);
@@ -40,7 +39,6 @@ class AboutController extends Controller
 
     public function mvcAction()
     {
-        $this->view->setContentPath('about/mvc');
         $this->view->setData([
             'title' => 'Oni - About / MVC Page'
         ]);
@@ -48,7 +46,6 @@ class AboutController extends Controller
 
     public function mvvmAction()
     {
-        $this->view->setContentPath('about/mvvm');
         $this->view->setData([
             'title' => 'Oni - About / MVVM Page'
         ]);

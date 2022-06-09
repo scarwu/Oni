@@ -70,39 +70,39 @@ class App extends Basic
         $path = $this->getAttr('task/path');
         $params = $this->io->getArguments();
 
-        while (0 < sizeof($params)) {
-            $param = $params[0];
-            $param = ucfirst($param);
+        $currentPath = null;
 
-            if (false === file_exists("{$path}/{$param}")
-                && false === file_exists("{$path}/{$param}Task.php")
+        while (0 < count($params)) {
+            $tempPath = ucfirst($params[0]);
+            $tempPath = (null !== $currentPath) ? "{$currentPath}/{$tempPath}" : $tempPath;
+
+            if (false === file_exists("{$path}/{$tempPath}")
+                && false === file_exists("{$path}/{$tempPath}Task.php")
             ) {
                 break;
             }
 
-            $path = "{$path}/{$param}";
-            $namespace = "{$namespace}\\{$param}";
+            $currentPath = $tempPath;
 
             array_shift($params);
         }
 
         // Rewrite Task
-        if (false === file_exists("{$path}Task.php")) {
-            $namespace = $this->getAttr('task/namespace');
-            $path = $this->getAttr('task/path');
+        if (null === $currentPath) {
             $handler = ucfirst($this->getAttr('task/default/handler'));
 
             if (false === file_exists("{$path}/{$handler}Task.php")) {
                 return false;
             }
 
-            $namespace = "{$namespace}\\{$handler}Task";
-        } else {
-            $namespace = "{$namespace}Task";
+            $currentPath = $handler;
         }
 
         // Task Flow
-        $instance = new $namespace();
+        $currentNamaspece = implode('\\', explode('/', $currentPath));
+        $currentNamaspece = "{$namespace}\\{$currentNamaspece}Task";
+
+        $instance = new $currentNamaspece();
 
         if (false !== $instance->up()) {
             $instance->run($params);

@@ -18,6 +18,9 @@ use Oni\Web\View;
 
 class App extends Basic
 {
+    /**
+     * @var object
+     */
     protected $_attr = [
         'controller/namespace'          => null,        // Requied
         'controller/path'               => null,        // Requied
@@ -25,13 +28,35 @@ class App extends Basic
         'controller/default/action'     => 'default',
         'controller/error/handler'      => 'Main',
         'controller/error/action'       => 'error',
+
         'model/namespace'               => null,        // Requied
         'model/path'                    => null,        // Requied
+
         'view/path'                     => null,        // Requied
         'view/ext'                      => 'php',
+
         'static/path'                   => null,        // Requied
+
         'cache/path'                    => null,        // Requied
         'cache/time'                    => 300          // 300 sec = 5 min
+    ];
+
+    /**
+     * @var object
+     */
+    protected $_mimeMapping = [
+        'html'  => 'text/html',
+        'css'   => 'text/css',
+        'js'    => 'text/javascript',
+        'json'  => 'application/json',
+        'xml'   => 'application/xml',
+
+        'jpg'   => 'image/jpeg',
+        'png'   => 'image/png',
+        'gif'   => 'image/gif',
+
+        'woff'  => 'application/font-woff',
+        'ttf'   => 'font/opentype'
     ];
 
     /**
@@ -60,14 +85,17 @@ class App extends Basic
      */
     public function run(): bool
     {
-        // Load Static File
-        if (null !== $this->getAttr('static/path') && $this->loadStatic()) {
-            return true;
-        }
+        if ('get' === $this->req->method()) {
 
-        // Load Cache File
-        if (null !== $this->getAttr('cache/path') && $this->loadCache()) {
-            return true;
+            // Load Static File
+            if (true === $this->loadStatic()) {
+                return true;
+            }
+
+            // Load Cache File
+            if (true === $this->loadCache()) {
+                return true;
+            }
         }
 
         // Register Model Classes
@@ -111,23 +139,14 @@ class App extends Basic
             return false;
         }
 
-        $fullpath = "{$path}/{$uri}";
+        $currentPath = "{$path}/{$uri}";
 
-        if (false === file_exists($fullpath)) {
+        if (false === file_exists($currentPath)) {
             return false;
         }
 
-        if ('get' !== $this->req->method()) {
-            return false;
-        }
-
-        $mime = mime_content_type($fullpath);
-
-        header("Content-Type: {$mime}");
-
-        echo file_get_contents($fullpath);
-
-        return true;
+        // Load Real File from Disk
+        return $this->loadRealFile($currentPath);
     }
 
     /**
@@ -144,28 +163,59 @@ class App extends Basic
             return false;
         }
 
-        $fullpath = "{$path}/" . md5($uri);
+        $currentPath = "{$path}/" . md5($uri);
 
-        if (false === file_exists($fullpath)) {
+        if (false === file_exists($currentPath)) {
             return false;
         }
 
         // Check File Create Time
-        if (time() - filectime($fullpath) > $this->getAttr('cache/time')) {
-            unlink($fullpath);
+        if (time() - filectime($currentPath) > $this->getAttr('cache/time')) {
+            unlink($currentPath);
 
             return false;
         }
 
-        if ('get' !== $this->req->method()) {
-            return false;
+        // Load Real File from Disk
+        return $this->loadRealFile($currentPath);
+    }
+
+    /**
+     * Load Real File
+     *
+     * @param string $currentPath
+     *
+     * @return bool
+     */
+    private function loadRealFile(string $currentPath): bool
+    {
+        $mimeType = null;
+        $fileInfo = pathinfo($currentPath);
+
+        // Check File Ext
+        if (true === isset($fileInfo['extension'])) {
+
+            // Skip .php File
+            if ('php' === $fileInfo['extension']) {
+                return false;
+            }
+
+            // Check MIME Type
+            if (true === isset($this->_mimeMapping[$fileInfo['extension']])) {
+                $mimeType = $this->_mimeMapping[$fileInfo['extension']];
+            }
         }
 
-        $mime = mime_content_type($fullpath);
+        // Using Builtin Function to Check MIME Type
+        if (null === $mimeType) {
+            $mimeType = mime_content_type($currentPath);
+        }
 
-        header("Content-Type: {$mime}");
+        // Set HTTP Header
+        header('Content-Type: ' . $mimeType);
+        header('Content-Length: ' . filesize($currentPath));
 
-        echo file_get_contents($fullpath);
+        echo file_get_contents($currentPath);
 
         return true;
     }
@@ -183,18 +233,19 @@ class App extends Basic
         $params = explode('/', $this->req->uri());
         $params = '' !== $params[0] ? $params : [];
 
-        foreach ($params as $param) {
-            $param = $params[0];
-            $param = ucfirst($param);
+        $currentPath = null;
 
-            if (false === file_exists("{$path}/{$param}")
-                && false === file_exists("{$path}/{$param}Controller.php")
+        while (0 < count($params)) {
+            $tempPath = ucfirst($params[0]);
+            $tempPath = (null !== $currentPath) ? "{$currentPath}/{$tempPath}" : $tempPath;
+
+            if (false === file_exists("{$path}/{$tempPath}")
+                && false === file_exists("{$path}/{$tempPath}Controller.php")
             ) {
                 break;
             }
 
-            $path = "{$path}/{$param}";
-            $namespace = "{$namespace}\\{$param}";
+            $currentPath = $tempPath;
 
             array_shift($params);
         }
@@ -202,50 +253,42 @@ class App extends Basic
         // Rewrite Controller
         $action = null;
 
-        if (false === file_exists("{$path}Controller.php")) {
-            $path = $this->getAttr('controller/path');
+        if (null === $currentPath) {
             $handler = ucfirst($this->getAttr('controller/default/handler'));
 
             if (false === file_exists("{$path}/{$handler}Controller.php")) {
                 $handler = ucfirst($this->getAttr('controller/error/handler'));
-                $action = $this->getAttr('controller/error/action') . 'Action';
 
                 if (false === file_exists("{$path}/{$handler}Controller.php")) {
                     http_response_code(400);
 
                     return false;
                 }
+
+                $action = $this->getAttr('controller/error/action');
             }
 
-            $namespace = $this->getAttr('controller/namespace');
-            $namespace = "{$namespace}\\{$handler}Controller";
-        } else {
-            $namespace = "{$namespace}Controller";
+            $currentPath = $handler;
         }
 
         // Controller Flow
-        $instance = new $namespace();
+        $currentNamaspece = implode('\\', explode('/', $currentPath));
+        $currentNamaspece = "{$namespace}\\{$currentNamaspece}Controller";
+
+        $instance = new $currentNamaspece();
 
         switch ($instance->getAttr('mode')) {
         case 'page':
-            $view = View::init();
-            $view->setAttr('path', $this->getAttr('view/path'));
-            $view->setAttr('ext', $this->getAttr('view/ext'));
-
-            if (null === $action) {
-                if (0 === count($params)) {
-                    $action = $this->getAttr('controller/default/action') . 'Action';
-                } else {
-                    $action = array_shift($params) . 'Action';
-                }
+            if (null === $action && 0 === count($params)) {
+                $action = $this->getAttr('controller/default/action');
+            } else {
+                $action = array_shift($params);
             }
 
-            if (false === method_exists($instance, $action)) {
-                $namespace = $this->getAttr('controller/namespace');
-                $path = $this->getAttr('controller/path');
+            $currentAction = "{$action}Action";
 
-                $handler = $this->getAttr('controller/error/handler');
-                $handler = ucfirst($handler);
+            if (false === method_exists($instance, $currentAction)) {
+                $handler = ucfirst($this->getAttr('controller/error/handler'));
 
                 if (false === file_exists("{$path}/{$handler}Controller.php")) {
                     http_response_code(404);
@@ -253,53 +296,85 @@ class App extends Basic
                     return false;
                 }
 
-                $namespace = "{$namespace}\\{$handler}Controller";
-                $instance = new $namespace();
-                $action = $this->getAttr('controller/error/action') . 'Action';
+                $action = $this->getAttr('controller/error/action');
+                $currentPath = $handler;
 
-                if (false === method_exists($instance, $action)) {
+                $currentNamaspece = implode('\\', explode('/', $currentPath));
+                $currentNamaspece = "{$namespace}\\{$currentNamaspece}Controller";
+
+                $instance = new $currentNamaspece();
+                $currentAction = "{$action}Action";
+
+                if (false === method_exists($instance, $currentAction)) {
                     http_response_code(404);
 
                     return false;
                 }
             }
 
-            break;
-        case 'ajax':
-            if (null === $action) {
-                if (0 === count($params)) {
-                    $action = $this->getAttr('controller/default/action') . 'Action';
-                } else {
-                    $action = array_shift($params) . 'Action';
-                }
+            if (false !== $instance->up()) {
+
+                // Init View
+                $view = View::init();
+                $view->setAttr('path', $this->getAttr('view/path'));
+                $view->setAttr('ext', $this->getAttr('view/ext'));
+                $view->setLayoutPath(implode('/', array_map(function ($segment) {
+                    return strtolower($segment);
+                }, explode('/', "{$currentPath}/{$action}"))));
+
+                $instance->$currentAction($params);
+
+                $this->res->html($view->render());
             }
 
-            if (false === method_exists($instance, $action)) {
+            $instance->down();
+
+            break;
+        case 'ajax':
+            if (null === $action && 0 === count($params)) {
+                $action = $this->getAttr('controller/default/action');
+            } else {
+                $action = array_shift($params);
+            }
+
+            $currentAction = "{$action}Action";
+
+            if (false === method_exists($instance, $currentAction)) {
                 http_response_code(501);
 
                 return false;
             }
+
+            if (false !== $instance->up()) {
+                $result = $instance->$currentAction($params);
+
+                $this->res->json($result);
+            }
+
+            $instance->down();
 
             break;
         case 'rest':
-            $action = $this->req->method() . 'Action';
+            $currentAction = $this->req->method() . 'Action';
 
-            if (false === method_exists($instance, $action)) {
+            if (false === method_exists($instance, $currentAction)) {
                 http_response_code(501);
 
                 return false;
             }
+
+            if (false !== $instance->up()) {
+                $result = $instance->$currentAction($params);
+
+                $this->res->json($result);
+            }
+
+            $instance->down();
 
             break;
         default:
             return false;
         }
-
-        if (false !== $instance->up()) {
-            $instance->$action($params);
-        }
-
-        $instance->down();
 
         return true;
     }

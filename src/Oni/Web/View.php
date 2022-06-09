@@ -169,9 +169,11 @@ class View extends Basic
             $_ext = $this->getAttr('ext');
             $_currentPath = null;
 
-            if (true === file_exists("{$_targetPath}.{$_ext}")) {
+            if (true === in_array(substr($_targetPath, 0, 1), [ '~', '/' ])
+                && true === file_exists("{$_targetPath}.{$_ext}")
+            ) {
                 $_currentPath = "{$_targetPath}.{$_ext}";
-            } else if (true === file_exists("{$_path}/{$_targetPath}.{$_ext}")) {
+            } elseif (true === file_exists("{$_path}/{$_targetPath}.{$_ext}")) {
                 $_currentPath = "{$_path}/{$_targetPath}.{$_ext}";
             }
 
