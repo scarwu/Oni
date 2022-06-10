@@ -21,10 +21,10 @@ $app = new Oni\Web\App();
 
 $app->setAttr('controller/namespace', 'WebApp\Controller');
 $app->setAttr('controller/path', "{$root}/controllers");
-$app->setAttr('model/namespace', 'WebApp\Model');
-$app->setAttr('model/path', "{$root}/models");
-$app->setAttr('view/folders', [ "{$root}/views" ]);
-$app->setAttr('static/folders', [ "{$root}/static" ]);
+// $app->setAttr('model/namespace', 'WebApp\Model');
+// $app->setAttr('model/path', "{$root}/models");
+$app->setAttr('view/paths', [ "{$root}/views" ]);
+$app->setAttr('static/paths', [ "{$root}/static" ]);
 $app->setAttr('cache/path', "{$root}/caches");
 $app->setAttr('cache/permission', 0777);
 

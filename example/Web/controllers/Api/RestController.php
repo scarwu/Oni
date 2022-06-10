@@ -42,11 +42,6 @@ class RestController extends Controller
         ];
     }
 
-    public function down()
-    {
-        // do nothing
-    }
-
     /**
      * Actions
      */

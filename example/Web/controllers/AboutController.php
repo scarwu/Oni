@@ -15,19 +15,6 @@ use Oni\Web\Controller\Page as Controller;
 class AboutController extends Controller
 {
     /**
-     * Lifecycle Functions
-     */
-    public function up()
-    {
-        // pass
-    }
-
-    public function down()
-    {
-        // pass
-    }
-
-    /**
      * Actions
      */
     public function defaultAction()

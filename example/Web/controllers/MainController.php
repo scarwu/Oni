@@ -15,19 +15,6 @@ use Oni\Web\Controller\Page as Controller;
 class MainController extends Controller
 {
     /**
-     * Lifecycle Functions
-     */
-    public function up()
-    {
-        // pass
-    }
-
-    public function down()
-    {
-        // pass
-    }
-
-    /**
      * Actions
      */
     public function defaultAction($params = [])
@@ -59,7 +46,7 @@ class MainController extends Controller
         ]);
     }
 
-    public function errorAction()
+    public function errorAction($params = [])
     {
         $this->view->setData([
             'title' => 'Oni - Error Page'

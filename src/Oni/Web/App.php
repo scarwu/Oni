@@ -22,20 +22,23 @@ class App extends Basic
      * @var object
      */
     protected $_attr = [
+        'router/event/up'               => null,
+        'router/event/down'             => null,
+        'router/default/controller'     => 'Main',
+        'router/default/action'         => 'default',
+        'router/error/controller'       => 'Main',
+        'router/error/action'           => 'error',
+
         'controller/namespace'          => null,        // Requied
         'controller/path'               => null,        // Requied
-        'controller/default/handler'    => 'Main',
-        'controller/default/action'     => 'default',
-        'controller/error/handler'      => 'Main',
-        'controller/error/action'       => 'error',
 
-        'model/namespace'               => null,        // Requied
-        'model/path'                    => null,        // Requied
+        // 'model/namespace'               => null,        // Requied
+        // 'model/path'                    => null,        // Requied
 
-        'view/folders'                  => null,        // Requied
+        'view/paths'                    => null,        // Requied
         'view/ext'                      => 'php',
 
-        'static/folders'                => null,        // Requied
+        'static/paths'                  => null,        // Requied
 
         'cache/path'                    => null,        // Requied
         'cache/permission'              => 0775,        // rwxrwxr-x
@@ -80,32 +83,17 @@ class App extends Basic
     }
 
     /**
-     * Run Application
-     *
-     * @return bool
+     * Up Function
      */
-    public function run(): bool
+    private function up(): bool
     {
-        if ('get' === $this->req->method()) {
+        // // Register Model Classes
+        // $namespace = $this->getAttr('model/namespace');
+        // $path = $this->getAttr('model/path');
 
-            // Load Static File
-            if (true === $this->loadStatic()) {
-                return true;
-            }
-
-            // Load Cache File
-            if (true === $this->loadCache()) {
-                return true;
-            }
-        }
-
-        // Register Model Classes
-        $namespace = $this->getAttr('model/namespace');
-        $path = $this->getAttr('model/path');
-
-        if (null !== $namespace && null !== $path) {
-            Loader::append($namespace, $path);
-        }
+        // if (null !== $namespace && null !== $path) {
+        //     Loader::append($namespace, $path);
+        // }
 
         // Register Controller Classes & Load
         $namespace = $this->getAttr('controller/namespace');
@@ -113,14 +101,65 @@ class App extends Basic
 
         if (null !== $namespace && null !== $path) {
             Loader::append($namespace, $path);
+        }
 
+        $upEvent = $this->getAttr('router/event/up');
+
+        if (true === is_callable($upEvent)) {
+            return $upEvent();
+        }
+
+        return true;
+    }
+
+    /**
+     * Down Function
+     */
+    private function down()
+    {
+        $downEvent = $this->getAttr('router/event/down');
+
+        if (true === is_callable($downEvent)) {
+            $downEvent();
+        }
+    }
+
+    /**
+     * Run Application
+     *
+     * @return bool
+     */
+    public function run()
+    {
+        if (false !== $this->up()) {
+            if ('get' === $this->req->method()) {
+
+                // Load Static File
+                if (true === $this->loadStatic()) {
+                    $this->down();
+
+                    return true;
+                }
+
+                // Load Cache File
+                if (true === $this->loadCache()) {
+                    $this->down();
+
+                    return true;
+                }
+            }
+
+            // Load Controller to Handle
             if (true === $this->loadController()) {
+                $this->down();
+
                 return true;
             }
         }
 
+        // Not executed anything
         if (200 === http_response_code()) {
-            http_response_code(404);
+            http_response_code(400);
         }
 
         return false;
@@ -133,21 +172,21 @@ class App extends Basic
      */
     private function loadStatic(): bool
     {
-        $folders = $this->getAttr('static/folders');
+        $paths = $this->getAttr('static/paths');
         $uri = $this->req->uri();
 
-        if (false === is_array($folders) || '' === $uri) {
+        if (false === is_array($paths) || '' === $uri) {
             return false;
         }
 
         $currentPath = null;
 
-        foreach ($folders as $folder) {
-            if (false === file_exists("{$folder}/{$uri}")) {
+        foreach ($paths as $path) {
+            if (false === file_exists("{$path}/{$uri}")) {
                 continue;
             }
 
-            $currentPath = "{$folder}/{$uri}";
+            $currentPath = "{$path}/{$uri}";
 
             break;
         }
@@ -280,21 +319,21 @@ class App extends Basic
         $actionName = null;
 
         if (null === $currentPath) {
-            $handlerName = ucfirst($this->getAttr('controller/default/handler'));
+            $controllerName = ucfirst($this->getAttr('router/default/controller'));
 
-            if (false === file_exists("{$path}/{$handlerName}Controller.php")) {
-                $handlerName = ucfirst($this->getAttr('controller/error/handler'));
+            if (false === file_exists("{$path}/{$controllerName}Controller.php")) {
+                $controllerName = ucfirst($this->getAttr('router/error/controller'));
 
-                if (false === file_exists("{$path}/{$handlerName}Controller.php")) {
+                if (false === file_exists("{$path}/{$controllerName}Controller.php")) {
                     http_response_code(400);
 
                     return false;
                 }
 
-                $actionName = $this->getAttr('controller/error/action');
+                $actionName = $this->getAttr('router/error/action');
             }
 
-            $currentPath = $handlerName;
+            $currentPath = $controllerName;
         }
 
         // Controller Flow
@@ -308,35 +347,35 @@ class App extends Basic
 
             // Custom Handler
             if (null === $actionName && 0 < count($params)) {
-                if (true === method_exists($instance, "{$params[0]}Action")) {
+                // if (true === method_exists($instance, "{$params[0]}Action")) {
                     $actionName = array_shift($params);
-                }
+                // }
             }
 
             // Default Handler
             if (null === $actionName) {
-                $actionName = $this->getAttr('controller/default/action');
+                $actionName = $this->getAttr('router/default/action');
             }
 
             $method = "{$actionName}Action";
 
             if (false === method_exists($instance, $method)) {
-                $handlerName = ucfirst($this->getAttr('controller/error/handler'));
+                $controllerName = ucfirst($this->getAttr('router/error/controller'));
 
-                if (false === file_exists("{$path}/{$handlerName}Controller.php")) {
+                if (false === file_exists("{$path}/{$controllerName}Controller.php")) {
                     http_response_code(404);
 
                     return false;
                 }
 
-                $currentPath = $handlerName;
+                $currentPath = $controllerName;
 
                 $className = implode('\\', explode('/', $currentPath));
                 $className = "{$namespace}\\{$className}Controller";
 
                 $instance = new $className();
 
-                $actionName = $this->getAttr('controller/error/action');
+                $actionName = $this->getAttr('router/error/action');
                 $method = "{$actionName}Action";
 
                 if (false === method_exists($instance, $method)) {
@@ -350,7 +389,7 @@ class App extends Basic
 
                 // Init View
                 $view = View::init();
-                $view->setAttr('folders', $this->getAttr('view/folders'));
+                $view->setAttr('paths', $this->getAttr('view/paths'));
                 $view->setAttr('ext', $this->getAttr('view/ext'));
                 $view->setLayoutPath(implode('/', array_map(function ($segment) {
                     return strtolower($segment);
@@ -376,14 +415,14 @@ class App extends Basic
 
             // Custom Handler
             if (null === $actionName && 0 < count($params)) {
-                if (true === method_exists($instance, "{$params[0]}Action")) {
+                // if (true === method_exists($instance, "{$params[0]}Action")) {
                     $actionName = array_shift($params);
-                }
+                // }
             }
 
             // Default Handler
             if (null === $actionName) {
-                $actionName = $this->getAttr('controller/default/action');
+                $actionName = $this->getAttr('router/default/action');
             }
 
             $method = "{$actionName}Action";

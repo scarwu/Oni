@@ -20,10 +20,13 @@ class App extends Basic
      * @var array
      */
     protected $_attr = [
+        'router/event/up'       => null,
+        'router/event/down'     => null,
+        'router/default/task'   => 'Main',
+        // 'router/error/task'     => 'Main',
+
         'task/namespace'        => null,    // Requied
-        'task/path'             => null,    // Requied
-        'task/default/handler'  => 'Main',
-        'task/error/handler'    => 'Main'
+        'task/path'             => null    // Requied
     ];
 
     /**
@@ -40,9 +43,9 @@ class App extends Basic
     }
 
     /**
-     * Run
+     * Up Function
      */
-    public function run(): bool
+    private function up()
     {
         // Register Task Classes & Load
         $namespace = $this->getAttr('task/namespace');
@@ -50,8 +53,40 @@ class App extends Basic
 
         if (null !== $namespace && null !== $path) {
             Loader::append($namespace, $path);
+        }
 
+        $upEvent = $this->getAttr('router/event/up');
+
+        if (true === is_callable($upEvent)) {
+            return $upEvent();
+        }
+
+        return true;
+    }
+
+    /**
+     * Down Function
+     */
+    private function down()
+    {
+        $downEvent = $this->getAttr('router/event/down');
+
+        if (true === is_callable($downEvent)) {
+            $downEvent();
+        }
+    }
+
+    /**
+     * Run
+     */
+    public function run(): bool
+    {
+        if (false !== $this->up()) {
+
+            // Load Task to Handle
             if (true === $this->loadTask()) {
+                $this->down();
+
                 return true;
             }
         }
@@ -89,13 +124,13 @@ class App extends Basic
 
         // Rewrite Task
         if (null === $currentPath) {
-            $handlerName = ucfirst($this->getAttr('task/default/handler'));
+            $taskName = ucfirst($this->getAttr('router/default/task'));
 
-            if (false === file_exists("{$path}/{$handlerName}Task.php")) {
+            if (false === file_exists("{$path}/{$taskName}Task.php")) {
                 return false;
             }
 
-            $currentPath = $handlerName;
+            $currentPath = $taskName;
         }
 
         // Task Flow
