@@ -305,10 +305,17 @@ class App extends Basic
 
         switch ($instance->getAttr('mode')) {
         case 'page':
-            if (null === $actionName && 0 === count($params)) {
+
+            // Custom Handler
+            if (null === $actionName && 0 < count($params)) {
+                if (true === method_exists($instance, "{$params[0]}Action")) {
+                    $actionName = array_shift($params);
+                }
+            }
+
+            // Default Handler
+            if (null === $actionName) {
                 $actionName = $this->getAttr('controller/default/action');
-            } else {
-                $actionName = array_shift($params);
             }
 
             $method = "{$actionName}Action";
@@ -322,13 +329,14 @@ class App extends Basic
                     return false;
                 }
 
-                $actionName = $this->getAttr('controller/error/action');
                 $currentPath = $handlerName;
 
                 $className = implode('\\', explode('/', $currentPath));
                 $className = "{$namespace}\\{$className}Controller";
 
                 $instance = new $className();
+
+                $actionName = $this->getAttr('controller/error/action');
                 $method = "{$actionName}Action";
 
                 if (false === method_exists($instance, $method)) {
@@ -365,10 +373,17 @@ class App extends Basic
 
             break;
         case 'ajax':
-            if (null === $actionName && 0 === count($params)) {
+
+            // Custom Handler
+            if (null === $actionName && 0 < count($params)) {
+                if (true === method_exists($instance, "{$params[0]}Action")) {
+                    $actionName = array_shift($params);
+                }
+            }
+
+            // Default Handler
+            if (null === $actionName) {
                 $actionName = $this->getAttr('controller/default/action');
-            } else {
-                $actionName = array_shift($params);
             }
 
             $method = "{$actionName}Action";
