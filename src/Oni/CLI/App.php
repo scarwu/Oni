@@ -22,8 +22,8 @@ class App extends Basic
     protected $_attr = [
         'router/event/up'       => null,
         'router/event/down'     => null,
-        'router/default/task'   => 'Main',
-        // 'router/error/task'     => 'Main',
+        'router/task/default'   => 'main',
+        // 'router/task/error'     => 'main',
 
         'task/namespace'        => null,    // Requied
         'task/path'             => null    // Requied
@@ -51,7 +51,7 @@ class App extends Basic
         $namespace = $this->getAttr('task/namespace');
         $path = $this->getAttr('task/path');
 
-        if (null !== $namespace && null !== $path) {
+        if (true === is_string($namespace) && true === is_string($path)) {
             Loader::append($namespace, $path);
         }
 
@@ -103,8 +103,12 @@ class App extends Basic
     {
         $namespace = $this->getAttr('task/namespace');
         $path = $this->getAttr('task/path');
-        $params = $this->io->getArguments();
 
+        if (false === is_string($namespace) || false === is_string($path)) {
+            return false;
+        }
+
+        $params = $this->io->getArguments();
         $currentPath = null;
 
         while (0 < count($params)) {
@@ -124,7 +128,7 @@ class App extends Basic
 
         // Rewrite Task
         if (null === $currentPath) {
-            $taskName = ucfirst($this->getAttr('router/default/task'));
+            $taskName = ucfirst($this->getAttr('router/task/default'));
 
             if (false === file_exists("{$path}/{$taskName}Task.php")) {
                 return false;
@@ -133,12 +137,12 @@ class App extends Basic
             $currentPath = $taskName;
         }
 
-        // Task Flow
         $className = implode('\\', explode('/', $currentPath));
         $className = "{$namespace}\\{$className}Task";
 
         $instance = new $className();
 
+        // Task Flow
         if (false !== $instance->up()) {
             $instance->run($params);
         }
