@@ -54,6 +54,7 @@ class Res
     public function html(string $data): void
     {
         header('Content-Type: text/html');
+        header('Content-Length: ' . strlen($data));
 
         echo $data;
     }
@@ -66,10 +67,13 @@ class Res
      */
     public function json(array $data, ?integer $option = null): void
     {
-        header('Content-Type: application/json');
-
-        echo (true === isset($option))
+        $data = (true === isset($option))
             ? json_encode($data, $option)
             : json_encode($data);
+
+        header('Content-Type: application/json');
+        header('Content-Length: ' . strlen($data));
+
+        echo $data;
     }
 }

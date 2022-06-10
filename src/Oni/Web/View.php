@@ -36,7 +36,7 @@ class View extends Basic
      * @var array
      */
     protected $_attr = [
-        'path' => null,
+        'folders' => null,
         'ext' => 'php'
     ];
 
@@ -165,16 +165,27 @@ class View extends Basic
         $_result = '';
 
         if (true === is_string($_targetPath)) {
-            $_path = $this->getAttr('path');
+            $_folders = $this->getAttr('folders');
             $_ext = $this->getAttr('ext');
+
             $_currentPath = null;
 
             if (true === in_array(substr($_targetPath, 0, 1), [ '~', '/' ])
                 && true === file_exists("{$_targetPath}.{$_ext}")
             ) {
                 $_currentPath = "{$_targetPath}.{$_ext}";
-            } elseif (true === file_exists("{$_path}/{$_targetPath}.{$_ext}")) {
-                $_currentPath = "{$_path}/{$_targetPath}.{$_ext}";
+            }
+
+            if (false === is_string($_currentPath)) {
+                foreach ($_folders as $folder) {
+                    if (false === file_exists("{$folder}/{$_targetPath}.{$_ext}")) {
+                        continue;
+                    }
+
+                    $_currentPath = "{$folder}/{$_targetPath}.{$_ext}";
+
+                    break;
+                }
             }
 
             if (true === is_string($_currentPath)) {

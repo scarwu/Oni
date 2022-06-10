@@ -89,20 +89,20 @@ class App extends Basic
 
         // Rewrite Task
         if (null === $currentPath) {
-            $handler = ucfirst($this->getAttr('task/default/handler'));
+            $handlerName = ucfirst($this->getAttr('task/default/handler'));
 
-            if (false === file_exists("{$path}/{$handler}Task.php")) {
+            if (false === file_exists("{$path}/{$handlerName}Task.php")) {
                 return false;
             }
 
-            $currentPath = $handler;
+            $currentPath = $handlerName;
         }
 
         // Task Flow
-        $currentNamaspece = implode('\\', explode('/', $currentPath));
-        $currentNamaspece = "{$namespace}\\{$currentNamaspece}Task";
+        $className = implode('\\', explode('/', $currentPath));
+        $className = "{$namespace}\\{$className}Task";
 
-        $instance = new $currentNamaspece();
+        $instance = new $className();
 
         if (false !== $instance->up()) {
             $instance->run($params);

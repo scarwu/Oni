@@ -23,8 +23,9 @@ $app->setAttr('controller/namespace', 'WebApp\Controller');
 $app->setAttr('controller/path', "{$root}/controllers");
 $app->setAttr('model/namespace', 'WebApp\Model');
 $app->setAttr('model/path', "{$root}/models");
-$app->setAttr('view/path', "{$root}/views");
-$app->setAttr('static/path', "{$root}/static");
-$app->setAttr('cache/path', "{$root}/cache");
+$app->setAttr('view/folders', [ "{$root}/views" ]);
+$app->setAttr('static/folders', [ "{$root}/static" ]);
+$app->setAttr('cache/path', "{$root}/caches");
+$app->setAttr('cache/permission', 0777);
 
 $app->run();

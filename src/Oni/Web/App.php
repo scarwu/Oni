@@ -32,12 +32,13 @@ class App extends Basic
         'model/namespace'               => null,        // Requied
         'model/path'                    => null,        // Requied
 
-        'view/path'                     => null,        // Requied
+        'view/folders'                  => null,        // Requied
         'view/ext'                      => 'php',
 
-        'static/path'                   => null,        // Requied
+        'static/folders'                => null,        // Requied
 
         'cache/path'                    => null,        // Requied
+        'cache/permission'              => 0775,        // rwxrwxr-x
         'cache/time'                    => 300          // 300 sec = 5 min
     ];
 
@@ -132,63 +133,29 @@ class App extends Basic
      */
     private function loadStatic(): bool
     {
-        $path = $this->getAttr('static/path');
+        $folders = $this->getAttr('static/folders');
         $uri = $this->req->uri();
 
-        if (false === is_string($path) || '' === $uri) {
+        if (false === is_array($folders) || '' === $uri) {
             return false;
         }
 
-        $currentPath = "{$path}/{$uri}";
+        $currentPath = null;
 
-        if (false === file_exists($currentPath)) {
+        foreach ($folders as $folder) {
+            if (false === file_exists("{$folder}/{$uri}")) {
+                continue;
+            }
+
+            $currentPath = "{$folder}/{$uri}";
+
+            break;
+        }
+
+        if (null === $currentPath) {
             return false;
         }
 
-        // Load Real File from Disk
-        return $this->loadRealFile($currentPath);
-    }
-
-    /**
-     * Load Cache File
-     *
-     * @return bool
-     */
-    private function loadCache(): bool
-    {
-        $path = $this->getAttr('cache/path');
-        $uri = $this->req->uri();
-
-        if (false === is_string($path) || '' === $uri) {
-            return false;
-        }
-
-        $currentPath = "{$path}/" . md5($uri);
-
-        if (false === file_exists($currentPath)) {
-            return false;
-        }
-
-        // Check File Create Time
-        if (time() - filectime($currentPath) > $this->getAttr('cache/time')) {
-            unlink($currentPath);
-
-            return false;
-        }
-
-        // Load Real File from Disk
-        return $this->loadRealFile($currentPath);
-    }
-
-    /**
-     * Load Real File
-     *
-     * @param string $currentPath
-     *
-     * @return bool
-     */
-    private function loadRealFile(string $currentPath): bool
-    {
         $mimeType = null;
         $fileInfo = pathinfo($currentPath);
 
@@ -216,6 +183,65 @@ class App extends Basic
         header('Content-Length: ' . filesize($currentPath));
 
         echo file_get_contents($currentPath);
+
+        return true;
+    }
+
+    /**
+     * Load Cache File
+     *
+     * @return bool
+     */
+    private function loadCache(): bool
+    {
+        $path = $this->getAttr('cache/path');
+        $uri = $this->req->uri();
+
+        if (false === is_string($path)) {
+            return false;
+        }
+
+        $currentPath = "{$path}/" . md5($uri);
+
+        if (false === file_exists($currentPath)) {
+            return false;
+        }
+
+        // Check File Create Time
+        if (time() - filectime($currentPath) > $this->getAttr('cache/time')) {
+            unlink($currentPath);
+
+            return false;
+        }
+
+        $this->res->html(file_get_contents($currentPath));
+
+        return true;
+    }
+
+    /**
+     * Save Cache File
+     *
+     * @return bool
+     */
+    private function saveCache($html): bool
+    {
+        $path = $this->getAttr('cache/path');
+        $uri = $this->req->uri();
+
+        if (false === is_string($path)) {
+            return false;
+        }
+
+        if (false === file_exists($path)) {
+            $permission = $this->getAttr('cache/permission');
+
+            mkdir($path, $permission, true);
+        }
+
+        $currentPath = "{$path}/" . md5($uri);
+
+        file_put_contents($currentPath, $html);
 
         return true;
     }
@@ -251,61 +277,61 @@ class App extends Basic
         }
 
         // Rewrite Controller
-        $action = null;
+        $actionName = null;
 
         if (null === $currentPath) {
-            $handler = ucfirst($this->getAttr('controller/default/handler'));
+            $handlerName = ucfirst($this->getAttr('controller/default/handler'));
 
-            if (false === file_exists("{$path}/{$handler}Controller.php")) {
-                $handler = ucfirst($this->getAttr('controller/error/handler'));
+            if (false === file_exists("{$path}/{$handlerName}Controller.php")) {
+                $handlerName = ucfirst($this->getAttr('controller/error/handler'));
 
-                if (false === file_exists("{$path}/{$handler}Controller.php")) {
+                if (false === file_exists("{$path}/{$handlerName}Controller.php")) {
                     http_response_code(400);
 
                     return false;
                 }
 
-                $action = $this->getAttr('controller/error/action');
+                $actionName = $this->getAttr('controller/error/action');
             }
 
-            $currentPath = $handler;
+            $currentPath = $handlerName;
         }
 
         // Controller Flow
-        $currentNamaspece = implode('\\', explode('/', $currentPath));
-        $currentNamaspece = "{$namespace}\\{$currentNamaspece}Controller";
+        $className = implode('\\', explode('/', $currentPath));
+        $className = "{$namespace}\\{$className}Controller";
 
-        $instance = new $currentNamaspece();
+        $instance = new $className();
 
         switch ($instance->getAttr('mode')) {
         case 'page':
-            if (null === $action && 0 === count($params)) {
-                $action = $this->getAttr('controller/default/action');
+            if (null === $actionName && 0 === count($params)) {
+                $actionName = $this->getAttr('controller/default/action');
             } else {
-                $action = array_shift($params);
+                $actionName = array_shift($params);
             }
 
-            $currentAction = "{$action}Action";
+            $method = "{$actionName}Action";
 
-            if (false === method_exists($instance, $currentAction)) {
-                $handler = ucfirst($this->getAttr('controller/error/handler'));
+            if (false === method_exists($instance, $method)) {
+                $handlerName = ucfirst($this->getAttr('controller/error/handler'));
 
-                if (false === file_exists("{$path}/{$handler}Controller.php")) {
+                if (false === file_exists("{$path}/{$handlerName}Controller.php")) {
                     http_response_code(404);
 
                     return false;
                 }
 
-                $action = $this->getAttr('controller/error/action');
-                $currentPath = $handler;
+                $actionName = $this->getAttr('controller/error/action');
+                $currentPath = $handlerName;
 
-                $currentNamaspece = implode('\\', explode('/', $currentPath));
-                $currentNamaspece = "{$namespace}\\{$currentNamaspece}Controller";
+                $className = implode('\\', explode('/', $currentPath));
+                $className = "{$namespace}\\{$className}Controller";
 
-                $instance = new $currentNamaspece();
-                $currentAction = "{$action}Action";
+                $instance = new $className();
+                $method = "{$actionName}Action";
 
-                if (false === method_exists($instance, $currentAction)) {
+                if (false === method_exists($instance, $method)) {
                     http_response_code(404);
 
                     return false;
@@ -316,55 +342,63 @@ class App extends Basic
 
                 // Init View
                 $view = View::init();
-                $view->setAttr('path', $this->getAttr('view/path'));
+                $view->setAttr('folders', $this->getAttr('view/folders'));
                 $view->setAttr('ext', $this->getAttr('view/ext'));
                 $view->setLayoutPath(implode('/', array_map(function ($segment) {
                     return strtolower($segment);
-                }, explode('/', "{$currentPath}/{$action}"))));
+                }, explode('/', "{$currentPath}/{$actionName}"))));
 
-                $instance->$currentAction($params);
+                $instance->$method($params);
 
-                $this->res->html($view->render());
+                // Render HTML
+                $data = $view->render();
+
+                // Save Cache
+                if ('get' === $this->req->method()) {
+                    $this->saveCache($data);
+                }
+
+                $this->res->html($data);
             }
 
             $instance->down();
 
             break;
         case 'ajax':
-            if (null === $action && 0 === count($params)) {
-                $action = $this->getAttr('controller/default/action');
+            if (null === $actionName && 0 === count($params)) {
+                $actionName = $this->getAttr('controller/default/action');
             } else {
-                $action = array_shift($params);
+                $actionName = array_shift($params);
             }
 
-            $currentAction = "{$action}Action";
+            $method = "{$actionName}Action";
 
-            if (false === method_exists($instance, $currentAction)) {
+            if (false === method_exists($instance, $method)) {
                 http_response_code(501);
 
                 return false;
             }
 
             if (false !== $instance->up()) {
-                $result = $instance->$currentAction($params);
+                $data = $instance->$method($params);
 
-                $this->res->json($result);
+                $this->res->json($data);
             }
 
             $instance->down();
 
             break;
         case 'rest':
-            $currentAction = $this->req->method() . 'Action';
+            $method = $this->req->method() . 'Action';
 
-            if (false === method_exists($instance, $currentAction)) {
+            if (false === method_exists($instance, $method)) {
                 http_response_code(501);
 
                 return false;
             }
 
             if (false !== $instance->up()) {
-                $result = $instance->$currentAction($params);
+                $result = $instance->$method($params);
 
                 $this->res->json($result);
             }
