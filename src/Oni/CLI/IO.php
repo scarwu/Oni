@@ -47,40 +47,33 @@ class IO extends Basic
 
         $argv = array_slice($_SERVER['argv'], 1);
 
-        // arguments
-        while ($argv) {
-            if (true === (bool) preg_match($configRegexRule, $argv[0])) {
-                break;
+        // Pasre Commends
+        while (0 !== count($argv)) {
+            $value = array_shift($argv);
+
+            // options
+            if (true === (bool) preg_match($optionRegexRule, $value, $match)) {
+                if (true === isset($argv[0])
+                    && false === (bool) preg_match($configRegexRule, $argv[0])
+                    && false === (bool) preg_match($optionRegexRule, $argv[0])
+                ) {
+                    $this->_options[$match[1]] = array_shift($argv);
+                } else {
+                    $this->_options[$match[1]] = null;
+                }
+
+                continue;
             }
 
-            if (true === (bool) preg_match($optionRegexRule, $argv[0])) {
-                break;
-            }
-
-            $this->_arguments[] = array_shift($argv);
-        }
-
-        // options & configs
-        while ($value = array_shift($argv)) {
+            // configs
             if (true === (bool) preg_match($configRegexRule, $value, $match)) {
                 $this->_configs[$match[1]] = isset($match[2]) ? $match[2] : null;
+
+                continue;
             }
 
-            if (true === (bool) preg_match($optionRegexRule, $value, $match)) {
-                $this->_options[$match[1]] = null;
-
-                if (true === isset($argv[0])) {
-                    if (true === (bool) preg_match($configRegexRule, $argv[0])) {
-                        continue;
-                    }
-
-                    if (true === (bool) preg_match($optionRegexRule, $argv[0])) {
-                        continue;
-                    }
-
-                    $this->_options[$match[1]] = array_shift($argv);
-                }
-            }
+            // arguments
+            $this->_arguments[] = $value;
         }
 
         // Set Ctrl Handler (PHP 7 >= 7.4.0, PHP 8)
