@@ -30,7 +30,7 @@ final class Loader
     private function __construct()
     {
         // Namespace Autoload Register
-        spl_autoload_register(function ($className) {
+        spl_autoload_register(function (string $className): bool {
             $className = trim($className, '\\');
 
             foreach (self::$_namespaceList as $namespace => $pathList) {

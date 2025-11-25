@@ -128,7 +128,7 @@ class App extends Basic
      *
      * @return bool
      */
-    public function run()
+    public function run(): bool
     {
         if (false !== $this->up()) {
             if ('get' === $this->req->method()) {

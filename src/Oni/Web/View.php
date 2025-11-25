@@ -23,7 +23,7 @@ class View extends Basic
     /**
      * Initialize
      */
-    public static function init()
+    public static function init(): object
     {
         if (null === self::$_instance) {
             self::$_instance = new self;

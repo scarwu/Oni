@@ -30,7 +30,7 @@ class Cache extends Basic
     /**
      * Initialize
      */
-    public static function init($config = null): object
+    public static function init(array $config = []): object
     {
         if (null === self::$_instance) {
             self::$_instance = Memcached();

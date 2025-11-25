@@ -51,7 +51,7 @@ class Res
      *
      * @param string $data
      */
-    public function html(string $data): void
+    public function html(string $data): string
     {
         header('Content-Type: text/html');
         header('Content-Length: ' . strlen($data));

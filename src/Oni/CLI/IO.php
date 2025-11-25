@@ -107,11 +107,11 @@ class IO extends Basic
     /**
      * Get Arguments
      *
-     * @return integer $index
+     * @return ?int $index
      *
      * @return mixed
      */
-    public function getArguments(int $index = null)
+    public function getArguments(?int $index = null): mixed
     {
         if (true === is_integer($index)) {
             if (true === array_key_exists($index, $this->_arguments)) {
@@ -141,7 +141,7 @@ class IO extends Basic
      *
      * @return mixed
      */
-    public function getOptions(?string $key = null)
+    public function getOptions(?string $key = null): mixed
     {
         if (true === is_string($key)) {
             if (true === array_key_exists($key, $this->_options)) {
@@ -177,7 +177,7 @@ class IO extends Basic
      *
      * @return mixed
      */
-    public function getConfigs(?string $key = null)
+    public function getConfigs(?string $key = null): mixed
     {
         if (true === is_string($key)) {
             if (true === array_key_exists($key, $this->_configs)) {
@@ -383,7 +383,7 @@ class IO extends Basic
      * @param string $fgColor
      * @param string $bgColor
      */
-    public function write($text, $fgColor = null, $bgColor = null): void
+    public function write(string $text, ?string $fgColor = null, ?string $bgColor = null): void
     {
         if (null !== $fgColor || null !== $bgColor) {
             $text = AEC::color($text, $fgColor, $bgColor);
@@ -399,7 +399,7 @@ class IO extends Basic
      * @param string $bgColor
      * @param string $bgColor
      */
-    public function writeln($text = '', $fgColor = null, $bgColor = null): void
+    public function writeln(string $text = '', ?string $fgColor = null, ?string $bgColor = null): void
     {
         $this->write("{$text}\n", $fgColor, $bgColor);
     }

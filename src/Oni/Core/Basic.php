@@ -39,7 +39,7 @@ abstract class Basic
      *
      * @return mixed
      */
-    final public function getAttr(string $key)
+    final public function getAttr(string $key): mixed
     {
         return (true === isset($this->_attr[$key]))
             ? $this->_attr[$key] : null;

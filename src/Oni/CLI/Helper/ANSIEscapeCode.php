@@ -69,7 +69,7 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function SGR($param): string
+    public static function SGR(string|array $param): string
     {
         if (true === is_array($param)) {
             $param = implode(self::SEP, $param);

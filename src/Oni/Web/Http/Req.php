@@ -181,9 +181,9 @@ class Req
     /**
      * Is Ajax
      *
-     * @return string
+     * @return bool
      */
-    public function isAjax(): string
+    public function isAjax(): bool
     {
         return (true === isset($_SERVER['HTTP_X_REQUESTED_WITH']))
             && 'XMLHttpRequest' === $_SERVER['HTTP_X_REQUESTED_WITH'];

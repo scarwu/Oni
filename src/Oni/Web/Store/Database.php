@@ -30,7 +30,7 @@ class Database extends Basic
     /**
      * Initialize
      */
-    public static function init($config = []): object
+    public static function init(array $config = []): object
     {
         if (null === self::$_instance) {
 
