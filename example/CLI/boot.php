@@ -22,6 +22,6 @@ $app = new Oni\CLI\App();
 
 $app->setAttr('task/namespace', 'CLIApp\Task');
 $app->setAttr('task/path', "{$root}/tasks");
-$app->setAttr('router/default/task', 'Help');
+$app->setAttr('router/task/default', 'Help');
 
 $app->run();

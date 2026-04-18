@@ -28,18 +28,18 @@ class App extends Basic
         'router/action/default'         => 'default',
         'router/action/error'           => 'error',
 
-        'controller/namespace'          => null,        // Requied
-        'controller/path'               => null,        // Requied
+        'controller/namespace'          => null,        // Required
+        'controller/path'               => null,        // Required
 
-        // 'model/namespace'               => null,        // Requied
-        // 'model/path'                    => null,        // Requied
+        // 'model/namespace'               => null,        // Required
+        // 'model/path'                    => null,        // Required
 
-        'view/paths'                    => null,        // Requied
+        'view/paths'                    => null,        // Required
         'view/ext'                      => 'php',
 
-        'static/paths'                  => null,        // Requied
+        'static/paths'                  => null,        // Required
 
-        'cache/path'                    => null,        // Requied
+        'cache/path'                    => null,        // Required
         'cache/permission'              => 0775,        // rwxrwxr-x
         'cache/time'                    => 300          // 300 sec = 5 min
     ];
@@ -84,7 +84,7 @@ class App extends Basic
     /**
      * Up Function
      */
-    private function up()
+    private function up(): mixed
     {
         // // Register Model Classes
         // $namespace = $this->getAttr('model/namespace');
@@ -114,7 +114,7 @@ class App extends Basic
     /**
      * Down Function
      */
-    private function down()
+    private function down(): void
     {
         $downEvent = $this->getAttr('router/event/down');
 
@@ -261,7 +261,7 @@ class App extends Basic
      *
      * @return bool
      */
-    private function saveCache($html): bool
+    private function saveCache(string $html): bool
     {
         $path = $this->getAttr('cache/path');
 
@@ -375,9 +375,7 @@ class App extends Basic
             $view = View::init();
             $view->setAttr('paths', $this->getAttr('view/paths'));
             $view->setAttr('ext', $this->getAttr('view/ext'));
-            $view->setLayoutPath(implode('/', array_map(function ($segment) {
-                return strtolower($segment);
-            }, explode('/', "{$currentPath}/{$actionName}"))));
+            $view->setLayoutPath(implode('/', array_map(strtolower(...), explode('/', "{$currentPath}/{$actionName}"))));
 
             // Controller Flow
             if (false !== $instance->up()) {

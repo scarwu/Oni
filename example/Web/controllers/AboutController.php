@@ -17,21 +17,21 @@ class AboutController extends Controller
     /**
      * Actions
      */
-    public function defaultAction()
+    public function defaultAction(array $params = []): void
     {
         $this->view->setData([
             'title' => 'Oni - About / Default Page'
         ]);
     }
 
-    public function mvcAction()
+    public function mvcAction(array $params = []): void
     {
         $this->view->setData([
             'title' => 'Oni - About / MVC Page'
         ]);
     }
 
-    public function mvvmAction()
+    public function mvvmAction(array $params = []): void
     {
         $this->view->setData([
             'title' => 'Oni - About / MVVM Page'

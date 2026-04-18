@@ -44,7 +44,7 @@ final class HTML
     public static function linkEncode(string $link): string
     {
         $segments = explode('/', $link);
-        $segments = array_map('rawurlencode', $segments);
+        $segments = array_map(rawurlencode(...), $segments);
         $link = implode('/', $segments);
 
         return $link;

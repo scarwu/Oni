@@ -29,36 +29,26 @@ abstract class Task extends Basic
     }
 
     /**
-     * @var array
-     */
-    private $_arguments = [];
-
-    /**
-     * @var array
-     */
-    private $_options = [];
-
-    /**
-     * @var array
-     */
-    private $_configs = [];
-
-    /**
      * Up
      *
      * Execute before run
      */
-    public function up() {}
+    public function up(): mixed
+    {
+        return true;
+    }
 
     /**
      * Down
      *
      * Execute after run
      */
-    public function down() {}
+    public function down(): void {}
 
     /**
      * Run
+     *
+     * @param array $params
      */
-    abstract public function run();
+    abstract public function run(array $params = []): void;
 }

@@ -33,7 +33,7 @@ class Cache extends Basic
     public static function init(array $config = []): object
     {
         if (null === self::$_instance) {
-            self::$_instance = Memcached();
+            self::$_instance = new Memcached();
         }
 
         return self::$_instance;

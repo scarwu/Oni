@@ -47,7 +47,7 @@ class IO extends Basic
 
         $argv = array_slice($_SERVER['argv'], 1);
 
-        // Pasre Commends
+        // Parse Arguments
         while (0 !== count($argv)) {
             $value = array_shift($argv);
 
@@ -67,7 +67,7 @@ class IO extends Basic
 
             // configs
             if (true === (bool) preg_match($configRegexRule, $value, $match)) {
-                $this->_configs[$match[1]] = isset($match[2]) ? $match[2] : null;
+                $this->_configs[$match[1]] = $match[2] ?? null;
 
                 continue;
             }
@@ -113,7 +113,7 @@ class IO extends Basic
      */
     public function getArguments(?int $index = null): mixed
     {
-        if (true === is_integer($index)) {
+        if (true === is_int($index)) {
             if (true === array_key_exists($index, $this->_arguments)) {
                 return $this->_arguments[$index];
             } else {
@@ -131,7 +131,7 @@ class IO extends Basic
      */
     public function hasArguments(): bool
     {
-        return sizeof($this->_arguments) > 0;
+        return count($this->_arguments) > 0;
     }
 
     /**
@@ -167,7 +167,7 @@ class IO extends Basic
             return array_key_exists($key, $this->_options);
         }
 
-        return sizeof($this->_options) > 0;
+        return count($this->_options) > 0;
     }
 
     /**
@@ -203,7 +203,7 @@ class IO extends Basic
             return array_key_exists($key, $this->_configs);
         }
 
-        return sizeof($this->_configs) > 0;
+        return count($this->_configs) > 0;
     }
 
     /**
@@ -268,7 +268,7 @@ class IO extends Basic
         $limitLines = $totalIndex <= $wHeight
             ? $totalIndex : $wHeight;
 
-        if (true === is_integer($specifyLimitLines)
+        if (true === is_int($specifyLimitLines)
             && $specifyLimitLines > 0
             && $specifyLimitLines < $limitLines
         ) {
@@ -396,7 +396,7 @@ class IO extends Basic
      * Write data to STDOUT
      *
      * @param string $text
-     * @param string $bgColor
+     * @param string $fgColor
      * @param string $bgColor
      */
     public function writeln(string $text = '', ?string $fgColor = null, ?string $bgColor = null): void

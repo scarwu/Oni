@@ -14,7 +14,8 @@ use Oni\CLI\Task;
 
 class ReadTask extends Task
 {
-    public function run()
+    #[\Override]
+    public function run(array $params = []): void
     {
         $gender = $this->io->menuSelector('What is your gender?', [
             'male',

@@ -14,7 +14,8 @@ use Oni\CLI\Task;
 
 class MenuTask extends Task
 {
-    public function run()
+    #[\Override]
+    public function run(array $params = []): void
     {
         $count = $this->io->ask('Item counts of menu? [10]', function ($value) {
             return true === (bool) preg_match('/^\d+$/', $value) || '' === $value;

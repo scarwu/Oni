@@ -25,7 +25,7 @@ abstract class Basic
      *
      * @return bool
      */
-    final public function setAttr(string $key, $value): bool
+    final public function setAttr(string $key, mixed $value): bool
     {
         $this->_attr[$key] = $value;
 

@@ -43,9 +43,7 @@ class Req
      */
     public function method(): string
     {
-        $method = (true === isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']))
-            ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
-            : $_SERVER['REQUEST_METHOD'];
+        $method = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? $_SERVER['REQUEST_METHOD'];
 
         return strtolower($method);
     }
@@ -57,7 +55,7 @@ class Req
      */
     public function contentLength(): int
     {
-        return (true === isset($_SERVER['CONTENT_LENGTH']) && '' !== $_SERVER['CONTENT_LENGTH'])
+        return (isset($_SERVER['CONTENT_LENGTH']) && '' !== $_SERVER['CONTENT_LENGTH'])
             ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
     }
 
@@ -74,7 +72,7 @@ class Req
         //     * multipart/form-data; boundary=----WebKitFormBoundaryKw2qnJFfEWBNPPYK
         //     * application/x-www-form-urlencoded
         //     * application/json
-        return (true === isset($_SERVER['CONTENT_TYPE']) && '' !== $_SERVER['CONTENT_TYPE'])
+        return (isset($_SERVER['CONTENT_TYPE']) && '' !== $_SERVER['CONTENT_TYPE'])
             ? explode(';', $_SERVER['CONTENT_TYPE'])[0] : null;
     }
 
@@ -115,15 +113,10 @@ class Req
      */
     public function uri(): string
     {
-        $uri = null;
+        $uri = $_SERVER['PATH_INFO']
+            ?? (isset($_SERVER['REQUEST_URI']) ? explode('?', $_SERVER['REQUEST_URI'])[0] : null);
 
-        if (true === isset($_SERVER['PATH_INFO'])) {
-            $uri = $_SERVER['PATH_INFO'];
-        } elseif (true === isset($_SERVER['REQUEST_URI'])) {
-            $uri = explode('?', $_SERVER['REQUEST_URI'])[0];
-        }
-
-        return trim($uri, '/');
+        return trim((string) $uri, '/');
     }
 
     /**
@@ -151,7 +144,7 @@ class Req
      *
      * @return mixed
      */
-    public function content()
+    public function content(): mixed
     {
         switch ($this->contentType()) {
         case 'application/x-www-form-urlencoded':
@@ -171,11 +164,7 @@ class Req
      */
     public function file(): array
     {
-        switch ($this->contentType()) {
-        case 'multipart/form-data':
-        default:
-            return $_FILES;
-        }
+        return $_FILES;
     }
 
     /**
@@ -185,7 +174,7 @@ class Req
      */
     public function isAjax(): bool
     {
-        return (true === isset($_SERVER['HTTP_X_REQUESTED_WITH']))
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
             && 'XMLHttpRequest' === $_SERVER['HTTP_X_REQUESTED_WITH'];
     }
 }

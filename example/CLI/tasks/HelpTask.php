@@ -14,7 +14,8 @@ use Oni\CLI\Task;
 
 class HelpTask extends Task
 {
-    public function run()
+    #[\Override]
+    public function run(array $params = []): void
     {
         $this->io->info('Try above tasks:');
         $this->io->info('    ./boot.php help');

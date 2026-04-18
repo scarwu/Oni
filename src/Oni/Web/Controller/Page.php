@@ -54,12 +54,15 @@ abstract class Page extends Basic
      *
      * Execute before xxxAction
      */
-    public function up() {}
+    public function up(): mixed
+    {
+        return true;
+    }
 
     /**
      * Down Function
      *
      * Execute after xxxAction
      */
-    public function down() {}
+    public function down(): void {}
 }

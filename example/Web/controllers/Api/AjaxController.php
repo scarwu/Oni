@@ -14,12 +14,13 @@ use Oni\Web\Controller\Ajax as Controller;
 
 class AjaxController extends Controller
 {
-    private $data;
+    private array $data = [];
 
     /**
      * Lifecycle Functions
      */
-    public function up()
+    #[\Override]
+    public function up(): mixed
     {
         $this->data = [
             'method' => $this->req->method(),
@@ -45,7 +46,7 @@ class AjaxController extends Controller
     /**
      * Actions
      */
-    public function defaultAction()
+    public function defaultAction(): array
     {
         return $this->data;
     }

@@ -13,24 +13,24 @@ namespace Oni\CLI\Helper;
 final class ANSIEscapeCode
 {
     // ANSI Escape Code
-    const ESC = "\x1b";
-    const CSI = self::ESC . '[';
-    const OSC = self::ESC . ']';
+    const string ESC = "\x1b";
+    const string CSI = self::ESC . '[';
+    const string OSC = self::ESC . ']';
 
     // Control Charater
-    const BEL = "\x07";
-    const SEP = ';';
+    const string BEL = "\x07";
+    const string SEP = ';';
 
     // Key Code
-    const KEY_CODE_ENTER        = 10;
-    const KEY_CODE_UP           = 65;
-    const KEY_CODE_DOWN         = 66;
-    const KEY_CODE_LEFT         = 68;
-    const KEY_CODE_RIGHT        = 67;
-    const KEY_CODE_PAGE_UP      = 53;
-    const KEY_CODE_PAGE_DOWN    = 54;
-    const KEY_CODE_HOME         = 72;
-    const KEY_CODE_END          = 70;
+    const int KEY_CODE_ENTER        = 10;
+    const int KEY_CODE_UP           = 65;
+    const int KEY_CODE_DOWN         = 66;
+    const int KEY_CODE_LEFT         = 68;
+    const int KEY_CODE_RIGHT        = 67;
+    const int KEY_CODE_PAGE_UP      = 53;
+    const int KEY_CODE_PAGE_DOWN    = 54;
+    const int KEY_CODE_HOME         = 72;
+    const int KEY_CODE_END          = 70;
 
     /**
      * @var array
@@ -99,7 +99,7 @@ final class ANSIEscapeCode
      *
      * @return string
      */
-    public static function moveTo(int $x = 0, int $y = 0)
+    public static function moveTo(int $x = 0, int $y = 0): string
     {
         return self::CUP($x, $y);
     }

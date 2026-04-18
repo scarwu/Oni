@@ -25,8 +25,8 @@ class App extends Basic
         'router/task/default'   => 'main',
         // 'router/task/error'     => 'main',
 
-        'task/namespace'        => null,    // Requied
-        'task/path'             => null    // Requied
+        'task/namespace'        => null,    // Required
+        'task/path'             => null    // Required
     ];
 
     /**
@@ -45,7 +45,7 @@ class App extends Basic
     /**
      * Up Function
      */
-    private function up()
+    private function up(): mixed
     {
         // Register Task Classes & Load
         $namespace = $this->getAttr('task/namespace');
@@ -67,7 +67,7 @@ class App extends Basic
     /**
      * Down Function
      */
-    private function down()
+    private function down(): void
     {
         $downEvent = $this->getAttr('router/event/down');
 

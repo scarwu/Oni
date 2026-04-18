@@ -51,7 +51,7 @@ class Res
      *
      * @param string $data
      */
-    public function html(string $data): string
+    public function html(string $data): void
     {
         header('Content-Type: text/html');
         header('Content-Length: ' . strlen($data));
@@ -65,11 +65,9 @@ class Res
      * @param array $data
      * @param integer $option
      */
-    public function json(array $data, ?integer $option = null): void
+    public function json(array $data, ?int $option = null): void
     {
-        $data = (true === isset($option))
-            ? json_encode($data, $option)
-            : json_encode($data);
+        $data = json_encode($data, $option ?? 0);
 
         header('Content-Type: application/json');
         header('Content-Length: ' . strlen($data));

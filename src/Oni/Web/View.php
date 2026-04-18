@@ -170,13 +170,13 @@ class View extends Basic
 
             $_currentPath = null;
 
-            if (true === in_array(substr($_targetPath, 0, 1), [ '~', '/' ])
+            if ((str_starts_with($_targetPath, '~') || str_starts_with($_targetPath, '/'))
                 && true === file_exists("{$_targetPath}.{$_ext}")
             ) {
                 $_currentPath = "{$_targetPath}.{$_ext}";
             }
 
-            if (false === is_string($_currentPath)) {
+            if (false === is_string($_currentPath) && true === is_array($_paths)) {
                 foreach ($_paths as $path) {
                     if (false === file_exists("{$path}/{$_targetPath}.{$_ext}")) {
                         continue;

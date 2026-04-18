@@ -14,12 +14,13 @@ use Oni\Web\Controller\Rest as Controller;
 
 class RestController extends Controller
 {
-    private $data;
+    private array $data = [];
 
     /**
      * Lifecycle Functions
      */
-    public function up()
+    #[\Override]
+    public function up(): mixed
     {
         $this->data = [
             'method' => $this->req->method(),
@@ -45,22 +46,22 @@ class RestController extends Controller
     /**
      * Actions
      */
-    public function getAction()
+    public function getAction(): array
     {
         return $this->data;
     }
 
-    public function postAction()
+    public function postAction(): array
     {
         return $this->data;
     }
 
-    public function putAction()
+    public function putAction(): array
     {
         return $this->data;
     }
 
-    public function deleteAction()
+    public function deleteAction(): array
     {
         return $this->data;
     }

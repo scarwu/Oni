@@ -14,7 +14,8 @@ use Oni\CLI\Task;
 
 class ParseTask extends Task
 {
-    public function run($params = [])
+    #[\Override]
+    public function run(array $params = []): void
     {
         if (0 !== count($params)) {
             $this->io->debug('Params:');

@@ -17,7 +17,7 @@ class MainController extends Controller
     /**
      * Actions
      */
-    public function defaultAction($params = [])
+    public function defaultAction(array $params = []): void
     {
         $this->view->setData([
             'title' => 'Oni - A Lightweight PHP Framework for Web & CLI',
@@ -46,7 +46,7 @@ class MainController extends Controller
         ]);
     }
 
-    public function errorAction($params = [])
+    public function errorAction(array $params = []): void
     {
         $this->view->setData([
             'title' => 'Oni - Error Page'
