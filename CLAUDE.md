@@ -6,14 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Oni is a lightweight PHP framework for Web & CLI applications, published as `scarwu/oni` on Packagist. The library code lives in `src/Oni`; `example/` contains reference Web and CLI apps that import the framework via Composer's vendor autoloader.
 
-Active branch `feature/php8` is a PHP 8 modernization pass (uses `mixed` return types, matched argument nullability). `composer.json` still declares `php: >=7.3.0` and pins `phpunit/phpunit: ^7` — these bounds are stale; treat PHP 8.0+ as the real floor.
+`composer.json` requires `php: >=8.4` and `phpunit/phpunit: ^13`. Source uses `mixed` return types and matched argument nullability throughout.
 
 ## Commands
 
 - `./setup.sh` — runs `composer install` (just installs vendor/)
 - Serve the Web example with the built-in PHP server: `php -S localhost:8000 -t example/Web/boot` (the boot directory has an `.htaccess` for Apache)
 - `./example/CLI/boot.php <task> [args] [-options] [--configs]` — runs the CLI example; entry is shebanged `#!/usr/bin/env php`
-- No test suite is committed despite phpunit being in dev-requires; if adding tests, the PHPUnit 7 pin is too old for PHP 8 and will need upgrading first.
+- `./vendor/bin/phpunit` — runs the test suite (`phpunit.xml` at the repo root; `failOnWarning` and `failOnRisky` are on, so warnings and risky tests fail the run). Single file: `./vendor/bin/phpunit tests/Core/LoaderTest.php`. Single test: `./vendor/bin/phpunit --filter testMethodName tests/Core/LoaderTest.php`. Test classes live under the `Oni\Tests\` PSR-4 namespace (`autoload-dev` in composer.json), with fixtures under `tests/fixtures/` (sample tasks, views, static files) referenced by tests via absolute paths.
 
 Commit messages in history follow the form `1. <verb> <subject>`; match that style if committing.
 
