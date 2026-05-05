@@ -8,7 +8,7 @@ A Lightweight PHP Framework for Web & CLI
 
 ### Requirement
 
-* PHP 7.4+
+* PHP 8.4+
 
 ## Installation
 
