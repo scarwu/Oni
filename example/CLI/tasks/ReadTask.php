@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Read Task
  *
@@ -26,9 +27,9 @@ class ReadTask extends Task
         // $this->io->write("What is your name?");
         // $name = $this->io->read();
 
-    	// or
+        // or
 
-        $name = $this->io->ask('What is your name?', function ($value) {
+        $name = $this->io->ask('What is your name?', static function (string $value): bool {
             return '' !== $value;
         });
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * CLI Application
  *
@@ -19,7 +20,7 @@ class App extends Basic
     /**
      * @var array
      */
-    protected $_attr = [
+    protected array $_attr = [
         'router/event/up'       => null,
         'router/event/down'     => null,
         'router/task/default'   => 'main',
@@ -30,9 +31,9 @@ class App extends Basic
     ];
 
     /**
-     * @var object
+     * @var IO
      */
-    protected $io = null;
+    protected IO $io;
 
     /**
      * Construct

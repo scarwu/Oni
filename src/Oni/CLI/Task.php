@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Task
  *
@@ -16,9 +17,9 @@ use Oni\CLI\IO;
 abstract class Task extends Basic
 {
     /**
-     * @var object
+     * @var IO
      */
-    protected $io = null;
+    protected IO $io;
 
     /**
      * Construct

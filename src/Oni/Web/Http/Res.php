@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Response
  *
@@ -13,14 +14,14 @@ namespace Oni\Web\Http;
 class Res
 {
     /**
-     * @var object
+     * @var ?self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * Initialize
      */
-    public static function init(): object
+    public static function init(): self
     {
         if (null === self::$_instance) {
             self::$_instance = new self;

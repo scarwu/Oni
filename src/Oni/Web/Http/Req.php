@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Request
  *
@@ -13,14 +14,14 @@ namespace Oni\Web\Http;
 class Req
 {
     /**
-     * @var object
+     * @var ?self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * Initialize
      */
-    public static function init(): object
+    public static function init(): self
     {
         if (null === self::$_instance) {
             self::$_instance = new self;
@@ -126,7 +127,7 @@ class Req
      */
     public function body(): string
     {
-        return file_get_contents('php://input');
+        return (string) file_get_contents('php://input');
     }
 
     /**
@@ -142,9 +143,9 @@ class Req
     /**
      * Content
      *
-     * @return mixed
+     * @return array<string, mixed>|string|null
      */
-    public function content(): mixed
+    public function content(): array|string|null
     {
         switch ($this->contentType()) {
         case 'application/x-www-form-urlencoded':

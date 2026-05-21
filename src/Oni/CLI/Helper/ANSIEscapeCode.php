@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ANSI Escape Code
  *
@@ -35,7 +36,7 @@ final class ANSIEscapeCode
     /**
      * @var array
      */
-    private static $colorMapping = [
+    private static array $colorMapping = [
         'black'         => [ 'fg' => '30', 'bg' => '40' ],
         'red'           => [ 'fg' => '31', 'bg' => '41' ],
         'green'         => [ 'fg' => '32', 'bg' => '42' ],

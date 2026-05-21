@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Web Application
  *
@@ -19,9 +20,9 @@ use Oni\Web\View;
 class App extends Basic
 {
     /**
-     * @var object
+     * @var array<string, mixed>
      */
-    protected $_attr = [
+    protected array $_attr = [
         'router/event/up'               => null,
         'router/event/down'             => null,
         'router/controller/default'     => 'main',
@@ -45,9 +46,9 @@ class App extends Basic
     ];
 
     /**
-     * @var object
+     * @var array<string, string>
      */
-    protected $_mimeMapping = [
+    protected array $_mimeMapping = [
         'html'  => 'text/html',
         'css'   => 'text/css',
         'js'    => 'text/javascript',
@@ -63,14 +64,14 @@ class App extends Basic
     ];
 
     /**
-     * @var object
+     * @var Req
      */
-    protected $req = null;
+    protected Req $req;
 
     /**
-     * @var object
+     * @var Res
      */
-    protected $res = null;
+    protected Res $res;
 
     /**
      * Construct
@@ -251,7 +252,7 @@ class App extends Basic
             return false;
         }
 
-        $this->res->html(file_get_contents($currentPath));
+        $this->res->html((string) file_get_contents($currentPath));
 
         return true;
     }

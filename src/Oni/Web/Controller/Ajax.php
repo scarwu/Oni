@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Ajax
  *
@@ -19,19 +20,19 @@ abstract class Ajax extends Basic
     /**
      * @var array
      */
-    protected $_attr = [
+    protected array $_attr = [
         'mode' => 'ajax'
     ];
 
     /**
-     * @var object
+     * @var Req
      */
-    protected $req = null;
+    protected Req $req;
 
     /**
-     * @var object
+     * @var Res
      */
-    protected $res = null;
+    protected Res $res;
 
     /**
      * Construct

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Menu Task
  *
@@ -17,7 +18,7 @@ class MenuTask extends Task
     #[\Override]
     public function run(array $params = []): void
     {
-        $count = $this->io->ask('Item counts of menu? [10]', function ($value) {
+        $count = $this->io->ask('Item counts of menu? [10]', static function (string $value): bool {
             return true === (bool) preg_match('/^\d+$/', $value) || '' === $value;
         });
 
@@ -31,7 +32,7 @@ class MenuTask extends Task
             $count = 10;
         }
 
-        $lines = $this->io->ask('Display lines of menu? [3]', function ($value) {
+        $lines = $this->io->ask('Display lines of menu? [3]', static function (string $value): bool {
             return true === (bool) preg_match('/^\d+$/', $value) || '' === $value;
         });
 
@@ -52,7 +53,7 @@ class MenuTask extends Task
         $list = [];
 
         for ($index = 0; $index < $count; $index++) {
-            $list[] = sprintf('[%3d]', $index) . ' ' . md5($index);
+            $list[] = sprintf('[%3d]', $index) . ' ' . md5((string) $index);
         }
 
         $index = $this->io->menuSelector("Select Index", $list, $lines);

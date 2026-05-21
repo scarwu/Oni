@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Api/Rest Controller
  *
@@ -20,7 +21,7 @@ class RestController extends Controller
      * Lifecycle Functions
      */
     #[\Override]
-    public function up(): mixed
+    public function up(): bool
     {
         $this->data = [
             'method' => $this->req->method(),
@@ -41,6 +42,8 @@ class RestController extends Controller
                 'get' => $_GET
             ]
         ];
+
+        return true;
     }
 
     /**

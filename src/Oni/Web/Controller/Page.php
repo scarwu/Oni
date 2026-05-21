@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Page
  *
@@ -20,24 +21,24 @@ abstract class Page extends Basic
     /**
      * @var array
      */
-    protected $_attr = [
+    protected array $_attr = [
         'mode' => 'page'
     ];
 
     /**
-     * @var object
+     * @var Req
      */
-    protected $req = null;
+    protected Req $req;
 
     /**
-     * @var object
+     * @var Res
      */
-    protected $res = null;
+    protected Res $res;
 
     /**
-     * @var object
+     * @var View
      */
-    protected $view = null;
+    protected View $view;
 
     /**
      * Construct

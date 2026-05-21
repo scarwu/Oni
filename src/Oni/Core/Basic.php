@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Basic
  *
@@ -15,7 +16,7 @@ abstract class Basic
     /**
      * @var array
      */
-    protected $_attr = [];
+    protected array $_attr = [];
 
     /**
      * Set Attr

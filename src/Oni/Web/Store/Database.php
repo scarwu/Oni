@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Database Store
  *
@@ -16,9 +17,9 @@ use Oni\Core\Basic;
 class Database extends Basic
 {
     /**
-     * @var object
+     * @var ?PDO
      */
-    private static $_instance = null;
+    private static ?PDO $_instance = null;
 
     /**
      * Construct
@@ -30,7 +31,7 @@ class Database extends Basic
     /**
      * Initialize
      */
-    public static function init(array $config = []): object
+    public static function init(array $config = []): PDO
     {
         if (null === self::$_instance) {
 

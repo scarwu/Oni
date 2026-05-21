@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * View
  *
@@ -11,19 +12,18 @@
 namespace Oni\Web;
 
 use Oni\Core\Basic;
-use Oni\Web\Helper\HTML;
 
 class View extends Basic
 {
     /**
-     * @var object
+     * @var ?self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * Initialize
      */
-    public static function init(): object
+    public static function init(): self
     {
         if (null === self::$_instance) {
             self::$_instance = new self;
@@ -33,9 +33,9 @@ class View extends Basic
     }
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $_attr = [
+    protected array $_attr = [
         'paths' => null,
         'ext' => 'php'
     ];
@@ -48,24 +48,24 @@ class View extends Basic
     private function __construct() {}
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $data = [];
+    private array $data = [];
 
     /**
      * @var string
      */
-    private $indexPath = 'index';
+    private string $indexPath = 'index';
 
     /**
      * @var string
      */
-    private $layoutPath = 'layout';
+    private string $layoutPath = 'layout';
 
     /**
      * @var string
      */
-    private $contentPath = null;
+    private ?string $contentPath = null;
 
     /**
      * Set Data
@@ -160,7 +160,7 @@ class View extends Basic
      *
      * @return string
      */
-    private function loadPartial(string $_targetPath): string
+    private function loadPartial(?string $_targetPath): string
     {
         $_result = '';
 

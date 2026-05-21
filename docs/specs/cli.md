@@ -43,6 +43,10 @@
   - `options`: `-x` 或 `-x value`。
   - `configs`: `--key` 或 `--key=value`。
 - `get*` 不存在時回傳 `null`；`has*` 回傳布林。
+- 型別簽章：
+  - `getArguments(?int $index = null): array|string|null`
+  - `getOptions(?string $key = null): array|string|null`
+  - `getConfigs(?string $key = null): array|string|null`
 
 ### 輸入輸出
 - `read()`: 讀 `STDIN` 並 `trim`。
@@ -53,8 +57,8 @@
 ### `menuSelector()`
 - 互動式選單，使用 `tput` 取得終端尺寸、`readline` callback 與 ANSI 控制碼。
 - 支援方向鍵、PageUp/Down、Home/End、Enter。
-- 回傳被選取 index（0-based）。
-- 注意：當 `options` 為空時程式碼會 `return null`，與宣告 `: int` 不一致。
+- 回傳被選取 index（0-based），簽章為 `?int`。
+- 當 `options` 為空時回傳 `null`。
 
 ## `Oni\CLI\Helper\ANSIEscapeCode`
 - 提供 ANSI 常數、鍵碼常數與游標/顏色函式。

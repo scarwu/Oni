@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Loader
  *
@@ -13,14 +14,14 @@ namespace Oni\Core;
 final class Loader
 {
     /**
-     * @var object
+     * @var ?self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
-     * @var array
+     * @var array<string, list<string>>
      */
-    private static $_namespaceList = [];
+    private static array $_namespaceList = [];
 
     /**
      * Construct

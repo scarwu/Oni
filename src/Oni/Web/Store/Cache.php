@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Cache Store
  *
@@ -16,9 +17,9 @@ use Oni\Core\Basic;
 class Cache extends Basic
 {
     /**
-     * @var object
+     * @var ?Memcached
      */
-    private static $_instance = null;
+    private static ?Memcached $_instance = null;
 
     /**
      * Construct
@@ -30,7 +31,7 @@ class Cache extends Basic
     /**
      * Initialize
      */
-    public static function init(array $config = []): object
+    public static function init(array $config = []): Memcached
     {
         if (null === self::$_instance) {
             self::$_instance = new Memcached();

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Input & Output
  *
@@ -16,24 +17,24 @@ use Oni\CLI\Helper\ANSIEscapeCode as AEC;
 class IO extends Basic
 {
     /**
-     * @var object
+     * @var ?self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * @var array
      */
-    private $_arguments = [];
+    private array $_arguments = [];
 
     /**
      * @var array
      */
-    private $_options = [];
+    private array $_options = [];
 
     /**
      * @var array
      */
-    private $_configs = [];
+    private array $_configs = [];
 
     /**
      * Construct
@@ -95,7 +96,7 @@ class IO extends Basic
     /**
      * Initialize
      */
-    public static function init(): object
+    public static function init(): self
     {
         if (null === self::$_instance) {
             self::$_instance = new self;
@@ -109,9 +110,9 @@ class IO extends Basic
      *
      * @return ?int $index
      *
-     * @return mixed
+     * @return array<string>|string|null
      */
-    public function getArguments(?int $index = null): mixed
+    public function getArguments(?int $index = null): array|string|null
     {
         if (true === is_int($index)) {
             if (true === array_key_exists($index, $this->_arguments)) {
@@ -139,9 +140,9 @@ class IO extends Basic
      *
      * @return string $key
      *
-     * @return mixed
+     * @return array<string, string|null>|string|null
      */
-    public function getOptions(?string $key = null): mixed
+    public function getOptions(?string $key = null): array|string|null
     {
         if (true === is_string($key)) {
             if (true === array_key_exists($key, $this->_options)) {
@@ -175,9 +176,9 @@ class IO extends Basic
      *
      * @return string $key
      *
-     * @return mixed
+     * @return array<string, string|null>|string|null
      */
-    public function getConfigs(?string $key = null): mixed
+    public function getConfigs(?string $key = null): array|string|null
     {
         if (true === is_string($key)) {
             if (true === array_key_exists($key, $this->_configs)) {
@@ -250,7 +251,7 @@ class IO extends Basic
      *
      * @return int
      */
-    public function menuSelector(string $text, array $options, ?int $specifyLimitLines = null): int
+    public function menuSelector(string $text, array $options, ?int $specifyLimitLines = null): ?int
     {
         $totalIndex = count($options);
 

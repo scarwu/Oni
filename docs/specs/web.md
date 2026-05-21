@@ -46,6 +46,7 @@
   - `application/x-www-form-urlencoded`、`multipart/form-data` -> `$_POST`
   - `application/json` -> `json_decode(body, true)`
   - 其他 -> 原始 body 字串
+  - 簽章為 `array|string|null`（JSON 解析失敗時可能為 `null`）
 - 提供 `query()`、`file()`、`isAjax()` 等存取器。
 
 ## `Oni\Web\Http\Res`
