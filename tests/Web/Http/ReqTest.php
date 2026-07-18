@@ -53,4 +53,14 @@ final class ReqTest extends TestCase
 
         self::assertSame('api/rest', Req::init()->uri());
     }
+
+    #[RunInSeparateProcess]
+    public function testSchemeDefaultsToHttpWithoutRequestScheme(): void
+    {
+        $_SERVER = [
+            'REQUEST_METHOD' => 'GET'
+        ];
+
+        self::assertSame('http', Req::init()->scheme());
+    }
 }

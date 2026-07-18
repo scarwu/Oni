@@ -94,7 +94,12 @@ class Req
      */
     public function scheme(): string
     {
-        return strtolower($_SERVER['REQUEST_SCHEME']);
+        if (true === isset($_SERVER['REQUEST_SCHEME'])) {
+            return strtolower($_SERVER['REQUEST_SCHEME']);
+        }
+
+        return (true === isset($_SERVER['HTTPS']) && 'off' !== $_SERVER['HTTPS'])
+            ? 'https' : 'http';
     }
 
     /**
