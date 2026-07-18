@@ -23,3 +23,9 @@ composer require scarwu/oni
 ~~~
 ./setup.sh
 ~~~
+
+### Run Tests
+
+~~~
+vendor/bin/phpunit
+~~~
