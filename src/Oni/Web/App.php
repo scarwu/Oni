@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Oni\Web;
 
+use Exception;
 use Oni\Core\Basic;
 use Oni\Core\Loader;
 use Oni\Web\Http\Req;
@@ -23,26 +24,29 @@ class App extends Basic
      * @var array<string, mixed>
      */
     protected array $_attr = [
+
+        // Required
+        'controller/namespace'          => null,
+        'controller/path'               => null,
+
+        // 'model/namespace'               => null,
+        // 'model/path'                    => null,
+
+        'view/paths'                    => null,
+        'view/ext'                      => 'php',
+
+        'static/paths'                  => null,
+
+        'cache/path'                    => null,
+        'cache/permission'              => 0775, // rwxrwxr-x
+        'cache/time'                    => 300, // 300 sec = 5 min
+
+        // Optional
         'router/event/up'               => null,
         'router/event/down'             => null,
         'router/controller/default'     => 'main',
         'router/action/default'         => 'default',
-        'router/action/error'           => 'error',
-
-        'controller/namespace'          => null,        // Required
-        'controller/path'               => null,        // Required
-
-        // 'model/namespace'               => null,        // Required
-        // 'model/path'                    => null,        // Required
-
-        'view/paths'                    => null,        // Required
-        'view/ext'                      => 'php',
-
-        'static/paths'                  => null,        // Required
-
-        'cache/path'                    => null,        // Required
-        'cache/permission'              => 0775,        // rwxrwxr-x
-        'cache/time'                    => 300          // 300 sec = 5 min
+        'router/action/error'           => 'error'
     ];
 
     /**
@@ -84,29 +88,25 @@ class App extends Basic
 
     /**
      * Up Function
+     *
+     * @return bool
      */
-    private function up(): mixed
+    private function up(): bool
     {
-        // // Register Model Classes
-        // $namespace = $this->getAttr('model/namespace');
-        // $path = $this->getAttr('model/path');
-
-        // if (true === is_string($namespace) && true === is_string($path)) {
-        //     Loader::append($namespace, $path);
-        // }
-
-        // Register Controller Classes & Load
         $namespace = $this->getAttr('controller/namespace');
         $path = $this->getAttr('controller/path');
 
-        if (true === is_string($namespace) && true === is_string($path)) {
-            Loader::append($namespace, $path);
+        if (false === is_string($namespace) || false === is_string($path)) {
+            throw new Exception('oni:exception:namespaceOrPathNotSet');
         }
+
+        // Register Controller Classes & Load
+        Loader::append($namespace, $path);
 
         $upEvent = $this->getAttr('router/event/up');
 
         if (true === is_callable($upEvent)) {
-            return $upEvent();
+            $upEvent();
         }
 
         return true;
@@ -114,14 +114,18 @@ class App extends Basic
 
     /**
      * Down Function
+     *
+     * @return bool
      */
-    private function down(): void
+    private function down(): bool
     {
         $downEvent = $this->getAttr('router/event/down');
 
         if (true === is_callable($downEvent)) {
             $downEvent();
         }
+
+        return true;
     }
 
     /**
@@ -131,30 +135,38 @@ class App extends Basic
      */
     public function run(): bool
     {
-        if (false !== $this->up()) {
-            if ('get' === $this->req->method()) {
+        if (false === $this->up()) {
+            return false;
+        }
 
-                // Load Static File
-                if (true === $this->loadStatic()) {
-                    $this->down();
+        if ('get' === $this->req->method()) {
 
-                    return true;
+            // Load Static File
+            if (true === $this->loadStatic()) {
+                if (false === $this->down()) {
+                    return false;
                 }
-
-                // Load Cache File
-                if (true === $this->loadCache()) {
-                    $this->down();
-
-                    return true;
-                }
-            }
-
-            // Load Controller to Handle
-            if (true === $this->loadController()) {
-                $this->down();
 
                 return true;
             }
+
+            // Load Cache File
+            if (true === $this->loadCache()) {
+                if (false === $this->down()) {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        // Load Controller to Handle
+        if (true === $this->loadController()) {
+            if (false === $this->down()) {
+                return false;
+            }
+
+            return true;
         }
 
         // Not executed anything
@@ -191,7 +203,7 @@ class App extends Basic
             break;
         }
 
-        if (null === $currentPath) {
+        if (false === is_string($currentPath)) {
             return false;
         }
 
@@ -213,8 +225,12 @@ class App extends Basic
         }
 
         // Using Builtin Function to Check MIME Type
-        if (null === $mimeType) {
+        if (false === is_string($mimeType)) {
             $mimeType = mime_content_type($currentPath);
+
+            if (false === is_string($mimeType)) {
+                return false;
+            }
         }
 
         // Set HTTP Header
@@ -294,7 +310,7 @@ class App extends Basic
         $path = $this->getAttr('controller/path');
 
         if (false === is_string($namespace) || false === is_string($path)) {
-            return false;
+            throw new Exception('oni:exception:namespaceOrPathNotSet');
         }
 
         $params = explode('/', $this->req->uri());
@@ -317,7 +333,7 @@ class App extends Basic
         }
 
         // Rewrite Controller
-        if (null === $currentPath) {
+        if (false === is_string($currentPath)) {
             $controllerName = ucfirst($this->getAttr('router/controller/default'));
 
             if (false === file_exists("{$path}/{$controllerName}Controller.php")) {
@@ -344,7 +360,7 @@ class App extends Basic
             }
 
             // Default Handler
-            if (null === $actionName) {
+            if (false === is_string($actionName)) {
                 $actionName = $this->getAttr('router/action/default');
             }
 
@@ -396,19 +412,21 @@ class App extends Basic
                 }
             }
 
-            $instance->down();
+            if (false === $instance->down()) {
+                return false;
+            }
 
             break;
         case 'ajax':
             $actionName = null;
 
             // Custom Handler
-            if (null === $actionName && 0 < count($params)) {
+            if (false === is_string($actionName) && 0 < count($params)) {
                 $actionName = array_shift($params);
             }
 
             // Default Handler
-            if (null === $actionName) {
+            if (false === is_string($actionName)) {
                 $actionName = $this->getAttr('router/action/default');
             }
 
@@ -426,7 +444,9 @@ class App extends Basic
                 $this->res->json($data);
             }
 
-            $instance->down();
+            if (false === $instance->down()) {
+                return false;
+            }
 
             break;
         case 'rest':
@@ -446,7 +466,9 @@ class App extends Basic
                 $this->res->json($result);
             }
 
-            $instance->down();
+            if (false === $instance->down()) {
+                return false;
+            }
 
             break;
         default:

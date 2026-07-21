@@ -15,8 +15,7 @@ use Oni\CLI\Task;
 
 class ColorTask extends Task
 {
-    #[\Override]
-    public function run(array $params = []): void
+    public function run(array $params = []): bool
     {
         // Text Colors Only
         $this->io->write('X', 'black');
@@ -80,5 +79,7 @@ class ColorTask extends Task
         $this->io->write('X', 'brightWhite',    'black');
 
         $this->io->writeln();
+
+        return true;
     }
 }

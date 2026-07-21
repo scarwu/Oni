@@ -15,8 +15,7 @@ use Oni\CLI\Task;
 
 class MenuTask extends Task
 {
-    #[\Override]
-    public function run(array $params = []): void
+    public function run(array $params = []): bool
     {
         $count = $this->io->ask('Item counts of menu? [10]', static function (string $value): bool {
             return true === (bool) preg_match('/^\d+$/', $value) || '' === $value;
@@ -59,5 +58,7 @@ class MenuTask extends Task
         $index = $this->io->menuSelector("Select Index", $list, $lines);
 
         $this->io->log("You selected index is {$index}!");
+
+        return true;
     }
 }

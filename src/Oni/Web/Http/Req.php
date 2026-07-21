@@ -148,9 +148,9 @@ class Req
     /**
      * Content
      *
-     * @return array<string, mixed>|string|null
+     * @return mixed
      */
-    public function content(): array|string|null
+    public function content(): mixed
     {
         switch ($this->contentType()) {
         case 'application/x-www-form-urlencoded':

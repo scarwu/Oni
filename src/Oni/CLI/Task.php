@@ -30,26 +30,31 @@ abstract class Task extends Basic
     }
 
     /**
-     * Up
+     * Up: Execute before run
      *
-     * Execute before run
+     * @return bool
      */
-    public function up(): mixed
+    public function up(): bool
     {
         return true;
     }
 
     /**
-     * Down
+     * Down: Execute after run
      *
-     * Execute after run
+     * @return bool
      */
-    public function down(): void {}
+    public function down(): bool
+    {
+        return true;
+    }
 
     /**
-     * Run
+     * Run: Execute the task
      *
      * @param array $params
+     *
+     * @return bool
      */
-    abstract public function run(array $params = []): void;
+    abstract public function run(array $params = []): bool;
 }

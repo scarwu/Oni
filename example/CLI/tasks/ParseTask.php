@@ -15,8 +15,7 @@ use Oni\CLI\Task;
 
 class ParseTask extends Task
 {
-    #[\Override]
-    public function run(array $params = []): void
+    public function run(array $params = []): bool
     {
         if (0 !== count($params)) {
             $this->io->debug('Params:');
@@ -37,5 +36,7 @@ class ParseTask extends Task
             $this->io->debug('Configs:');
             var_dump($this->io->getConfigs());
         }
+
+        return true;
     }
 }

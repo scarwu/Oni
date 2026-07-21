@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Oni\CLI;
 
+use Exception;
 use Oni\Core\Basic;
 use Oni\Core\Loader;
 use Oni\CLI\IO;
@@ -21,13 +22,15 @@ class App extends Basic
      * @var array
      */
     protected array $_attr = [
+        // Required
+        'task/namespace'        => null,
+        'task/path'             => null,
+
+        // Optional
         'router/event/up'       => null,
         'router/event/down'     => null,
         'router/task/default'   => 'main',
-        // 'router/task/error'     => 'main',
-
-        'task/namespace'        => null,    // Required
-        'task/path'             => null    // Required
+        'router/task/error'     => 'error'
     ];
 
     /**
@@ -45,21 +48,25 @@ class App extends Basic
 
     /**
      * Up Function
+     *
+     * @return bool
      */
-    private function up(): mixed
+    private function up(): bool
     {
-        // Register Task Classes & Load
         $namespace = $this->getAttr('task/namespace');
         $path = $this->getAttr('task/path');
 
-        if (true === is_string($namespace) && true === is_string($path)) {
-            Loader::append($namespace, $path);
+        if (false === is_string($namespace) || false === is_string($path)) {
+            throw new Exception('oni:exception:namespaceOrPathNotSet');
         }
+
+        // Register Task Classes & Load
+        Loader::append($namespace, $path);
 
         $upEvent = $this->getAttr('router/event/up');
 
         if (true === is_callable($upEvent)) {
-            return $upEvent();
+            $upEvent();
         }
 
         return true;
@@ -67,32 +74,40 @@ class App extends Basic
 
     /**
      * Down Function
+     *
+     * @return bool
      */
-    private function down(): void
+    private function down(): bool
     {
         $downEvent = $this->getAttr('router/event/down');
 
         if (true === is_callable($downEvent)) {
             $downEvent();
         }
+
+        return true;
     }
 
     /**
      * Run
+     *
+     * @return bool
      */
     public function run(): bool
     {
-        if (false !== $this->up()) {
-
-            // Load Task to Handle
-            if (true === $this->loadTask()) {
-                $this->down();
-
-                return true;
-            }
+        if (false === $this->up()) {
+            return false;
         }
 
-        return false;
+        if (false === $this->loadTask()) {
+            return false;
+        }
+
+        if (false === $this->down()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -106,7 +121,7 @@ class App extends Basic
         $path = $this->getAttr('task/path');
 
         if (false === is_string($namespace) || false === is_string($path)) {
-            return false;
+            throw new Exception('oni:exception:namespaceOrPathNotSet');
         }
 
         $params = $this->io->getArguments();
@@ -114,7 +129,7 @@ class App extends Basic
 
         while (0 < count($params)) {
             $tempPath = ucfirst($params[0]);
-            $tempPath = (null !== $currentPath) ? "{$currentPath}/{$tempPath}" : $tempPath;
+            $tempPath = (true === is_string($currentPath)) ? "{$currentPath}/{$tempPath}" : $tempPath;
 
             if (false === file_exists("{$path}/{$tempPath}")
                 && false === file_exists("{$path}/{$tempPath}Task.php")
@@ -128,10 +143,14 @@ class App extends Basic
         }
 
         // Rewrite Task
-        if (null === $currentPath) {
+        if (false === is_string($currentPath)) {
             $taskName = ucfirst($this->getAttr('router/task/default'));
 
-            if (false === file_exists("{$path}/{$taskName}Task.php")) {
+            if (false === is_string($taskName) || false === file_exists("{$path}/{$taskName}Task.php")) {
+                $taskName = ucfirst($this->getAttr('router/task/error'));
+            }
+
+            if (false === is_string($taskName) || false === file_exists("{$path}/{$taskName}Task.php")) {
                 return false;
             }
 
@@ -144,11 +163,17 @@ class App extends Basic
         $instance = new $className();
 
         // Task Flow
-        if (false !== $instance->up()) {
-            $instance->run($params);
+        if (false === $instance->up()) {
+            return false;
         }
 
-        $instance->down();
+        if (false === $instance->run($params)) {
+            return false;
+        }
+
+        if (false === $instance->down()) {
+            return false;
+        }
 
         return true;
     }

@@ -44,19 +44,22 @@ abstract class Ajax extends Basic
     }
 
     /**
-     * Up Function
+     * Up: Execute before xxxAction
      *
-     * Execute before xxxAction
+     * @return bool
      */
-    public function up(): mixed
+    public function up(): bool
     {
         return true;
     }
 
     /**
-     * Down Function
+     * Down: Execute after xxxAction
      *
-     * Execute after xxxAction
+     * @return bool
      */
-    public function down(): void {}
+    public function down(): bool
+    {
+        return true;
+    }
 }

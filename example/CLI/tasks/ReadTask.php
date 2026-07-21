@@ -15,8 +15,7 @@ use Oni\CLI\Task;
 
 class ReadTask extends Task
 {
-    #[\Override]
-    public function run(array $params = []): void
+    public function run(array $params = []): bool
     {
         $gender = $this->io->menuSelector('What is your gender?', [
             'male',
@@ -38,5 +37,7 @@ class ReadTask extends Task
         } else {
             $this->io->log("Hi, Ms.{$name}!");
         }
+
+        return true;
     }
 }

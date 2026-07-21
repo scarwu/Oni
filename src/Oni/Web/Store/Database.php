@@ -33,15 +33,15 @@ class Database extends Basic
      */
     public static function init(array $config = []): PDO
     {
-        if (null === self::$_instance) {
+        if (false === isset(self::$_instance)) {
 
             // config: host, port, name, user, pass
-            $conn = new PDO("mysql:host={$config['host']};port={$config['port']};dbname={$config['name']}", $config['user'], $config['pass']);
-            $conn->query("SET NAMES 'utf8'");
-            $conn->query("SET CHARACTER_SET_CLIENT=utf8");
-            $conn->query("SET CHARACTER_SET_RESULTS=utf8");
+            $connection = new PDO("mysql:host={$config['host']};port={$config['port']};dbname={$config['name']}", $config['user'], $config['pass']);
+            $connection->query("SET NAMES 'utf8'");
+            $connection->query("SET CHARACTER_SET_CLIENT=utf8");
+            $connection->query("SET CHARACTER_SET_RESULTS=utf8");
 
-            self::$_instance = $conn;
+            self::$_instance = $connection;
         }
 
         return self::$_instance;
