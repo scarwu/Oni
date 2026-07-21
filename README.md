@@ -2,8 +2,6 @@
 
 A lightweight PHP framework for Web and CLI applications.
 
-[![Build Status](https://travis-ci.org/scarwu/Oni.png?branch=master)](https://travis-ci.org/scarwu/Oni)
-
 ## Requirements
 
 - PHP 8.4+
@@ -27,7 +25,6 @@ For local development:
 src/Oni/Core     Shared base class and namespace loader
 src/Oni/Web      Web app, controllers, request/response, views, stores
 src/Oni/CLI      CLI app, task base class, IO, ANSI helpers
-example/Web      Example web application
 example/CLI      Example CLI application
 tests            PHPUnit test suite and fixtures
 docs/specs       Current behavior specifications
@@ -39,7 +36,7 @@ Oni has two application stacks that share `Oni\Core`:
 
 - `Oni\Web\App` handles HTTP requests, static files, cached pages, controller dispatch, and view rendering.
 - `Oni\CLI\App` handles command-line task routing and task lifecycle execution.
-- `Oni\Core\Loader` registers application namespaces to filesystem paths.
+- `Oni\Core\Loader` registers application namespaces to filesystem paths via `Loader::append($namespace, $path)`.
 - `Oni\Core\Basic` provides the shared `setAttr()` / `getAttr()` configuration container.
 
 ## Web Applications
@@ -63,6 +60,13 @@ $app->setAttr('cache/path', "{$root}/caches");
 $app->run();
 ```
 
+Optional lifecycle hooks run before and after each request:
+
+```php
+$app->setAttr('router/event/up',   function() { /* before dispatch */ });
+$app->setAttr('router/event/down', function() { /* after dispatch  */ });
+```
+
 Controllers are named `{Name}Controller` and actions are named `{action}Action`.
 
 Supported controller modes:
@@ -71,11 +75,19 @@ Supported controller modes:
 - `Ajax`: returns action data as JSON.
 - `Rest`: maps HTTP methods to actions such as `getAction()` and `postAction()`.
 
-Run the web example:
+### View
 
-```sh
-php -S localhost:8000 -t example/Web/boot
-```
+`Oni\Web\View` is a singleton injected by `Web\App` into Page controllers. Key methods:
+
+- `setData(array $data)` — exposes variables to view templates.
+- `setIndexPath(string $path)` — overrides the default `index` template path.
+- `setLayoutPath(string $path)` — sets the layout template path.
+- `setContentPath(string $path)` — sets the content partial path.
+- `render()` — renders and returns the output as a string.
+
+### Model
+
+`Oni\Web\Model` is a thin base class that extends `Oni\Core\Basic`, providing the `setAttr()` / `getAttr()` configuration container for application models.
 
 ## CLI Applications
 
@@ -105,17 +117,45 @@ Task lifecycle:
 up() -> run($params) -> down()
 ```
 
-`Oni\CLI\IO` parses command input into:
-
-- `arguments`: positional values
-- `options`: short options such as `-x` or `-x value`
-- `configs`: long configs such as `--key` or `--key=value`
-
 Run the CLI example:
 
 ```sh
 php example/CLI/boot.php Help
 ```
+
+### IO
+
+`Oni\CLI\IO` is a singleton that parses command input and provides output helpers.
+
+**Input parsing** splits `$argv` into three buckets:
+
+- `arguments`: positional values
+- `options`: short flags such as `-x` or `-x value`
+- `configs`: long options such as `--key` or `--key=value`
+
+Access methods: `getArguments()`, `getOptions()`, `getConfigs()` and their `has*` counterparts.
+
+**Output helpers:**
+
+```php
+$io->write($text, $fgColor, $bgColor);   // write without newline
+$io->writeln($text, $fgColor, $bgColor); // write with newline
+$io->error($text);    // red
+$io->warning($text);  // yellow
+$io->notice($text);   // green
+$io->info($text);     // bright black (dim)
+$io->debug($text);    // white
+$io->log($text);      // plain
+```
+
+**Interactive methods:**
+
+- `ask(string $text, ?callable $callback)` — prompts the user, repeating until the callback returns `true`.
+- `menuSelector(string $text, array $options)` — interactive arrow-key menu; returns the selected index (0-based) or `null` for an empty list.
+
+### ANSIEscapeCode
+
+`Oni\CLI\Helper\ANSIEscapeCode` provides ANSI escape code constants and helpers for cursor movement, color output (`color()`), and cursor visibility (`cursorShow()` / `cursorHide()`).
 
 ## Testing
 
